@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import GuestLayout from "@/layouts/guest-layout";
 import DemoPage from "@/components/demo";
 
+
 export const router = createBrowserRouter([
   {
     path: "/",
