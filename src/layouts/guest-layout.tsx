@@ -5,7 +5,7 @@ import { Footer } from "@/components/footer/footer";
 export default function GuestLayout() {
   return (
     <div className="flex min-h-screen flex-col">
-      <Navbar isLoggedIn={true} />
+      <Navbar isLoggedIn={false} />
       {/*  Main content area */}
       <main className="flex-1">
         <Outlet />
