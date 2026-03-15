@@ -1,28 +1,58 @@
 import { createBrowserRouter } from "react-router-dom";
 import GuestLayout from "@/layouts/guest-layout";
-import DemoPage from "@/components/demo";
-
-
+import DashboardLayout from "@/layouts/dashboard-layout";
+import ProtectedRoute from "@/features/auth/components/protected-route";
+import Home from "./pages/Home";
+import AnnouncementPage from "@/pages/website/announcement-page";
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <GuestLayout />,
     children: [
+      /** Public Routes */
       {
-        path: "/ui",
-        element: <DemoPage />,
+        path: "/",
+        element: <GuestLayout />,
+        children: [
+          {
+            index: true,
+            element: <Home />,
+          },
+          {
+            path: "announcements",
+            element: <AnnouncementPage/>,
+          },
+        ],
       },
+
+      /** User Dashboard */
       {
-        index: true, // home
+        path: "/dashboard",
+        element: (
+          <ProtectedRoute allowed={["user"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <div>User Dashboard</div>,
+          },
+        ],
       },
+
+      /** Admin Dashboard */
       {
-        path: "/announcements", // announcements
-      },
-      {
-        path: "/login", // login
-      },
-      {
-        path: "/register", // register
+        path: "/admin",
+        element: (
+          <ProtectedRoute allowed={["admin", "staff"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <div>Admin Dashboard</div>,
+          },
+        ],
       },
     ],
   },

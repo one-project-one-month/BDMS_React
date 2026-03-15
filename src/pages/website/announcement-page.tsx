@@ -1,6 +1,6 @@
 import { useState } from "react";
-import FilterBar from "../components/Filter-bar";
-import Card from "../components/Card";
+import FilterBar from "../../components/Filter-bar";
+import Card from "../../components/Card";
 import Container from "@/components/container";
 import Section from "@/components/section";
 
@@ -17,7 +17,7 @@ export type CardData = {
 };
 
 export default function Home() {
-  const [category, setCategory] = useState < CardType | "all">("all");
+  const [category, setCategory] = useState<CardType | "all">("all");
 
   const cards: CardData[] = [
     {
@@ -53,18 +53,18 @@ export default function Home() {
     category === "all" ? cards : cards.filter((card) => card.type === category);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+  <Container>
+    <Section>
+          <div className="max-w-7xl mx-auto space-y-6">
       <FilterBar category={category} setCategory={setCategory} />
 
-       <Container>
-        <Section>
-          <div className="space-y-6">
+      <div className="space-y-6">
         {filteredCards.map((card) => (
           <Card key={card.id} {...card} />
         ))}
       </div>
-        </Section>
-       </Container>
     </div>
+    </Section>
+  </Container>
   );
 }

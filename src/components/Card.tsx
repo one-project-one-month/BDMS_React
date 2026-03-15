@@ -1,61 +1,55 @@
-import {
-  ExclamationTriangleIcon,
-}from "@heroicons/react/24/outline";
+import { Typography } from "./ui/typography";
+
+type CardType = "emergency" | "news" | "awareness";
 
 type CardProps = {
   title: string;
-  description: string;
-  emergencyButton: string;
-  category: string;
-  time: string;
+  content: string;
   image: string;
+  type: CardType;
+  isActive: boolean;
 };
 
-function Card({ title, description, time, image,emergencyButton, category }: CardProps) {
+function Card({ title, content, image, type }: CardProps) {
   return (
-
-    <div className="bg-white max-w-5xl shadow-md rounded-md flex flex-col md:flex-row overflow-hidden">
-
-      {/* TEXT AREA */}
-      <div className="md:w-2/3 p-8">
-       <h3
-        className={`text-lg font-semibold ${
-          title.includes("Urgent")
-            ? "text-red-500"
-            : "text-dark-primary"
-        }`} >
-        {title}
-         </h3>
-
-        <p className={`my-3 ${description.includes('We urgently need B+ blood donors. A patient in critical condition requires immediate transfusion. Please contact us if you can donate') ? "text-rose-500" : "text-dark-primary"}`}>
-        {description}
-        </p>
-
-        <button className={`bg-red-500 text-white font-semibold px-4 flex py-3 rounded-md ${category.includes('emergency') ? "block" : "hidden"}`}><ExclamationTriangleIcon className="w-6 h-6 mx-1" />
-        <a href="#"> {emergencyButton}</a>
-       </button>
-        
-        <div className={`mt-6 ${time.includes('7 hours ago') ? "text-red-600" : "text-dark-primary"}`}>
-          {time}
-        </div>
-         
-      </div>
+    <div className="bg-white max-w-5xl shadow-lg shadow-rose-300 rounded-md flex flex-col md:flex-row overflow-hidden border border-gray-100 mx-auto">
       
-     {/* BORDER */}
-    <div className="hidden md:block w-1 h-[130px] bg-red-500 self-center"></div>
+      {/* TEXT AREA */}
+      <div className="w-full md:flex-1 pt-16 pb-6 px-8 flex flex-col">
+        
+        <Typography className={`text-xl font-bold ${type === "emergency" ? "text-primary" : "text-dark-primary"}`}>
+          {title}
+        </Typography>
+
+        <Typography className={`my-3 leading-relaxed ${type === "emergency" ? "text-primary" : "text-dark-primary"}`}>
+          {content}
+        </Typography>
+
+        {type === "emergency" && (
+          <button className="bg-red-500 text-white font-semibold px-6 py-2 rounded-md w-fit mt-4 shadow-sm active:scale-95 transition-transform">
+          <div className="flex items-center gap-2">
+          <img src={'/assets/emergencyIcon.svg'} alt="" />
+          <a href="#">
+          Emergency
+          </a>
+          </div>
+          </button>
+        )}
+      </div>
+
+      {/* BORDER */}
+      <div className="hidden md:block w-[3px] h-32.5 bg-primary self-center shrink-0 md:mx-20"></div>
 
       {/* IMAGE AREA */}
-      <div className="w-full md:w-1/3 flex items-center justify-center p-6">
+      <div className="w-full md:flex-1 flex items-center justify-center p-6">
         <img
-          src={image}
-          className="w-full md:max-h-40 object-contain"
+          src={image} 
+          alt={title} 
+          className="w-full h-48 md:h-64 object-cover rounded-lg shadow-inner" 
         />
-
       </div>
 
     </div>
-
   );
 }
-
 export default Card;
