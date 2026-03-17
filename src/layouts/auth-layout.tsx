@@ -7,7 +7,7 @@ export default function AuthLayout() {
   const { user, isAuthenticated } = useAuth();
 
   if (isAuthenticated && user) {
-    if (user.role === "admin" || user.role === "staff") {
+    if (user.roleName === "admin" || user.roleName === "staff") {
       return <Navigate to="/admin" replace />;
     }
 

@@ -1,8 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import * as z from "zod";
+import { isAxiosError } from "axios";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -54,31 +54,30 @@ export default function RegisterForm() {
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
-      const user = await registerMutation.mutateAsync({
+      const session = await registerMutation.mutateAsync({
         userName: data.userName,
         email: data.email,
         password: data.password,
         passwordConfirmation: data.passwordConfirmation,
       });
 
-      queryClient.setQueryData(authKeys.me(), user);
-
-      toast.success("Account created successfully!", {
-        position: "bottom-right",
-      });
+      queryClient.setQueryData(authKeys.me(), session);
 
       form.reset();
       const destination =
-        user.role === "admin" || user.role === "staff"
+        session.userInfo.roleName === "admin" ||
+        session.userInfo.roleName === "staff"
           ? "/admin"
           : "/dashboard";
 
       navigate(destination);
     } catch (error) {
       console.error(error);
-      toast.error("Registration failed", {
-        position: "bottom-right",
-      });
+      const message = isAxiosError(error)
+        ? ((error.response?.data as { message?: string })?.message ??
+          "Registration failed")
+        : "Registration failed";
+      form.setError("root", { message });
     }
   }
 
@@ -221,6 +220,11 @@ export default function RegisterForm() {
                 </Field>
               )}
             />
+            {form.formState.errors.root && (
+              <Field>
+                <FieldError errors={[form.formState.errors.root]} />
+              </Field>
+            )}
           </FieldGroup>
         </form>
       </CardContent>
@@ -239,6 +243,7 @@ export default function RegisterForm() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="size-5"
+              aria-hidden="true"
             >
               <path
                 d="M5.5 5.7619C6.775 5.7619 7.80769 4.69643 7.80769 3.38095C7.80769 2.06548 6.775 1 5.5 1C4.225 1 3.19231 2.06548 3.19231 3.38095C3.19231 4.69643 4.225 5.7619 5.5 5.7619ZM4.92885 6.87302C3.03462 6.87302 1.5 8.45635 1.5 10.4107C1.5 10.7361 1.75577 11 2.07115 11H8.92885C9.24423 11 9.5 10.7361 9.5 10.4107C9.5 8.45635 7.96538 6.87302 6.07115 6.87302H4.92885Z"

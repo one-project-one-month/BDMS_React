@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { Link, useNavigate } from "react-router-dom";
 import * as z from "zod";
+import { isAxiosError } from "axios";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -51,28 +51,28 @@ export default function LoginForm() {
     try {
       setIsSubmitting(true);
 
-      const loggedUser = await login({
+      const session = await login({
         email: data.email,
         password: data.password,
         rememberMe: data.rememberMe ?? false,
       });
 
-      toast.success("Logged in successfully", {
-        position: "bottom-right",
-      });
       form.reset();
 
       const destination =
-        loggedUser.role === "admin" || loggedUser.role === "staff"
+        session.userInfo.roleName === "admin" ||
+        session.userInfo.roleName === "staff"
           ? "/admin"
           : "/dashboard";
 
       navigate(destination);
     } catch (error) {
       console.error(error);
-      toast.error("Invalid email or password", {
-        position: "bottom-right",
-      });
+      const message = isAxiosError(error)
+        ? ((error.response?.data as { message?: string })?.message ??
+          "Invalid email or password")
+        : "Invalid email or password";
+      form.setError("root", { message });
     } finally {
       setIsSubmitting(false);
     }
@@ -182,6 +182,11 @@ export default function LoginForm() {
                 </Field>
               )}
             />
+            {form.formState.errors.root && (
+              <Field>
+                <FieldError errors={[form.formState.errors.root]} />
+              </Field>
+            )}
           </FieldGroup>
         </form>
       </CardContent>
@@ -200,6 +205,7 @@ export default function LoginForm() {
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
               className="size-5"
+              aria-hidden="true"
             >
               <path
                 d="M13 5H15C15.5531 5 16 5.44688 16 6V14C16 14.5531 15.5531 15 15 15H13C12.4469 15 12 15.4469 12 16C12 16.5531 12.4469 17 13 17H15C16.6562 17 18 15.6562 18 14V6C18 4.34375 16.6562 3 15 3H13C12.4469 3 12 3.44687 12 4C12 4.55313 12.4469 5 13 5ZM12.7063 10.7063C13.0969 10.3156 13.0969 9.68125 12.7063 9.29062L8.70625 5.29063C8.31563 4.9 7.68125 4.9 7.29063 5.29063C6.9 5.68125 6.9 6.31563 7.29063 6.70625L9.58438 9H3C2.44687 9 2 9.44688 2 10C2 10.5531 2.44687 11 3 11H9.58438L7.29063 13.2937C6.9 13.6844 6.9 14.3188 7.29063 14.7094C7.68125 15.1 8.31563 15.1 8.70625 14.7094L12.7063 10.7094V10.7063Z"

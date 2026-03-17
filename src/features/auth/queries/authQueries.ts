@@ -1,21 +1,21 @@
 import { queryOptions, mutationOptions } from "@tanstack/react-query";
-import { getCurrentUser, login, logout, register } from "../api/api";
-import type { UserProfile } from "../auth.types";
+import { getCurrentSession, login, logout, register } from "../api/api";
+import type { AuthSession } from "../auth.types";
 import { authKeys } from "./authKeys";
 
 /**
  * Query: current authenticated user.
  */
-export const currentUserQueryOptions = queryOptions<UserProfile | null>({
+export const currentUserQueryOptions = queryOptions<AuthSession | null>({
     queryKey: authKeys.me(),
-    queryFn: getCurrentUser,
+    queryFn: getCurrentSession,
 });
 
 /**
  * Mutation: register new user.
  */
 export const registerMutationOptions = mutationOptions<
-    UserProfile,
+    AuthSession,
     unknown,
     Parameters<typeof register>[0]
 >({
@@ -26,7 +26,7 @@ export const registerMutationOptions = mutationOptions<
  * Mutation: login user.
  */
 export const loginMutationOptions = mutationOptions<
-    UserProfile,
+    AuthSession,
     unknown,
     Parameters<typeof login>[0]
 >({

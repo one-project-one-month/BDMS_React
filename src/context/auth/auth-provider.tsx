@@ -1,4 +1,9 @@
-import { useCallback, useMemo, type PropsWithChildren } from "react";
+import {
+  useCallback,
+  useLayoutEffect,
+  useMemo,
+  type PropsWithChildren,
+} from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { AuthContext, type AuthContextType } from "./auth-context";
 import {
@@ -8,11 +13,12 @@ import {
   logoutMutationOptions,
 } from "@/features/auth/queries";
 import type { LoginPayload } from "@/features/auth/auth.types";
+import api from "@/api/axios-client";
 
 export default function AuthProvider({ children }: PropsWithChildren) {
   const queryClient = useQueryClient();
 
-  const { data: user, isPending } = useQuery({
+  const { data: session, isPending } = useQuery({
     ...currentUserQueryOptions,
     retry: false,
     staleTime: 5 * 60 * 1000,
@@ -20,9 +26,6 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
   const loginMutation = useMutation({
     ...loginMutationOptions,
-    onSuccess: (user) => {
-      queryClient.setQueryData(authKeys.me(), user);
-    },
   });
 
   const logoutMutation = useMutation({
@@ -34,25 +37,37 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
   const login = useCallback(
     async (credentials: LoginPayload) => {
-      return await loginMutation.mutateAsync(credentials);
+      const session = await loginMutation.mutateAsync(credentials);
+      queryClient.setQueryData(authKeys.me(), session);
+      return session;
     },
-    [loginMutation],
+    [loginMutation, queryClient],
   );
 
   const logout = useCallback(async () => {
     await logoutMutation.mutateAsync();
   }, [logoutMutation]);
 
+  const user = session?.userInfo ?? null;
+
   const value: AuthContextType = useMemo(
     () => ({
-      user: user ?? null,
+      user,
       isAuthenticated: !!user,
-      isInitializing: isPending && user === undefined,
+      isInitializing: isPending && session === undefined,
       login,
       logout,
     }),
-    [user, isPending, login, logout],
+    [user, isPending, session, login, logout],
   );
+
+  useLayoutEffect(() => {
+    if (session?.token) {
+      api.defaults.headers.common.Authorization = `Bearer ${session.token}`;
+    } else {
+      delete api.defaults.headers.common.Authorization;
+    }
+  }, [session?.token]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

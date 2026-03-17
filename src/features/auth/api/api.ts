@@ -2,9 +2,9 @@ import api from "@/api/axios-client";
 import { AUTH_ENDPOINTS } from "@/api/endpoints/auth.endpoints";
 import type {
     ApiResponse,
+    AuthSession,
     LoginPayload,
     RegisterPayload,
-    UserProfile,
 } from "@/features/auth/auth.types";
 import { isAxiosError } from "axios";
 
@@ -12,15 +12,19 @@ import { isAxiosError } from "axios";
  * Register a new user.
  *
  * Sends registration data to the backend and returns
- * the API response containing the created user profile.
+ * the API response containing the user profile and token.
  */
 export const register = async (
     payload: RegisterPayload,
-): Promise<UserProfile> => {
-    const { data } = await api.post<ApiResponse<UserProfile>>(
+): Promise<AuthSession> => {
+    const { data } = await api.post<ApiResponse<AuthSession>>(
         AUTH_ENDPOINTS.REGISTER,
         payload,
     );
+
+    if (!data.isSuccess || data.isError) {
+        throw new Error(data.message || "Registration failed");
+    }
 
     return data.data;
 };
@@ -28,16 +32,20 @@ export const register = async (
 /**
  * Login a user.
  *
- * The backend will create an HTTP-only cookie session.
- * Returns the authenticated user's profile.
+ * Returns the authenticated user's session info
+ * (profile + token).
  */
 export const login = async (
     payload: LoginPayload,
-): Promise<UserProfile> => {
-    const { data } = await api.post<ApiResponse<UserProfile>>(
+): Promise<AuthSession> => {
+    const { data } = await api.post<ApiResponse<AuthSession>>(
         AUTH_ENDPOINTS.LOGIN,
         payload,
     );
+
+    if (!data.isSuccess || data.isError) {
+        throw new Error(data.message || "Login failed");
+    }
 
     return data.data;
 };
@@ -54,14 +62,19 @@ export const logout = async (): Promise<void> => {
 /**
  * Fetch the currently authenticated user.
  *
- * Uses the session cookie automatically sent by the browser
- * to retrieve the user's profile from the backend.
+ * Uses the stored token (if available) to retrieve the user's profile
+ * from the backend.
  */
-export const getCurrentUser = async (): Promise<UserProfile | null> => {
+export const getCurrentSession = async (): Promise<AuthSession | null> => {
     try {
-        const { data } = await api.get<ApiResponse<UserProfile>>(
+        const { data } = await api.get<ApiResponse<AuthSession>>(
             AUTH_ENDPOINTS.PROFILE,
         );
+
+        if (!data.isSuccess || data.isError) {
+            return null;
+        }
+
         return data.data;
     } catch (error) {
         if (isAxiosError(error) && error.response?.status === 401) {
