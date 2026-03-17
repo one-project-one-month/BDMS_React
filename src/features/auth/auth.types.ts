@@ -11,18 +11,25 @@ export interface RegisterPayload {
     passwordConfirmation: string;
 }
 
-// TODO: Fix with database User structure
 export interface UserProfile {
-    name?: string;
-    email?: string;
-    role?: Role;
+    userId: number;
+    userName: string;
+    email: string;
+    roleName: Role;
+    permissions: string[];
 }
 
 export type Role = "admin" | "staff" | "user";
 
 export interface ApiResponse<T> {
-    success: number;
-    code: number;
+    isSuccess: boolean;
+    isError: boolean;
     data: T;
     message: string;
+}
+
+export interface AuthSession {
+    userInfo: UserProfile;
+    token: string;
+    expireToken: string;
 }
