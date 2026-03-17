@@ -1,29 +1,45 @@
 import { createBrowserRouter } from "react-router-dom";
+
 import GuestLayout from "@/layouts/guest-layout";
 import DashboardLayout from "@/layouts/dashboard-layout";
+
+import ForbiddenPage from "@/pages/forbidden-page";
+import NotFoundPage from "@/pages/not-found-page";
+import ErrorPage from "@/pages/error-page";
+
+import DemoPage from "@/components/demo";
 import ProtectedRoute from "@/features/auth/components/protected-route";
-import Home from "./pages/Home";
-import AnnouncementPage from "@/pages/website/announcement-page";
+import { authRoutes } from "@/features/auth/auth.routes";
+
 export const router = createBrowserRouter([
   {
+    errorElement: <ErrorPage />,
     children: [
-      /** Public Routes */
+      /** public routes */
       {
         path: "/",
         element: <GuestLayout />,
         children: [
           {
             index: true,
-            element: <Home />,
+            element: <div>Home</div>,
+          },
+          {
+            // TODO: remove this in production
+            path: "ui",
+            element: <DemoPage />,
           },
           {
             path: "announcements",
-            element: <AnnouncementPage/>,
+            element: <div>Announcements</div>,
           },
         ],
       },
 
-      /** User Dashboard */
+      /** auth routes */
+      authRoutes,
+
+      /** user dashboard */
       {
         path: "/dashboard",
         element: (
@@ -34,12 +50,12 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <div>User Dashboard</div>,
+            element: <div>Client Dashboard Page</div>,
           },
         ],
       },
 
-      /** Admin Dashboard */
+      /** admin / staff dashboard */
       {
         path: "/admin",
         element: (
@@ -50,9 +66,21 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <div>Admin Dashboard</div>,
+            element: <div>Admin Dashboard Page</div>,
           },
         ],
+      },
+
+      /** forbidden */
+      {
+        path: "unauthorized",
+        element: <ForbiddenPage />,
+      },
+
+      /** 404 */
+      {
+        path: "*",
+        element: <NotFoundPage />,
       },
     ],
   },
