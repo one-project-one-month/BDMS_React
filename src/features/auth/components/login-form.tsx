@@ -33,7 +33,11 @@ const formSchema = z.object({
   rememberMe: z.boolean().optional(),
 });
 
-export default function LoginForm() {
+type LoginFormProps = {
+  mode: "admin" | "user";
+};
+
+export default function LoginForm({ mode }: LoginFormProps) {
   const { login } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -55,6 +59,11 @@ export default function LoginForm() {
         email: data.email,
         password: data.password,
         rememberMe: data.rememberMe ?? false,
+        mode,
+        /**
+         * * NOTE: backend ဆရာသမားများက Auth အတွက် api နှစ်ခု ထုတ်ပေးလိုက်သည့်အတွက်
+         * * admin auth နဲ့ user auth ဖြစ်စေရန် mode('user' | 'admin') သုံးထားပါသည်။
+         */
       });
 
       form.reset();

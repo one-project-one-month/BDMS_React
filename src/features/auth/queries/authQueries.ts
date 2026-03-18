@@ -37,6 +37,10 @@ export const loginMutationOptions = mutationOptions<
 /**
  * Mutation: logout user.
  */
-export const logoutMutationOptions = mutationOptions({
+export const logoutMutationOptions = mutationOptions<
+    void,
+    unknown,
+    Parameters<typeof logout>[0]
+>({
     mutationFn: logout,
 });

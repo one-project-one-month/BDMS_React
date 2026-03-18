@@ -1,7 +1,7 @@
 import axios, { type AxiosError } from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const API_PREFIX = "/api/v1";
+const API_PREFIX = "/api";
 
 if (!BASE_URL) {
     throw new Error("VITE_API_BASE_URL is not defined");

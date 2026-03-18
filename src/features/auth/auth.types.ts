@@ -2,13 +2,14 @@ export interface LoginPayload {
     email: string;
     password: string;
     rememberMe?: boolean;
+    mode?: AuthMode;
 }
 
 export interface RegisterPayload {
     userName: string;
     email: string;
     password: string;
-    passwordConfirmation: string;
+    confirmPassword: string;
 }
 
 export interface UserProfile {
@@ -20,6 +21,7 @@ export interface UserProfile {
 }
 
 export type Role = "admin" | "staff" | "user";
+export type AuthMode = "admin" | "user";
 
 export interface ApiResponse<T> {
     isSuccess: boolean;

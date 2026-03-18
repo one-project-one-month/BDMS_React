@@ -8,6 +8,12 @@ import type {
 } from "@/features/auth/auth.types";
 import { isAxiosError } from "axios";
 
+const getLoginEndpoint = (mode: LoginPayload["mode"]) =>
+    mode === "admin" ? AUTH_ENDPOINTS.ADMIN_LOGIN : AUTH_ENDPOINTS.USER_LOGIN;
+
+const getLogoutEndpoint = (mode: LoginPayload["mode"]) =>
+    mode === "admin" ? AUTH_ENDPOINTS.ADMIN_LOGOUT : AUTH_ENDPOINTS.USER_LOGOUT;
+
 /**
  * Register a new user.
  *
@@ -18,7 +24,7 @@ export const register = async (
     payload: RegisterPayload,
 ): Promise<AuthSession> => {
     const { data } = await api.post<ApiResponse<AuthSession>>(
-        AUTH_ENDPOINTS.REGISTER,
+        AUTH_ENDPOINTS.USER_REGISTER,
         payload,
     );
 
@@ -38,9 +44,10 @@ export const register = async (
 export const login = async (
     payload: LoginPayload,
 ): Promise<AuthSession> => {
+    const { mode = "user", ...body } = payload;
     const { data } = await api.post<ApiResponse<AuthSession>>(
-        AUTH_ENDPOINTS.LOGIN,
-        payload,
+        getLoginEndpoint(mode),
+        body,
     );
 
     if (!data.isSuccess || data.isError) {
@@ -55,8 +62,10 @@ export const login = async (
  *
  * Invalidates the current session cookie on the server.
  */
-export const logout = async (): Promise<void> => {
-    await api.post(AUTH_ENDPOINTS.LOGOUT);
+export const logout = async (
+    mode: LoginPayload["mode"] = "user",
+): Promise<void> => {
+    await api.post(getLogoutEndpoint(mode));
 };
 
 /**

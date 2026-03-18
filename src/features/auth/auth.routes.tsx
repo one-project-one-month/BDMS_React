@@ -8,7 +8,11 @@ export const authRoutes: RouteObject = {
   children: [
     {
       path: "login",
-      element: <LoginPage />,
+      element: <LoginPage mode="user" />,
+    },
+    {
+      path: "admin/login",
+      element: <LoginPage mode="admin" />,
     },
     {
       path: "register",
