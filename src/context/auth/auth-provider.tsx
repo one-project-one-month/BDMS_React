@@ -45,8 +45,13 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   );
 
   const logout = useCallback(async () => {
-    await logoutMutation.mutateAsync();
-  }, [logoutMutation]);
+    const mode =
+      session?.userInfo.roleName === "admin" ||
+      session?.userInfo.roleName === "staff"
+        ? "admin"
+        : "user";
+    await logoutMutation.mutateAsync(mode);
+  }, [logoutMutation, session?.userInfo.roleName]);
 
   const user = session?.userInfo ?? null;
 

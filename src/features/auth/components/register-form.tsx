@@ -29,11 +29,11 @@ const formSchema = z
     userName: z.string().min(2, "Name must be at least 2 characters."),
     email: z.email("Please enter a valid email address."),
     password: z.string().min(8, "Password must be at least 8 characters"),
-    passwordConfirmation: z.string(),
+    confirmPassword: z.string(),
   })
-  .refine((data) => data.password === data.passwordConfirmation, {
+  .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
-    path: ["passwordConfirmation"],
+    path: ["confirmPassword"],
   });
 
 export default function RegisterForm() {
@@ -43,7 +43,7 @@ export default function RegisterForm() {
       userName: "",
       email: "",
       password: "",
-      passwordConfirmation: "",
+      confirmPassword: "",
     },
   });
 
@@ -58,7 +58,7 @@ export default function RegisterForm() {
         userName: data.userName,
         email: data.email,
         password: data.password,
-        passwordConfirmation: data.passwordConfirmation,
+        confirmPassword: data.confirmPassword,
       });
 
       queryClient.setQueryData(authKeys.me(), session);
@@ -194,13 +194,13 @@ export default function RegisterForm() {
 
             {/* Confirm Password */}
             <Controller
-              name="passwordConfirmation"
+              name="confirmPassword"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel
                     className="text-dark-primary"
-                    htmlFor="register-form-password-confirmation"
+                    htmlFor="register-form-confirm-password"
                   >
                     Confirm Password
                   </FieldLabel>
@@ -208,7 +208,7 @@ export default function RegisterForm() {
                   <Input
                     {...field}
                     type="password"
-                    id="register-form-password-confirmation"
+                    id="register-form-confirm-password"
                     placeholder="Confirm your password"
                     className="bg-input"
                     autoComplete="new-password"

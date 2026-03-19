@@ -1,5 +1,9 @@
 import LoginForm from "../components/login-form";
 
-export default function LoginPage() {
-  return <LoginForm />;
+type LoginPageProps = {
+  mode: "admin" | "user";
+};
+
+export default function LoginPage({ mode }: LoginPageProps) {
+  return <LoginForm mode={mode} />;
 }
