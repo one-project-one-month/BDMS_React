@@ -2,8 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import GuestLayout from "@/layouts/guest-layout";
 import DashboardLayout from "@/layouts/dashboard-layout";
 import ProtectedRoute from "@/features/auth/components/protected-route";
-import Home from "./pages/Home";
-import AnnouncementPage from "@/pages/website/announcement-page";
+import AnnouncementPage from "./features/announcements/pages/website/announcement-page";
 export const router = createBrowserRouter([
   {
     children: [
@@ -14,7 +13,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <Home />,
+            element: <div>Home</div>,
           },
           {
             path: "announcements",
