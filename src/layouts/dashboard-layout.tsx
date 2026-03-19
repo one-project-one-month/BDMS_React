@@ -3,8 +3,8 @@ import { useState } from "react";
 import {
   DashboardSidebar,
   type DashboardSidebarItem,
-} from "@/components/dashboard-sidebar/dashboardSidebar";
-import { DashboardTopNavbar } from "@/components/dashboard-nav/dashboardNav";
+} from "@/layouts/dashboard-side-bar";
+import { DashboardTopNavbar } from "@/layouts/dashboard-nav";
 
 export default function DashboardLayout() {
   const [activeItem, setActiveItem] =
