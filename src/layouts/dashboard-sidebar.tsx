@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { Typography } from "@/components/ui/typography";
+import { SidebarSkeleton } from "@/components/sidebar-skeleton";
 import { cn } from "@/lib/utils";
 
 import useAuth from "@/context/auth/useAuth";
@@ -148,7 +149,7 @@ export function DashboardSidebar({
     },
   ] as const;
 
-  // filter the menu items with role
+  /** filter the menu items with role */
   const filteredMenuItems = role
     ? menuItems.filter((item) => item.roles.includes(role))
     : [];
@@ -265,37 +266,47 @@ export function DashboardSidebar({
         </div>
 
         {/* Sidebar items */}
-        <div className="flex items-center justify-end ps-20">
-          <nav className="flex flex-1 flex-col items-end gap-2">
-            {filteredMenuItems.map((item) => (
-              <Link
-                key={item.label}
-                to={item.path}
-                className={cn(
-                  itemBaseClass,
-                  pathname === item.path ? activeItemClass : inactiveItemClass,
-                )}
-              >
-                <item.icon
+        {role ? (
+          <div className="flex items-center justify-end ps-20">
+            <nav className="flex flex-1 flex-col items-end gap-2">
+              {filteredMenuItems.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.path}
                   className={cn(
-                    "size-5 shrink-0",
-                    pathname === item.path ? "text-secondary" : "text-inherit",
-                  )}
-                />
-                <Typography
-                  as="span"
-                  variant="body"
-                  className={cn(
-                    "text-base! capitalize font-semibold",
-                    pathname === item.path ? "text-secondary" : "text-inherit",
+                    itemBaseClass,
+                    pathname === item.path
+                      ? activeItemClass
+                      : inactiveItemClass,
                   )}
                 >
-                  {item.label}
-                </Typography>
-              </Link>
-            ))}
-          </nav>
-        </div>
+                  <item.icon
+                    className={cn(
+                      "size-5 shrink-0",
+                      pathname === item.path
+                        ? "text-secondary"
+                        : "text-inherit",
+                    )}
+                  />
+                  <Typography
+                    as="span"
+                    variant="body"
+                    className={cn(
+                      "text-base! capitalize font-semibold",
+                      pathname === item.path
+                        ? "text-secondary"
+                        : "text-inherit",
+                    )}
+                  >
+                    {item.label}
+                  </Typography>
+                </Link>
+              ))}
+            </nav>
+          </div>
+        ) : (
+          <SidebarSkeleton />
+        )}
       </aside>
     </>
   );
