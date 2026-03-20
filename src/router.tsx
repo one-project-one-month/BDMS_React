@@ -10,6 +10,7 @@ import ErrorPage from "@/pages/error-page";
 import DemoPage from "@/components/demo";
 import ProtectedRoute from "@/features/auth/components/protected-route";
 import { authRoutes } from "@/features/auth/auth.routes";
+import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
 
 export const router = createBrowserRouter([
   {
@@ -31,7 +32,7 @@ export const router = createBrowserRouter([
           },
           {
             path: "announcements",
-            element: <div>Announcements</div>,
+            element: <AnnouncementPage />,
           },
         ],
       },
