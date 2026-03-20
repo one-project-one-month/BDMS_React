@@ -11,7 +11,7 @@ export default function AuthLayout() {
       return <Navigate to="/admin" replace />;
     }
 
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/client" replace />;
   }
 
   return (

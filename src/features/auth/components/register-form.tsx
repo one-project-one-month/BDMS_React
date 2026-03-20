@@ -68,7 +68,7 @@ export default function RegisterForm() {
         session.userInfo.roleName === "admin" ||
         session.userInfo.roleName === "staff"
           ? "/admin"
-          : "/dashboard";
+          : "/client";
 
       navigate(destination);
     } catch (error) {

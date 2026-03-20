@@ -72,7 +72,7 @@ export default function LoginForm({ mode }: LoginFormProps) {
         session.userInfo.roleName === "admin" ||
         session.userInfo.roleName === "staff"
           ? "/admin"
-          : "/dashboard";
+          : "/client";
 
       navigate(destination);
     } catch (error) {
