@@ -18,7 +18,10 @@ export interface UserProfile {
     email: string;
     roleName: Role;
     permissions: string[];
+    donor?: DonorProfile | null;
 }
+
+export type DonorProfile = unknown;
 
 export type Role = "admin" | "staff" | "user";
 export type AuthMode = "admin" | "user";

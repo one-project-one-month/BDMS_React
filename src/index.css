@@ -157,4 +157,11 @@
     box-shadow: var(--shadow-x) var(--shadow-y) var(--shadow-blur)
       var(--shadow-spread) rgba(255, 115, 125, 0.45);
   }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }

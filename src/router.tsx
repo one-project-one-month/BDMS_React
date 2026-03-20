@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
 
       /** user dashboard */
       {
-        path: "/dashboard",
+        path: "/client",
         element: (
           <ProtectedRoute allowed={["user"]}>
             <DashboardLayout />
@@ -51,6 +51,26 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <div>Client Dashboard Page</div>,
+          },
+          {
+            path: "donations",
+            element: <div>Client Donations Page</div>,
+          },
+          {
+            path: "blood-requests",
+            element: <div>Client Blood Requests Page</div>,
+          },
+          {
+            path: "appointments",
+            element: <div>Client Appointments Page</div>,
+          },
+          {
+            path: "certificates",
+            element: <div>Client Certificates Page</div>,
+          },
+          {
+            path: "profile",
+            element: <div>Client Profile Page</div>,
           },
         ],
       },
@@ -67,6 +87,94 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <div>Admin Dashboard Page</div>,
+          },
+          {
+            path: "users",
+            element: (
+              <ProtectedRoute allowed={["admin"]}>
+                <div>Admin Users Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "donors",
+            element: (
+              <ProtectedRoute allowed={["admin"]}>
+                <div>Admin Donors Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "announcements",
+            element: (
+              <ProtectedRoute allowed={["admin"]}>
+                <div>Admin Announcements Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "certificates",
+            element: (
+              <ProtectedRoute allowed={["admin"]}>
+                <div>Admin Certificates Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "settings",
+            element: (
+              <ProtectedRoute allowed={["admin"]}>
+                <div>Admin Settings Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "donations",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <div>Admin Donations Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "blood-requests",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <div>Admin Blood Requests Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "appointments",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <div>Admin Appointments Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "medical-records",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <div>Admin Medical Records Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "blood-inventories",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <div>Admin Blood Inventories Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "profile",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <div>Admin Profile Page</div>
+              </ProtectedRoute>
+            ),
           },
         ],
       },

@@ -1,5 +1,6 @@
 export const AUTH_ENDPOINTS = {
-    PROFILE: "/Auth/me",
+    ADMIN_PROFILE: "/Auth/me",
+    USER_PROFILE: "/UserAuth/me",
     ADMIN_LOGIN: "/Auth/login",
     ADMIN_LOGOUT: "/Auth/logout",
     USER_LOGIN: "/UserAuth/login",
