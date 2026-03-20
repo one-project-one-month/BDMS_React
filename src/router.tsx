@@ -68,6 +68,10 @@ export const router = createBrowserRouter([
             path: "certificates",
             element: <div>Client Certificates Page</div>,
           },
+          {
+            path: "profile",
+            element: <div>Client Profile Page</div>,
+          },
         ],
       },
 
@@ -161,6 +165,14 @@ export const router = createBrowserRouter([
             element: (
               <ProtectedRoute allowed={["admin", "staff"]}>
                 <div>Admin Blood Inventories Page</div>
+              </ProtectedRoute>
+            ),
+          },
+          {
+            path: "profile",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <div>Admin Profile Page</div>
               </ProtectedRoute>
             ),
           },

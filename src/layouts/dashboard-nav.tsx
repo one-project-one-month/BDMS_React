@@ -1,15 +1,34 @@
+import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { DashboardNavSkeleton } from "@/components/dashboard-nav-skeleton";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import useAuth from "@/context/auth/useAuth";
+import { LogOut } from "lucide-react";
 
 interface DashboardTopNavbarProps {
   onMenuClick?: () => void;
 }
 
 export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const handleLogout = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    logout();
+  };
+
+  const profileRoute =
+    user?.roleName === "admin" || user?.roleName === "staff"
+      ? "/admin/profile"
+      : "/client/profile";
 
   return (
     <header className="w-full bg-background font-[Roboto]">
@@ -99,47 +118,90 @@ export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
               </Button>
 
               {/* Profile */}
-              <Button
-                variant="outline"
-                website="outline"
-                className="h-10 border-primary bg-transparent px-4 text-primary shadow-none hover:bg-primary hover:text-primary-foreground"
-              >
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="size-4 shrink-0"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M10.2275 9.57143C12.6182 9.57143 14.5545 7.65357 14.5545 5.28571C14.5545 2.91786 12.6182 1 10.2275 1C7.83691 1 5.90062 2.91786 5.90062 5.28571C5.90062 7.65357 7.83691 9.57143 10.2275 9.57143ZM9.15663 11.5714C5.60494 11.5714 2.72754 14.4214 2.72754 17.9393C2.72754 18.525 3.20711 19 3.79845 19H16.6566C17.248 19 17.7275 18.525 17.7275 17.9393C17.7275 14.4214 14.8501 11.5714 11.2985 11.5714H9.15663Z"
-                    fill="currentColor"
-                  />
-                </svg>
-                <Typography
-                  as="span"
-                  variant="body"
-                  className="text-sm! font-medium"
-                >
-                  {user.userName}
-                </Typography>
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="size-4 shrink-0"
-                  aria-hidden="true"
-                >
-                  <path
-                    d="M9.6809 15.5357C10.0449 16.1548 10.9551 16.1548 11.3191 15.5357L17.8719 4.39286C18.2359 3.77381 17.7809 3 17.0528 3H3.94722C3.21914 3 2.76408 3.77381 3.12813 4.39286L9.6809 15.5357Z"
-                    fill="currentColor"
-                  />
-                </svg>
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    website="outline"
+                    className="group h-10 border-primary bg-transparent px-4 text-primary shadow-none hover:bg-primary hover:text-primary-foreground"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="size-4 shrink-0"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M10.2275 9.57143C12.6182 9.57143 14.5545 7.65357 14.5545 5.28571C14.5545 2.91786 12.6182 1 10.2275 1C7.83691 1 5.90062 2.91786 5.90062 5.28571C5.90062 7.65357 7.83691 9.57143 10.2275 9.57143ZM9.15663 11.5714C5.60494 11.5714 2.72754 14.4214 2.72754 17.9393C2.72754 18.525 3.20711 19 3.79845 19H16.6566C17.248 19 17.7275 18.525 17.7275 17.9393C17.7275 14.4214 14.8501 11.5714 11.2985 11.5714H9.15663Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                    <Typography
+                      as="span"
+                      variant="body"
+                      className="text-sm! font-medium"
+                    >
+                      {user.userName}
+                    </Typography>
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 20 20"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="size-4 shrink-0 transition-transform group-data-[state=open]:rotate-180"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M9.6809 15.5357C10.0449 16.1548 10.9551 16.1548 11.3191 15.5357L17.8719 4.39286C18.2359 3.77381 17.7809 3 17.0528 3H3.94722C3.21914 3 2.76408 3.77381 3.12813 4.39286L9.6809 15.5357Z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-40" align="start">
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem className="justify-center">
+                      <Link
+                        to={profileRoute}
+                        className="flex items-center justify-center gap-2 w-full"
+                      >
+                        <svg
+                          width="20"
+                          height="20"
+                          viewBox="0 0 20 20"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="size-4 shrink-0"
+                          aria-hidden="true"
+                        >
+                          <path
+                            d="M10.2275 9.57143C12.6182 9.57143 14.5545 7.65357 14.5545 5.28571C14.5545 2.91786 12.6182 1 10.2275 1C7.83691 1 5.90062 2.91786 5.90062 5.28571C5.90062 7.65357 7.83691 9.57143 10.2275 9.57143ZM9.15663 11.5714C5.60494 11.5714 2.72754 14.4214 2.72754 17.9393C2.72754 18.525 3.20711 19 3.79845 19H16.6566C17.248 19 17.7275 18.525 17.7275 17.9393C17.7275 14.4214 14.8501 11.5714 11.2985 11.5714H9.15663Z"
+                            fill="currentColor"
+                          />
+                        </svg>
+                        Profile
+                      </Link>
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <form id="logout-form" onSubmit={handleLogout}>
+                      <Button
+                        type="submit"
+                        variant={"default"}
+                        className="w-full"
+                      >
+                        <LogOut className="size-4" />
+                        Log out
+                      </Button>
+                    </form>
+                  </DropdownMenuGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </>
           ) : (
             <DashboardNavSkeleton />
