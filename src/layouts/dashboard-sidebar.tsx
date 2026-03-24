@@ -162,6 +162,14 @@ export function DashboardSidebar({
   const inactiveItemClass =
     "text-sidebar-accent/45 hover:bg-sidebar-accent/15 hover:text-secondary/85";
 
+  const isActivePath = (itemPath: string) => {
+    if (itemPath === dashboardRoute) {
+      return pathname === itemPath;
+    }
+
+    return pathname === itemPath || pathname.startsWith(`${itemPath}/`);
+  };
+
   return (
     <>
       {isOpen && (
@@ -275,7 +283,7 @@ export function DashboardSidebar({
                   to={item.path}
                   className={cn(
                     itemBaseClass,
-                    pathname === item.path
+                    isActivePath(item.path)
                       ? activeItemClass
                       : inactiveItemClass,
                   )}
@@ -283,7 +291,7 @@ export function DashboardSidebar({
                   <item.icon
                     className={cn(
                       "size-5 shrink-0",
-                      pathname === item.path
+                      isActivePath(item.path)
                         ? "text-secondary"
                         : "text-inherit",
                     )}
@@ -293,7 +301,7 @@ export function DashboardSidebar({
                     variant="body"
                     className={cn(
                       "text-base! capitalize font-semibold",
-                      pathname === item.path
+                      isActivePath(item.path)
                         ? "text-secondary"
                         : "text-inherit",
                     )}

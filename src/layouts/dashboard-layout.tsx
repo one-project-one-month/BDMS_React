@@ -3,6 +3,7 @@ import { Outlet } from "react-router-dom";
 /** edited by KK */
 import { DashboardSidebar } from "@/layouts/dashboard-sidebar";
 import { DashboardTopNavbar } from "@/layouts/dashboard-nav";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function DashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -19,6 +20,7 @@ export default function DashboardLayout() {
 
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
           <Outlet />
+          <Toaster />
         </main>
       </div>
     </div>
