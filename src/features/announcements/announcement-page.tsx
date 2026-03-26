@@ -1,14 +1,11 @@
-import Announcements from "./components/announcements";
-import CategoryList from "./components/category-list";
+import React from 'react'
 
-const AnnouncementPage = () => {
+type Props = {}
+
+const AnnouncementPage = (props: Props) => {
   return (
-    <div className="flex items-center justify-between bg-accent">
-      <h1 className="text-2xl text-primary">This is announcement page!</h1>
-      <CategoryList/>
-      <Announcements/>
-    </div>
+    <div>This is announcement page</div>
   )
 }
 
-export default AnnouncementPage;
+export default AnnouncementPage
