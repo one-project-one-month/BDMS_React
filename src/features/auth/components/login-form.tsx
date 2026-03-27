@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import * as z from "zod";
 import { isAxiosError } from "axios";
 
@@ -50,6 +50,7 @@ export default function LoginForm({ mode }: LoginFormProps) {
     },
   });
   const navigate = useNavigate();
+  const location = useLocation();
 
   async function onSubmit(data: z.infer<typeof formSchema>) {
     try {
@@ -68,13 +69,18 @@ export default function LoginForm({ mode }: LoginFormProps) {
 
       form.reset();
 
-      const destination =
+      const roleDestination =
         session.userInfo.roleName === "admin" ||
         session.userInfo.roleName === "staff"
           ? "/admin"
           : "/client";
 
-      navigate(destination);
+      const fromState = location.state as { from?: Location } | null;
+      const returnTo = fromState?.from?.pathname
+        ? `${fromState.from.pathname}${fromState.from.search ?? ""}`
+        : null;
+
+      navigate(returnTo ?? roleDestination);
     } catch (error) {
       console.error(error);
       const message = isAxiosError(error)

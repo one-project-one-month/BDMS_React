@@ -1,4 +1,7 @@
 import axios, { type AxiosError } from "axios";
+import queryClient from "@/query-client";
+import { authKeys } from "@/features/auth/queries";
+import type { AuthSession } from "@/features/auth/auth.types";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_PREFIX = "/api";
@@ -29,6 +32,21 @@ api.interceptors.response.use(
     (error: AxiosError) => {
         if (error.response?.status === 401) {
             console.warn("401 - Unauthorized request - user session may be expired.");
+            const session = queryClient.getQueryData<AuthSession | null>(
+                authKeys.me(),
+            );
+            queryClient.setQueryData(authKeys.me(), null);
+
+            const roleName = session?.userInfo?.roleName;
+            const loginPath =
+                roleName === "admin" || roleName === "staff"
+                    ? "/admin/login"
+                    : "/login";
+
+            const currentPath = window.location.pathname;
+            if (!currentPath.startsWith("/login") && !currentPath.startsWith("/admin/login")) {
+                window.location.assign(loginPath);
+            }
         }
         return Promise.reject(error);
     }

@@ -21,7 +21,8 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   const { data: session, isPending } = useQuery({
     ...currentUserQueryOptions,
     retry: false,
-    staleTime: 5 * 60 * 1000,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 
   const loginMutation = useMutation({
