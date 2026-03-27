@@ -1,5 +1,5 @@
 
-import { createAnnouncement, deleteAnnouncement, getAnnouncements, updateAnnouncement } from "@/services/announcementService";
+import { createAnnouncement, deleteAnnouncement, getAnnouncementById, getAnnouncements, updateAnnouncement } from "@/services/announcementService";
 import { useQuery, useMutation, useQueryClient} from "@tanstack/react-query"; 
 
 
@@ -10,6 +10,15 @@ export const useAnnouncements = () => {
     queryFn: getAnnouncements,
   }); 
 }; 
+
+export const useAnnouncementById = (id?: number) => {
+  return useQuery({
+    queryKey: ["announcement", id],
+    queryFn: () => getAnnouncementById(id!),
+    enabled: !!id,
+  });
+};
+
 
 export const useCreateAnnouncement = () => {
   const queryClient = useQueryClient(); 

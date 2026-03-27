@@ -11,9 +11,10 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import { useAnnouncements, useCreateAnnouncement } from "../../hooks/useAnnouncement";
+import {  useCreateAnnouncement, useUpdateAnnouncement } from "../../hooks/useAnnouncement";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useEffect } from "react";
 
 type FormValues = {
   title: string;
@@ -27,9 +28,15 @@ type FormValues = {
   };
 };
 
-const CreateAnnouncementForm = () => {
+type props = {
+  defaultValues?: FormValues;
+  mode: string;
+}
+
+
+const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
   const { register, handleSubmit, setValue, watch, reset } = useForm<FormValues>({
-    defaultValues: {
+    defaultValues: defaultValues || {
       title: "",
       content: "",
       isActive: true,
@@ -41,13 +48,30 @@ const CreateAnnouncementForm = () => {
     },
   });
 
-  const { mutate: createAnnouncement, isPending } = useCreateAnnouncement();
+  const { mutate: createAnnouncement, isPending } = useCreateAnnouncement(); 
+  const { mutate: updateAnnouncement } = useUpdateAnnouncement(); 
+
+  useEffect(() => {
+    if (defaultValues){
+      reset(defaultValues); 
+    }
+  }, [defaultValues, reset]); 
 
   const isActive = watch("isActive");
 
   const onSubmit = (data: FormValues) => {
-    createAnnouncement(data);
-    console.log("input data: ", data);
+
+    if (mode === "edit" && defaultValues){
+      updateAnnouncement({
+        id: (defaultValues as any).id, 
+        data, 
+      });
+    } else {
+      createAnnouncement(data);
+      console.log("input data: ", data);
+      
+    }
+    
     reset(); 
   };
 
@@ -109,7 +133,9 @@ const CreateAnnouncementForm = () => {
               <FieldLabel>
                 Month
               </FieldLabel>
-              <Select defaultValue="">
+              <Select 
+                defaultValue=""  
+                onValueChange={(val) => setValue("expiredAt.month", Number(val))}>
                 <SelectTrigger>
                   <SelectValue placeholder="MM" {...register("expiredAt.month", { required: true })}/>
                 </SelectTrigger>
@@ -135,7 +161,9 @@ const CreateAnnouncementForm = () => {
               <FieldLabel>
                 Year
               </FieldLabel>
-              <Select defaultValue="">
+              <Select 
+                defaultValue="" 
+                 onValueChange={(val) => setValue("expiredAt.year", Number(val))} >
                 <SelectTrigger >
                   <SelectValue placeholder="YYYY" {...register("expiredAt.year", { required: true })}/>
                 </SelectTrigger>
@@ -156,13 +184,26 @@ const CreateAnnouncementForm = () => {
           </div>
           
         {/* Submit */}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-4 py-2 mt-6 bg-primary text-white rounded-md w-fit mx-auto"
-        >
-          {isPending ? "Creating..." : "Create Announcement"}
-        </button>
+        {mode === "create" && (
+          <button
+            type="submit"
+            disabled={isPending}
+            className="px-4 py-2 mt-6 bg-primary text-white rounded-md w-fit mx-auto"
+          >
+            {isPending ? "Creating..." : "Create Announcement"}
+          </button>
+        )}
+
+        {mode === "edit" && (
+          <button
+            type="submit"
+            disabled={isPending}
+            className="px-4 py-2 mt-6 bg-primary text-white rounded-md w-fit mx-auto"
+          >
+            {isPending ? "Saving..." : "Save changes"}
+          </button>
+        )}
+        
 
       </FieldGroup>
     </form>

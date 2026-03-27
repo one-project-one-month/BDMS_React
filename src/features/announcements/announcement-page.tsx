@@ -1,12 +1,10 @@
-import AnnouncementCreateSection from '@/modules/announcement/components/create/AnnouncementCreateSection'
+import AnnouncementListSection from '@/modules/announcement/components/list/AnnouncementListSection'
 import React from 'react'
 
-type Props = {}
-
-const AnnouncementPage = (props: Props) => {
+const AnnouncementPage = () => {
   return (
     <div>
-      <AnnouncementCreateSection />
+      <AnnouncementListSection />
     </div>
   )
 }
