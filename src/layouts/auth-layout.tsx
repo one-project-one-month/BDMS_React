@@ -4,7 +4,11 @@ import Container from "@/components/container";
 import Section from "@/components/section";
 
 export default function AuthLayout() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isInitializing } = useAuth();
+
+  if (isInitializing) {
+    return null;
+  }
 
   if (isAuthenticated && user) {
     if (user.roleName === "admin" || user.roleName === "staff") {
