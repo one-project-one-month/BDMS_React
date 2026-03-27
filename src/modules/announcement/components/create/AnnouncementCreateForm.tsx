@@ -15,6 +15,7 @@ import {  useCreateAnnouncement, useUpdateAnnouncement } from "../../hooks/useAn
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
+import { Navigate, useNavigate } from "react-router-dom";
 
 type FormValues = {
   title: string;
@@ -50,6 +51,7 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
 
   const { mutate: createAnnouncement, isPending } = useCreateAnnouncement(); 
   const { mutate: updateAnnouncement } = useUpdateAnnouncement(); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (defaultValues){
@@ -65,11 +67,12 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
       updateAnnouncement({
         id: (defaultValues as any).id, 
         data, 
-      });
+      }); 
+      navigate("/Announcements"); 
     } else {
       createAnnouncement(data);
       console.log("input data: ", data);
-      
+      navigate("/Announcements"); 
     }
     
     reset(); 

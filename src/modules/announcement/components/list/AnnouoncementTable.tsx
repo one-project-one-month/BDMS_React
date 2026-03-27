@@ -1,53 +1,68 @@
 import React from 'react'
 import AnnouncementTableRow from './AnnouncementTableRow'
 import { useAnnouncements } from '../../hooks/useAnnouncement'
-import { TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
-import { SearchIcon, Table } from 'lucide-react'
+import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { SearchIcon } from 'lucide-react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
+import AnnouncementTableLoader from './AnnouncementTableLoader'
 
 
 const AnnouoncementTable = () => {
 
   const {data, isLoading} = useAnnouncements(); 
 
-  if (isLoading) return <div>Loading... </div>
+  if (isLoading) return <AnnouncementTableLoader/>; 
 
   return (
-    <>
-      <div>
-        <InputGroup>
-          <InputGroupInput id="inline-start-input" placeholder="Search..." />
+    <div className="space-y-6 p-6 bg-gray-100 rounded-sm border border-gray-200 w-full">
+      
+      {/* Search */}
+      <div className="flex justify-between items-center">
+        <InputGroup className="max-w-sm">
+          <InputGroupInput placeholder="Search announcements..." />
           <InputGroupAddon align="inline-start">
-            <SearchIcon className="text-muted-foreground" />
+            <SearchIcon className="text-muted-foreground w-4 h-4" />
           </InputGroupAddon>
         </InputGroup>
       </div>
+
+      {/* Table */}
       <Table>
-        <TableCaption>Announcements List</TableCaption>
+        <TableCaption className="text-gray-500">
+          Announcements List
+        </TableCaption>
+
         <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">No.</TableHead>
+          <TableRow className="bg-gray-50">
+            <TableHead>No.</TableHead>
             <TableHead>Title</TableHead>
             <TableHead>Content</TableHead>
             <TableHead className="text-right">Status</TableHead>
             <TableHead className="text-right">Expiry Date</TableHead>
+            <TableHead className="text-right">#</TableHead>
+            <TableHead className="text-right">#</TableHead>
           </TableRow>
         </TableHeader>
+
         <TableBody>
-          {
-          data?.map((d : any) => (
-            <AnnouncementTableRow announcement={d} key={d.id}/>
-          ))
-        }
+          {data?.map((d: any) => (
+            <AnnouncementTableRow
+              announcement={d}
+              key={d.id}
+            />
+          ))}
         </TableBody>
+
         <TableFooter>
           <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
-            <TableCell className="text-right"></TableCell>
+            <TableCell colSpan={4}>Total</TableCell>
+            <TableCell className="text-right">
+              {data?.length || 0}
+            </TableCell>
           </TableRow>
         </TableFooter>
       </Table>
-    </>
+    </div>
     
 
   )

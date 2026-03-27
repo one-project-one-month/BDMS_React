@@ -23,7 +23,7 @@ const AnnouncementTableRow = ({announcement}: Props) => {
       <TableCell>1</TableCell>
 
       {/* Title */}
-      <TableCell>{announcement.title}</TableCell>
+      <TableCell>{announcement.title}</TableCell> 
 
       {/* Content */}
       <TableCell className="max-w-[300px] truncate">
