@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const getAnnouncements = async () => {
 
-  const res = await fetch(`${BASE_URL}/${ANNOUNCEMENT_ENDPOINTS.LIST}`); 
+  const res = await fetch(`${BASE_URL}${ANNOUNCEMENT_ENDPOINTS.LIST}`); 
 
   if (!res.ok) {
     throw new Error("Failed to fetch announcements"); 
@@ -15,7 +15,7 @@ export const getAnnouncements = async () => {
 
 export const getAnnouncementById = async (id: number) => {
 
-  const res = await fetch(`${BASE_URL}/${ANNOUNCEMENT_ENDPOINTS.DETAIL(id)}`); 
+  const res = await fetch(`${BASE_URL}${ANNOUNCEMENT_ENDPOINTS.DETAIL(id)}`); 
 
   if (!res.ok) {
     throw new Error("Failed to fetch announcement"); 
@@ -29,7 +29,7 @@ export const getAnnouncementById = async (id: number) => {
 //must fix later
 export const createAnnouncement = async (data: any) => {
 
-  const res = await fetch(`${BASE_URL}/${ANNOUNCEMENT_ENDPOINTS.CREATE}`, {
+  const res = await fetch(`${BASE_URL}${ANNOUNCEMENT_ENDPOINTS.CREATE}`, {
     method: "POST", 
     headers: {"Content-Type": "application/json"}, 
     body: JSON.stringify(data), 
@@ -44,7 +44,7 @@ export const createAnnouncement = async (data: any) => {
 
 export const updateAnnouncement = async (id: number, data: any) => {
 
-  const res = await fetch(`${BASE_URL}/${ANNOUNCEMENT_ENDPOINTS.UPDATE(id)}`, {
+  const res = await fetch(`${BASE_URL}${ANNOUNCEMENT_ENDPOINTS.UPDATE(id)}`, {
     method: "PUT", 
     headers: {"Content-Type": "application/json"}, 
     body: JSON.stringify(data), 

@@ -1,7 +1,7 @@
 export const ANNOUNCEMENT_ENDPOINTS = {
-    LIST: "/announcements",
-    CREATE: "/announcements",
-    DETAIL: (id: number) => `/announcements/${id}`,
-    UPDATE: (id: number) => `/announcements/${id}`,
-    DELETE: (id: number) => `/announcements/${id}`,
+    LIST: "/announcement",
+    CREATE: "/announcement",
+    DETAIL: (id: number) => `/announcement/${id}`,
+    UPDATE: (id: number) => `/announcement/${id}`,
+    DELETE: (id: number) => `/announcement/${id}`,
 } as const;
