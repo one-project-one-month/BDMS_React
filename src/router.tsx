@@ -12,9 +12,6 @@ import ProtectedRoute from "@/features/auth/components/protected-route";
 import { authRoutes } from "@/features/auth/auth.routes";
 import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
 import { userRoutes } from "@/features/users/user.routes";
-import AnnouncementPage from "./features/announcements/announcement-page";
-import AnnouncementCreatePage from "./features/announcements/announcement-create-page";
-import AnnouncementEditPage from "./features/announcements/announcement-edit-page";
 
 export const router = createBrowserRouter([
   {
