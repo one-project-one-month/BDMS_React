@@ -35,6 +35,16 @@ api.interceptors.response.use(
             const session = queryClient.getQueryData<AuthSession | null>(
                 authKeys.me(),
             );
+            const hasSession = Boolean(session?.userInfo);
+            const hasAuthHeader = Boolean(
+                error.config?.headers?.Authorization ??
+                error.config?.headers?.authorization,
+            );
+
+            if (!hasSession && !hasAuthHeader) {
+                return Promise.reject(error);
+            }
+
             queryClient.setQueryData(authKeys.me(), null);
 
             const roleName = session?.userInfo?.roleName;
@@ -44,7 +54,10 @@ api.interceptors.response.use(
                     : "/login";
 
             const currentPath = window.location.pathname;
-            if (!currentPath.startsWith("/login") && !currentPath.startsWith("/admin/login")) {
+            if (
+                !currentPath.startsWith("/login") &&
+                !currentPath.startsWith("/admin/login")
+            ) {
                 window.location.assign(loginPath);
             }
         }
