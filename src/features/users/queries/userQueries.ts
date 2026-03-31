@@ -1,7 +1,7 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import type { User } from "../user.types";
 import { userKeys } from "./userKeys";
-import { deleteUser, getUser, getUsers, storeUser, updateUser } from "../api/user.api";
+import { activateUser, deactivateUser, deleteUser, getUser, getUsers, storeUser, updateUser } from "../api/user.api";
 
 /**
  * Query: get all users.
@@ -51,3 +51,25 @@ export const deleteUserMutationOptions = mutationOptions<
 >({
     mutationFn: deleteUser,
 })
+
+/**
+ * Mutation: activate user.
+ */
+export const activateUserMutationOptions = mutationOptions<
+    User,
+    unknown,
+    Parameters<typeof activateUser>[0]
+>({
+    mutationFn: activateUser,
+});
+
+/**
+ * Mutation: deactivate user.
+ */
+export const deactivateUserMutationOptions = mutationOptions<
+    User,
+    unknown,
+    Parameters<typeof deactivateUser>[0]
+>({
+    mutationFn: deactivateUser,
+});

@@ -19,10 +19,12 @@ const basePath = "/admin/users";
 
 type ColumnHandlers = {
   onRequestDelete: (user: User) => void;
+  onRequestStatus: (user: User) => void;
 };
 
 export const buildColumns = ({
   onRequestDelete,
+  onRequestStatus,
 }: ColumnHandlers): ColumnDef<User>[] => {
   return [
     {
@@ -53,6 +55,7 @@ export const buildColumns = ({
               "cursor-pointer text-secondary",
               user.isActive ? "bg-green-400" : "bg-destructive",
             )}
+            onClick={() => onRequestStatus(user)}
           >
             {user.isActive ? "Active" : "Inactive"}
           </Badge>

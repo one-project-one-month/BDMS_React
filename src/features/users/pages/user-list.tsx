@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
@@ -18,6 +19,8 @@ import UserDataTable from "../components/user-data-table";
 import { buildColumns } from "../components/user-columns";
 
 import {
+  activateUserMutationOptions,
+  deactivateUserMutationOptions,
   deleteUserMutationOptions,
   getUsersQueryOptions,
 } from "../queries/userQueries";
@@ -30,14 +33,56 @@ export default function UserListPage() {
   const safeUsers = users ?? [];
 
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
 
   const deleteMutation = useMutation({
     ...deleteUserMutationOptions,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: userKeys.list() });
+      toast.success("User record deleted successfully.", {
+        position: "bottom-right",
+      });
       setDeleteOpen(false);
       setSelectedUser(null);
+    },
+  });
+
+  const activateMutation = useMutation({
+    ...activateUserMutationOptions,
+    onSuccess: (user) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.list() });
+      toast.success(`${user.role.roleName} activated successfully.`, {
+        position: "bottom-right",
+      });
+      setSelectedUser(null);
+      setStatusOpen(false);
+    },
+    onError: () => {
+      toast.success("Failed user activation.", {
+        position: "bottom-right",
+      });
+      setSelectedUser(null);
+      setStatusOpen(false);
+    },
+  });
+
+  const deactivateMutation = useMutation({
+    ...deactivateUserMutationOptions,
+    onSuccess: (user) => {
+      queryClient.invalidateQueries({ queryKey: userKeys.list() });
+      toast.success(`${user.role.roleName} deactivated successfully.`, {
+        position: "bottom-right",
+      });
+      setSelectedUser(null);
+      setStatusOpen(false);
+    },
+    onError: () => {
+      toast.success("Failed user deactivation.", {
+        position: "bottom-right",
+      });
+      setSelectedUser(null);
+      setStatusOpen(false);
     },
   });
 
@@ -51,8 +96,33 @@ export default function UserListPage() {
     deleteMutation.mutateAsync(selectedUser);
   };
 
+  const handleRequestStatus = (user: User) => {
+    setSelectedUser(user);
+    setStatusOpen(true);
+  };
+
+  const handleRequestActivateStatus = () => {
+    if (!selectedUser || activateMutation.isPending) return;
+    activateMutation.mutateAsync(selectedUser.userId);
+  };
+
+  const handleRequestDeactivateStatus = () => {
+    if (!selectedUser || deactivateMutation.isPending) return;
+    if (selectedUser.role.roleName === "admin") {
+      toast.warning("You can not deactivate admin.", {
+        position: "bottom-right",
+      });
+      return;
+    }
+    deactivateMutation.mutateAsync(selectedUser.userId);
+  };
+
   const columns = useMemo(
-    () => buildColumns({ onRequestDelete: handleRequestDelete }),
+    () =>
+      buildColumns({
+        onRequestDelete: handleRequestDelete,
+        onRequestStatus: handleRequestStatus,
+      }),
     [],
   );
 
@@ -102,6 +172,65 @@ export default function UserListPage() {
             </Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog>
+
+      {/* Change status dialog box */}
+      <Dialog open={statusOpen} onOpenChange={setStatusOpen}>
+        {!selectedUser?.isActive ? (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Activate User</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to activate{" "}
+                <span className="font-medium">
+                  {selectedUser?.username ?? "this user"}
+                </span>
+                ?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setStatusOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleRequestActivateStatus}
+                disabled={activateMutation.isPending}
+                className="bg-green-400 hover:bg-green-500"
+              >
+                {activateMutation.isPending ? "Activating..." : "Activate"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        ) : (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Deactivate User</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to deactivate{" "}
+                <span className="font-medium">
+                  {selectedUser?.username ?? "this user"}
+                </span>
+                ?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setStatusOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleRequestDeactivateStatus}
+                disabled={deactivateMutation.isPending}
+                className="hover:bg-dark-primary"
+              >
+                {deactivateMutation.isPending
+                  ? "Deactivating..."
+                  : "Deactivate"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </Card>
   );
