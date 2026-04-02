@@ -29,14 +29,25 @@ import {
 import { getRolesQueryOptions } from "@/features/roles/queries";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { getHospitalsQueryOptions } from "@/features/hospitals/queries";
 
-const formSchema = z.object({
-  userId: z.number(),
-  username: z.string().min(2, "Username must be at least 2 characters."),
-  email: z.email("Please enter a valid email address."),
-  userRoleId: z.number(),
-  userHospitalId: z.number().nullable().optional(),
-});
+const formSchema = z
+  .object({
+    userId: z.number(),
+    username: z.string().min(2, "Username must be at least 2 characters."),
+    email: z.email("Please enter a valid email address."),
+    userRoleId: z.number(),
+    userHospitalId: z.number().nullable().optional(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.userRoleId === 2 && data.userHospitalId == null) {
+      ctx.addIssue({
+        path: ["userHospitalId"],
+        code: z.ZodIssueCode.custom,
+        message: "Hospital is required for staff.",
+      });
+    }
+  });
 
 export default function UserEditForm({ id }: { id: number }) {
   const [showHospital, setShowHospital] = useState(false);
@@ -46,6 +57,8 @@ export default function UserEditForm({ id }: { id: number }) {
 
   const { data: roles } = useSuspenseQuery(getRolesQueryOptions);
   const userRoles = roles?.filter((role) => role.id !== 3);
+
+  const { data: hospitals } = useSuspenseQuery(getHospitalsQueryOptions);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -93,7 +106,14 @@ export default function UserEditForm({ id }: { id: number }) {
 
   const handleShowHospital = (value: string) => {
     const roleId = +value;
-    setShowHospital(roleId === 2);
+    const isStaff = roleId === 2;
+
+    setShowHospital(isStaff);
+
+    if (!isStaff) {
+      form.setValue("userHospitalId", null);
+      form.clearErrors("userHospitalId");
+    }
   };
 
   async function onSubmit(payload: z.infer<typeof formSchema>) {
@@ -166,7 +186,7 @@ export default function UserEditForm({ id }: { id: number }) {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel
-                htmlFor="user-edit-form-role"
+                htmlFor="user-edit-form-select-role"
                 className="text-dark-primary"
               >
                 Role
@@ -180,7 +200,7 @@ export default function UserEditForm({ id }: { id: number }) {
                 }}
               >
                 <SelectTrigger
-                  id="form-rhf-select-language"
+                  id="user-edit-form-select-role"
                   aria-invalid={fieldState.invalid}
                   className="min-w-30"
                 >
@@ -201,9 +221,45 @@ export default function UserEditForm({ id }: { id: number }) {
 
         {/* hospital */}
         {showHospital && (
-          <div>
-            {/* hospital select implementation goes here after getting api */}
-          </div>
+          <Controller
+            name="userHospitalId"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel
+                  htmlFor="user-edit-form-select-hospital"
+                  className="text-dark-primary"
+                >
+                  Hospital
+                </FieldLabel>
+                <Select
+                  name={field.name}
+                  value={field.value == null ? "" : String(field.value)}
+                  onValueChange={(value) => {
+                    field.onChange(Number(value));
+                  }}
+                >
+                  <SelectTrigger
+                    id="user-edit-form-select-hospital"
+                    aria-invalid={fieldState.invalid}
+                    className="min-w-30"
+                  >
+                    <SelectValue placeholder="Please select hospital" />
+                  </SelectTrigger>
+                  <SelectContent position="item-aligned">
+                    {hospitals?.map((hospital) => (
+                      <SelectItem key={hospital.id} value={`${hospital.id}`}>
+                        {hospital.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
         )}
       </FieldGroup>
       {form.formState.errors.root && (
