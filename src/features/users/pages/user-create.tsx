@@ -1,6 +1,8 @@
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import UserCreateForm from "../components/user-create-form";
+import { Suspense } from "react";
+import UserFormSkeleton from "../components/user-form-skeleton";
 
 export default function UserCreatePage() {
   return (
@@ -12,7 +14,9 @@ export default function UserCreatePage() {
       </header>
 
       <section>
-        <UserCreateForm />
+        <Suspense fallback={<UserFormSkeleton />}>
+          <UserCreateForm />
+        </Suspense>
       </section>
     </Card>
   );
