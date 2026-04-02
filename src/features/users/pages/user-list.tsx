@@ -93,7 +93,13 @@ export default function UserListPage() {
 
   const handleConfirmDelete = () => {
     if (!selectedUser || deleteMutation.isPending) return;
-    deleteMutation.mutateAsync(selectedUser);
+    if (selectedUser.userId === 1) {
+      toast.warning("You can not delete super admin.", {
+        position: "bottom-right",
+      });
+      return;
+    }
+    deleteMutation.mutateAsync(selectedUser.userId);
   };
 
   const handleRequestStatus = (user: User) => {
