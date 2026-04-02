@@ -12,6 +12,7 @@ import ProtectedRoute from "@/features/auth/components/protected-route";
 import { authRoutes } from "@/features/auth/auth.routes";
 import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
 import { userRoutes } from "@/features/users/user.routes";
+import { donorRoutes } from "./features/donors/donor.routes";
 
 export const router = createBrowserRouter([
   {
@@ -92,14 +93,15 @@ export const router = createBrowserRouter([
           },
           /** user */
           userRoutes,
-          {
-            path: "donors",
-            element: (
-              <ProtectedRoute allowed={["admin"]}>
-                <div>Admin Donors Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          donorRoutes,
+          // {
+          //   path: "donors",
+          //   element: (
+          //     <ProtectedRoute allowed={["admin"]}>
+          //       <DonorPage />
+          //     </ProtectedRoute>
+          //   ),
+          // },
           {
             path: "announcements",
             element: (
