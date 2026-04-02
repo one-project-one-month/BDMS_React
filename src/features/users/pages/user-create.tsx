@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import UserCreateForm from "../components/user-create-form";
 import { Suspense } from "react";
-import UserFormSkeleton from "../components/user-form-skeleton";
+import UserFormSkeleton from "../components/ui/user-form-skeleton";
 
 export default function UserCreatePage() {
   return (

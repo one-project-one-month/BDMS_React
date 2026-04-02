@@ -1,4 +1,4 @@
-import type { User } from "../user.types";
+import type { User } from "../../user.types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";

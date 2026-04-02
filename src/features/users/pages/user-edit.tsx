@@ -6,7 +6,7 @@ import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button";
 
 import UserEditForm from "../components/user-edit-form";
-import UserFormSkeleton from "../components/user-form-skeleton";
+import UserFormSkeleton from "../components/ui/user-form-skeleton";
 
 export default function UserEditPage() {
   const { userId } = useParams();

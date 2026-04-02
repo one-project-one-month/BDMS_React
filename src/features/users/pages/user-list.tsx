@@ -15,8 +15,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import UserDataTable from "../components/user-data-table";
-import { buildColumns } from "../components/user-columns";
+import UserDataTable from "../components/table/user-data-table";
+import { buildColumns } from "../components/table/user-columns";
 
 import {
   activateUserMutationOptions,
