@@ -6,6 +6,7 @@ import { isAxiosError } from "axios";
 import { toast } from "sonner";
 import * as z from "zod";
 
+import { useQuery } from "@tanstack/react-query";
 import { createDonorMutationOptions, donorKeys } from "../queries";
 
 import {
@@ -25,8 +26,10 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { getUsersQueryOptions } from "@/features/users/queries";
 
 const formSchema = z.object({
+  userId: z.number().min(1, "Please select a user."),
   nicNo: z.string().min(9, "NIC No must be at least 9 characters."),
   dateOfBirth: z.string().min(1, "Date of birth is required."),
   gender: z.string().min(1, "Please select a gender."),
@@ -48,6 +51,7 @@ export default function DonorCreateForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      userId: 0,
       nicNo: "",
       dateOfBirth: "",
       gender: "",
@@ -62,11 +66,12 @@ export default function DonorCreateForm() {
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-
+  const { data: users, isPending: isUsersLoading } =
+    useQuery(getUsersQueryOptions);
   const createDonorMutation = useMutation({
     ...createDonorMutationOptions,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [donorKeys.list()] });
+      queryClient.invalidateQueries({ queryKey: donorKeys.list() });
       toast.success("Donor record created successfully.", {
         position: "bottom-right",
       });
@@ -88,7 +93,7 @@ export default function DonorCreateForm() {
   });
 
   async function onSubmit(payload: z.infer<typeof formSchema>) {
-    // createDonorMutation.mutateAsync(payload);
+    createDonorMutation.mutateAsync(payload);
     console.log("payload", payload);
   }
 
@@ -98,6 +103,49 @@ export default function DonorCreateForm() {
       className="space-y-6"
       onSubmit={form.handleSubmit(onSubmit)}
     >
+      {/* User */}
+      <FieldGroup>
+        <Controller
+          name="userId"
+          control={form.control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel
+                htmlFor="donor-create-form-userId"
+                className="text-dark-primary"
+              >
+                User
+              </FieldLabel>
+              <Select
+                name={field.name}
+                value={field.value ? `${field.value}` : ""}
+                onValueChange={(value) => field.onChange(Number(value))}
+                disabled={isUsersLoading}
+              >
+                <SelectTrigger
+                  id="donor-create-form-userId"
+                  aria-invalid={fieldState.invalid}
+                >
+                  <SelectValue
+                    placeholder={
+                      isUsersLoading ? "Loading users..." : "Select user email"
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent position="item-aligned">
+                  <SelectSeparator />
+                  {users?.map((user) => (
+                    <SelectItem key={user.userId} value={`${user.userId}`}>
+                      {user.email}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </FieldGroup>
       {/* NIC No */}
       <FieldGroup>
         <Controller

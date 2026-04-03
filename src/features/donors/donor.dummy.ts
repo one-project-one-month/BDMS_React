@@ -72,3 +72,18 @@ export const dummyDonors: Donor[] = [
     isActive: true,
   },
 ];
+
+// {
+//   "id": 1,
+//   "userId": 4,
+//   "nicNo": "321654987V",
+//   "dateOfBirth": "1990-03-15",
+//   "gender": "Female",
+//   "bloodGroup": "AB+",
+//   "lastDonationDate":"2024-11-15",
+//   "remarks": "First time donor",
+//   "emergencyContact": "Sara Lee",
+//   "emergencyPhone": "0756789012",
+//   "address": "22 Beach Rd, Negombo",
+//   "isActive": true
+// }

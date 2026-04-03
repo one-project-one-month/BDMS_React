@@ -14,6 +14,7 @@ export interface Donor {
 }
 
 export interface StoreDonorPayload {
+  userId: number;
   nicNo: string;
   dateOfBirth: string;
   gender: string;

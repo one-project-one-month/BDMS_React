@@ -23,15 +23,12 @@ import {
 } from "../queries/donorQueries";
 import { donorKeys } from "../queries";
 import type { Donor } from "../donor.types";
-import { dummyDonors } from "../donor.dummy";
 
 export default function DonorListPage() {
   const queryClient = useQueryClient();
-  //   const { data: donors, isPending } = useQuery(getDonorsQueryOptions);
-  //   const safeDonors = donors ?? [];
+  const { data: donors, isPending } = useQuery(getDonorsQueryOptions);
+  const safeDonors = donors ?? [];
 
-  const safeDonors = dummyDonors;
-  const isPending = false;
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedDonor, setSelectedDonor] = useState<Donor | null>(null);
 

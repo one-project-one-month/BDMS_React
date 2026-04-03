@@ -11,6 +11,7 @@ import { DONOR_ENDPOINTS } from "@/api/endpoints/donor.endpoints";
 /** Get all donors */
 export const getDonors = async (): Promise<Donor[]> => {
   const { data } = await api.get<ApiResponse<Donor[]>>(DONOR_ENDPOINTS.LIST);
+  console.log("getDonors response:", data); // ← add this
 
   if (!data.isSuccess)
     throw new Error(data.message || `Failed to fetch ${DONOR_ENDPOINTS.LIST}`);
