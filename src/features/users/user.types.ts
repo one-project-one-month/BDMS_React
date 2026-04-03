@@ -32,11 +32,3 @@ export interface UpdateUserPayload {
   userRoleId: number;
   userHospitalId: number | null;
 }
-
-export interface DeleteUserPayload {
-  userId: number;
-  username: string;
-  email: string;
-  userRoleId: number;
-  userHospitalId: number | null;
-}
