@@ -5,12 +5,14 @@ import type { AuthSession } from "@/features/auth/auth.types";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 const API_PREFIX = "/api";
+export const HAS_API_BASE_URL = Boolean(BASE_URL);
+export const API_BASE = BASE_URL ? `${BASE_URL}${API_PREFIX}` : undefined;
 
-if (!BASE_URL) {
-    throw new Error("VITE_API_BASE_URL is not defined");
+if (!HAS_API_BASE_URL) {
+    console.warn(
+        "VITE_API_BASE_URL is not defined. API-backed features will be unavailable until a backend URL is configured.",
+    );
 }
-
-export const API_BASE = `${BASE_URL}${API_PREFIX}`;
 
 const api = axios.create({
     baseURL: API_BASE,

@@ -1,5 +1,6 @@
 /** @author Khant Loon Thu */
 
+import { HAS_API_BASE_URL } from "@/api/axios-client";
 import api from "@/api/axios-client";
 import { AUTH_ENDPOINTS } from "@/api/endpoints/auth.endpoints";
 import type {
@@ -80,6 +81,10 @@ export const logout = async (
 
 /** Fetch the current session using the route-based /me. */
 export const getCurrentSession = async (): Promise<AuthSession | null> => {
+  if (!HAS_API_BASE_URL) {
+    return null;
+  }
+
   const mode = getAuthModeFromPath();
 
   try {
@@ -107,8 +112,10 @@ export const getCurrentSession = async (): Promise<AuthSession | null> => {
       expireToken: "",
     };
   } catch (error) {
-    if (isAxiosError(error) && error.response?.status === 401) {
-      return null;
+    if (isAxiosError(error)) {
+      if (error.response?.status === 401 || !error.response) {
+        return null;
+      }
     }
     throw error;
   }
