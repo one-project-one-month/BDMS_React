@@ -1,7 +1,6 @@
 import api from "@/api/axios-client";
 import type { ApiResponse } from "@/features/auth/auth.types";
 import type {
-  DeleteDonorPayload,
   Donor,
   StoreDonorPayload,
   UpdateDonorPayload,
@@ -11,7 +10,6 @@ import { DONOR_ENDPOINTS } from "@/api/endpoints/donor.endpoints";
 /** Get all donors */
 export const getDonors = async (): Promise<Donor[]> => {
   const { data } = await api.get<ApiResponse<Donor[]>>(DONOR_ENDPOINTS.LIST);
-  console.log("getDonors response:", data); // ← add this
 
   if (!data.isSuccess)
     throw new Error(data.message || `Failed to fetch ${DONOR_ENDPOINTS.LIST}`);
@@ -68,18 +66,14 @@ export const updateDonor = async (
 };
 
 /** Delete a specific donor */
-export const deleteDonor = async (donor: Donor): Promise<boolean> => {
-  const payload: DeleteDonorPayload = {
-    id: donor.id,
-  };
-
-  const { data } = await api.delete<ApiResponse<null>>(DONOR_ENDPOINTS.DELETE, {
-    data: payload,
-  });
+export const deleteDonor = async (donorId: number): Promise<boolean> => {
+  const { data } = await api.delete<ApiResponse<null>>(
+    DONOR_ENDPOINTS.DELETE(donorId),
+  );
 
   if (!data.isSuccess)
     throw new Error(
-      data.message || `Failed to delete ${DONOR_ENDPOINTS.DELETE}`,
+      data.message || `Failed to delete ${DONOR_ENDPOINTS.DELETE(donorId)}`,
     );
 
   return true;

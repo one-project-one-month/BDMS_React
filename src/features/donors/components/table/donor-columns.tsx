@@ -1,4 +1,3 @@
-import type { Donor } from "../donor.types";
 import type { ColumnDef } from "@tanstack/react-table";
 
 import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
@@ -14,15 +13,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import type { Donor } from "../../donor.types";
 
 const basePath = "/admin/donors";
 
 type ColumnHandlers = {
   onRequestDelete: (donor: Donor) => void;
+  onRequestStatus: (donor: Donor) => void;
 };
 
 export const buildColumns = ({
   onRequestDelete,
+  onRequestStatus,
 }: ColumnHandlers): ColumnDef<Donor>[] => {
   return [
     {
@@ -91,6 +93,7 @@ export const buildColumns = ({
               "cursor-pointer text-secondary",
               donor.isActive ? "bg-green-400" : "bg-destructive",
             )}
+            onClick={() => onRequestStatus(donor)}
           >
             {donor.isActive ? "Active" : "Inactive"}
           </Badge>

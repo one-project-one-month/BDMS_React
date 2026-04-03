@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/table-skeleton";
-import type { Donor } from "../donor.types";
+import type { Donor } from "../../donor.types";
 
 interface DonorDataTableProps {
   columns: ColumnDef<Donor, unknown>[];

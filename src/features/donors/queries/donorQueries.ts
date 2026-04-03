@@ -1,6 +1,8 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import { donorKeys } from "./donorKeys";
 import {
+  activateDonor,
+  deactivateDonor,
   deleteDonor,
   getDonor,
   getDonors,
@@ -58,4 +60,26 @@ export const deleteDonorMutationOptions = mutationOptions<
   Parameters<typeof deleteDonor>[0]
 >({
   mutationFn: deleteDonor,
+});
+
+/**
+ * Mutation: activate donor.
+ */
+export const activateDonorMutationOptions = mutationOptions<
+  Donor,
+  unknown,
+  Parameters<typeof activateDonor>[0]
+>({
+  mutationFn: activateDonor,
+});
+
+/**
+ * Mutation: deactivate Donor.
+ */
+export const deactivateDonorMutationOptions = mutationOptions<
+  Donor,
+  unknown,
+  Parameters<typeof deactivateDonor>[0]
+>({
+  mutationFn: deactivateDonor,
 });

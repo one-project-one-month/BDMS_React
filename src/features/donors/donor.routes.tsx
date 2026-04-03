@@ -3,6 +3,8 @@ import type { RouteObject } from "react-router-dom";
 // import DonorEditPage from "./pages/donor-edit";
 import DonorListPage from "./pages/donor-list-page";
 import DonorCreatePage from "./pages/donor-create-page";
+import DonorDetailPage from "./pages/donor-detail-page";
+import DonorEditPage from "./pages/donor-edit-page";
 
 export const donorRoutes: RouteObject = {
   path: "donors",
@@ -15,13 +17,13 @@ export const donorRoutes: RouteObject = {
       path: "create",
       element: <DonorCreatePage />,
     },
-    // {
-    //   path: ":donorId/edit",
-    //   element: <DonorEditPage />,
-    // },
-    // {
-    //   path: ":donorId",
-    //   element: <DonorDetailPage />,
-    // },
+    {
+      path: ":donorId/edit",
+      element: <DonorEditPage />,
+    },
+    {
+      path: ":donorId",
+      element: <DonorDetailPage />,
+    },
   ],
 };

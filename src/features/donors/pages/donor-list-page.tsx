@@ -14,15 +14,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-import DonorDataTable from "../components/donor-data-table";
-import { buildColumns } from "../components/donor-columns";
+import DonorDataTable from "../components/table/donor-data-table";
 
 import {
   deleteDonorMutationOptions,
   getDonorsQueryOptions,
+  activateDonorMutationOptions,
+  deactivateDonorMutationOptions,
 } from "../queries/donorQueries";
 import { donorKeys } from "../queries";
 import type { Donor } from "../donor.types";
+import { buildColumns } from "../components/table/donor-columns";
+import { toast } from "sonner";
 
 export default function DonorListPage() {
   const queryClient = useQueryClient();
@@ -31,13 +34,51 @@ export default function DonorListPage() {
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedDonor, setSelectedDonor] = useState<Donor | null>(null);
+  const [statusOpen, setStatusOpen] = useState(false);
 
   const deleteMutation = useMutation({
     ...deleteDonorMutationOptions,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: donorKeys.list() });
+      toast.success("Donor record deleted successfully.", {
+        position: "bottom-right",
+      });
       setDeleteOpen(false);
       setSelectedDonor(null);
+    },
+  });
+
+  const activateMutation = useMutation({
+    ...activateDonorMutationOptions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: donorKeys.list() });
+      toast.success("Donor activated successfully.", {
+        position: "bottom-right",
+      });
+      setSelectedDonor(null);
+      setStatusOpen(false);
+    },
+    onError: () => {
+      toast.error("Failed donor activation.", {
+        position: "bottom-right",
+      });
+    },
+  });
+
+  const deactivateMutation = useMutation({
+    ...deactivateDonorMutationOptions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: donorKeys.list() });
+      toast.success("Donor deactivated successfully.", {
+        position: "bottom-right",
+      });
+      setSelectedDonor(null);
+      setStatusOpen(false);
+    },
+    onError: () => {
+      toast.error("Failed donor deactivation.", {
+        position: "bottom-right",
+      });
     },
   });
 
@@ -48,11 +89,30 @@ export default function DonorListPage() {
 
   const handleConfirmDelete = () => {
     if (!selectedDonor || deleteMutation.isPending) return;
-    deleteMutation.mutateAsync(selectedDonor);
+    deleteMutation.mutateAsync(selectedDonor.id);
+  };
+
+  const handleRequestStatus = (donor: Donor) => {
+    setSelectedDonor(donor);
+    setStatusOpen(true);
+  };
+
+  const handleActivate = () => {
+    if (!selectedDonor || activateMutation.isPending) return;
+    activateMutation.mutateAsync(selectedDonor.id);
+  };
+
+  const handleDeactivate = () => {
+    if (!selectedDonor || deactivateMutation.isPending) return;
+    deactivateMutation.mutateAsync(selectedDonor.id);
   };
 
   const columns = useMemo(
-    () => buildColumns({ onRequestDelete: handleRequestDelete }),
+    () =>
+      buildColumns({
+        onRequestDelete: handleRequestDelete,
+        onRequestStatus: handleRequestStatus,
+      }),
     [],
   );
 
@@ -102,6 +162,64 @@ export default function DonorListPage() {
             </Button>
           </DialogFooter>
         </DialogContent>
+      </Dialog>
+
+      {/* Status dialog */}
+      <Dialog open={statusOpen} onOpenChange={setStatusOpen}>
+        {!selectedDonor?.isActive ? (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Activate Donor</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to activate{" "}
+                <span className="font-medium">
+                  {selectedDonor?.nicNo ?? "this donor"}
+                </span>
+                ?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setStatusOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                onClick={handleActivate}
+                disabled={activateMutation.isPending}
+                className="bg-green-400 hover:bg-green-500"
+              >
+                {activateMutation.isPending ? "Activating..." : "Activate"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        ) : (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Deactivate Donor</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to deactivate{" "}
+                <span className="font-medium">
+                  {selectedDonor?.nicNo ?? "this donor"}
+                </span>
+                ?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setStatusOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={handleDeactivate}
+                disabled={deactivateMutation.isPending}
+                className="hover:bg-dark-primary"
+              >
+                {deactivateMutation.isPending
+                  ? "Deactivating..."
+                  : "Deactivate"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
     </Card>
   );

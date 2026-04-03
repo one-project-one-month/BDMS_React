@@ -31,10 +31,45 @@ import { getUsersQueryOptions } from "@/features/users/queries";
 const formSchema = z.object({
   userId: z.number().min(1, "Please select a user."),
   nicNo: z.string().min(9, "NIC No must be at least 9 characters."),
-  dateOfBirth: z.string().min(1, "Date of birth is required."),
+  dateOfBirth: z
+    .string()
+    .min(1, "Date of birth is required.")
+    .refine((val) => {
+      const date = new Date(val);
+      const today = new Date();
+      return date < today;
+    }, "Date of birth cannot be in the future.")
+    .refine((val) => {
+      const date = new Date(val);
+      const today = new Date();
+      const age = today.getFullYear() - date.getFullYear();
+      return age >= 18;
+    }, "Donor must be at least 18 years old.")
+    .refine((val) => {
+      const date = new Date(val);
+      const today = new Date();
+      const age = today.getFullYear() - date.getFullYear();
+      return age <= 65;
+    }, "Donor must be under 65 years old."),
   gender: z.string().min(1, "Please select a gender."),
   bloodGroup: z.string().min(1, "Please select a blood group."),
-  lastDonationDate: z.string().nullable(),
+  lastDonationDate: z
+    .string()
+    .nullable()
+    .refine((val) => {
+      if (!val) return true;
+      const date = new Date(val);
+      const today = new Date();
+      return date <= today;
+    }, "Last donation date cannot be in the future.")
+    .refine((val) => {
+      if (!val) return true;
+      const date = new Date(val);
+      const today = new Date();
+      const diffDays =
+        (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+      return diffDays >= 56; // 56 days = 8 weeks minimum between donations
+    }, "Minimum 56 days (8 weeks) must have passed since last donation."),
   remarks: z.string().optional(),
   emergencyContact: z.string().min(1, "Emergency contact name is required."),
   emergencyPhone: z.string().min(9, "Please enter a valid phone number."),
@@ -68,6 +103,7 @@ export default function DonorCreateForm() {
   const queryClient = useQueryClient();
   const { data: users, isPending: isUsersLoading } =
     useQuery(getUsersQueryOptions);
+  console.log("users", users);
   const createDonorMutation = useMutation({
     ...createDonorMutationOptions,
     onSuccess: () => {
@@ -134,11 +170,15 @@ export default function DonorCreateForm() {
                 </SelectTrigger>
                 <SelectContent position="item-aligned">
                   <SelectSeparator />
-                  {users?.map((user) => (
-                    <SelectItem key={user.userId} value={`${user.userId}`}>
-                      {user.email}
-                    </SelectItem>
-                  ))}
+                  {users
+                    ?.filter(
+                      (user) => user.isActive && user.role.roleName === "user",
+                    )
+                    .map((user) => (
+                      <SelectItem key={user.userId} value={`${user.userId}`}>
+                        {user.email}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
