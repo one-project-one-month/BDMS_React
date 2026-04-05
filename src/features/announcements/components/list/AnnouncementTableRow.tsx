@@ -1,4 +1,4 @@
-import type { AnnouncementDetailTypes } from '@/types/AnnouncementTypes'
+import type { AnnouncementDetailTypes } from '@/features/announcements/types/AnnouncementTypes'
 import { useDeleteAnnouncement } from '../../hooks/useAnnouncement';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,9 @@ const AnnouncementTableRow = ({announcement}: Props) => {
 
       {/* Title */}
       <TableCell>{announcement.title}</TableCell> 
+
+      {/* Title */}
+      <TableCell>{announcement.category}</TableCell> 
 
       {/* Content */}
       <TableCell className="max-w-[300px] truncate">

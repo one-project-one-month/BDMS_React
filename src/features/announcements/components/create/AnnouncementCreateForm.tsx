@@ -15,7 +15,7 @@ import {  useCreateAnnouncement, useUpdateAnnouncement } from "../../hooks/useAn
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 type FormValues = {
   title: string;

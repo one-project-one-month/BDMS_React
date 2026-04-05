@@ -1,4 +1,4 @@
-import AnnouncementCreateSection from '@/modules/announcement/components/create/AnnouncementCreateSection'
+import AnnouncementCreateSection from '@/features/announcements/components/create/AnnouncementCreateSection'
 import React from 'react'
 
 type Props = {}

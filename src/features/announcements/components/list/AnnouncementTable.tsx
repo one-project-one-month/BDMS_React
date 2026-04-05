@@ -4,14 +4,14 @@ import { useAnnouncements } from '../../hooks/useAnnouncement'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { SearchIcon } from 'lucide-react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
-import AnnouncementTableLoader from './AnnouncementTableLoader'
+import TableSkeleton from '@/components/table-skeleton'
 
 
-const AnnouoncementTable = () => {
+const AnnouncementTable = () => {
 
   const {data, isLoading} = useAnnouncements(); 
 
-  if (isLoading) return <AnnouncementTableLoader/>; 
+  if (isLoading) return <TableSkeleton columns={7} rows={10} />; 
 
   return (
     <div className="space-y-6 p-6 bg-gray-100 rounded-sm border border-gray-200 w-full">
@@ -68,4 +68,4 @@ const AnnouoncementTable = () => {
   )
 }
 
-export default AnnouoncementTable
+export default AnnouncementTable

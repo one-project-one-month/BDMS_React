@@ -1,5 +1,7 @@
 import React from 'react'
-import AnnouoncementTable from './AnnouoncementTable'
+import AnnouncementTable from './AnnouncementTable'
+
+
 
 const AnnouncementListSection = () => {
   return (
@@ -7,7 +9,7 @@ const AnnouncementListSection = () => {
       <h3 className='font-semibold text-primary px-4 mb-12 text-2xl'>
         Announcements 
       </h3>
-      <AnnouoncementTable />
+      <AnnouncementTable/>
     </div>
   )
 }
