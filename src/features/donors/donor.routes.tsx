@@ -5,9 +5,11 @@ import DonorListPage from "./pages/donor-list-page";
 import DonorCreatePage from "./pages/donor-create-page";
 import DonorDetailPage from "./pages/donor-detail-page";
 import DonorEditPage from "./pages/donor-edit-page";
+import DonorErrorPage from "./pages/donor-error-page";
 
 export const donorRoutes: RouteObject = {
   path: "donors",
+  errorElement: <DonorErrorPage />,
   children: [
     {
       index: true,

@@ -76,7 +76,7 @@ const formSchema = z.object({
   address: z.string().min(1, "Address is required."),
 });
 
-const GENDER_OPTIONS = ["Male", "Female", "Other"];
+const GENDER_OPTIONS = ["Male", "Female"];
 
 const BLOOD_GROUP_OPTIONS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 
@@ -103,7 +103,6 @@ export default function DonorCreateForm() {
   const queryClient = useQueryClient();
   const { data: users, isPending: isUsersLoading } =
     useQuery(getUsersQueryOptions);
-  console.log("users", users);
   const createDonorMutation = useMutation({
     ...createDonorMutationOptions,
     onSuccess: () => {
@@ -129,8 +128,7 @@ export default function DonorCreateForm() {
   });
 
   async function onSubmit(payload: z.infer<typeof formSchema>) {
-    createDonorMutation.mutateAsync(payload);
-    console.log("payload", payload);
+    createDonorMutation.mutateAsync({ ...payload, isActive: true });
   }
 
   return (
@@ -230,6 +228,7 @@ export default function DonorCreateForm() {
                 id="donor-create-form-dob"
                 aria-invalid={fieldState.invalid}
                 type="date"
+                max={new Date().toISOString().split("T")[0]}
               />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
@@ -399,6 +398,7 @@ export default function DonorCreateForm() {
                   id="donor-create-form-ldd"
                   aria-invalid={fieldState.invalid}
                   type="date"
+                  max={new Date().toISOString().split("T")[0]}
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />

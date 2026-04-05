@@ -6,20 +6,24 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getDonorQueryOptions } from "../queries";
+import { getUserQueryOptions } from "@/features/users/queries";
 
 export default function DonorDetailTable({ id }: { id: number }) {
   const { data: donor } = useSuspenseQuery(getDonorQueryOptions(id));
-  console.log("donor", donor);
+  const { data: user } = useSuspenseQuery(getUserQueryOptions(donor.userId));
   return (
     <>
-      <div>
-        <Button asChild variant={"outline"}>
-          <Link to={"/admin/donors"}>Back to Donor List</Link>
-        </Button>
-      </div>
       <div className="overflow-hidden rounded-[10px] border">
         <Table>
           <TableBody>
+            <TableRow className="divide-x">
+              <TableCell>Name</TableCell>
+              <TableCell>{user?.username ?? "-"}</TableCell>
+            </TableRow>
+            <TableRow className="divide-x">
+              <TableCell>Email</TableCell>
+              <TableCell>{user?.email ?? "-"}</TableCell>
+            </TableRow>
             <TableRow className="divide-x">
               <TableCell>NIC No</TableCell>
               <TableCell>{donor?.nicNo ?? "-"}</TableCell>

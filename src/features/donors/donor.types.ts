@@ -24,6 +24,7 @@ export interface StoreDonorPayload {
   emergencyContact: string;
   emergencyPhone: string;
   address: string;
+  isActive: boolean;
 }
 
 export interface UpdateDonorPayload extends StoreDonorPayload {

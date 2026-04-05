@@ -36,12 +36,27 @@ const formSchema = z.object({
   dateOfBirth: z.string(),
   gender: z.string(),
   bloodGroup: z.string(),
-  lastDonationDate: z.string().nullable().optional(),
+  lastDonationDate: z
+    .string()
+    .optional()
+    .refine((val) => {
+      if (!val) return true;
+      const date = new Date(val);
+      const today = new Date();
+      return date <= today;
+    }, "Last donation date cannot be in the future.")
+    .refine((val) => {
+      if (!val) return true;
+      const date = new Date(val);
+      const today = new Date();
+      const diffDays =
+        (today.getTime() - date.getTime()) / (1000 * 60 * 60 * 24);
+      return diffDays >= 56; // 56 days = 8 weeks minimum between donations
+    }, "Minimum 56 days (8 weeks) must have passed since last donation."),
   remarks: z.string().optional(),
   emergencyContact: z.string(),
   emergencyPhone: z.string(),
   address: z.string(),
-  isActive: z.boolean(),
 });
 
 export default function DonorEditForm({ id }: { id: number }) {
@@ -63,7 +78,6 @@ export default function DonorEditForm({ id }: { id: number }) {
       emergencyContact: donor.emergencyContact,
       emergencyPhone: donor.emergencyPhone,
       address: donor.address,
-      isActive: donor.isActive,
     },
   });
 
@@ -94,7 +108,8 @@ export default function DonorEditForm({ id }: { id: number }) {
   async function onSubmit(payload: z.infer<typeof formSchema>) {
     await updateMutation.mutateAsync({
       ...payload,
-      lastDonationDate: payload.lastDonationDate || null,
+      lastDonationDate: payload.lastDonationDate || "",
+      isActive: true,
     });
   }
 
@@ -233,7 +248,7 @@ export default function DonorEditForm({ id }: { id: number }) {
         />
 
         {/* Active */}
-        <Controller
+        {/* <Controller
           name="isActive"
           control={form.control}
           render={({ field }) => (
@@ -253,7 +268,7 @@ export default function DonorEditForm({ id }: { id: number }) {
               </Select>
             </Field>
           )}
-        />
+        /> */}
       </FieldGroup>
 
       {form.formState.errors.root && (
