@@ -1,35 +1,35 @@
 import { Typography } from "@/components/ui/typography";
+import { steps } from "../schema";
 
 interface StepIndicatorProps {
   currentStep: number;
 }
 
-const steps = [
-  { label: "Person Details" },
-  { label: "Requirement Details" },
-  { label: "Contact & Reason" },
-  { label: "Confirm" },
-];
-
 export default function StepIndicator({ currentStep }: StepIndicatorProps) {
   return (
-    <div className="flex items-start justify-center w-full">
+    <div className="flex w-full items-start justify-center overflow-x-auto pb-2">
       {steps.map((step, index) => {
         const isActive = index === currentStep;
+        const isCompleted = index < currentStep;
         const isLast = index === steps.length - 1;
 
         return (
-          <div key={index} className="flex items-start justify-center">
-            {/* Step circle + label */}
+          <div
+            key={step.title}
+            className="flex min-w-36 items-start justify-center"
+          >
             <div className="flex flex-col items-center gap-2">
               <div
-                className={`w-16 h-16 rounded-full flex items-center justify-center shrink-0 shadow
-                  ${isActive ? "bg-red-500" : "bg-gray-400"}`}
+                className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow transition-colors md:h-14 md:w-14 ${
+                  isActive || isCompleted ? "bg-red-500" : "bg-gray-300"
+                }`}
               >
                 <Typography
                   as="h3"
                   variant="title"
-                  className={isActive ? "text-white" : "text-gray-100"}
+                  className={
+                    isActive || isCompleted ? "text-white" : "text-gray-600"
+                  }
                 >
                   {index + 1}
                 </Typography>
@@ -37,24 +37,35 @@ export default function StepIndicator({ currentStep }: StepIndicatorProps) {
               <Typography
                 as="span"
                 variant="body"
-                className="font-semibold text-center leading-tight text-gray-90"
+                className={`max-w-28 text-center text-sm! font-semibold leading-tight ${
+                  isActive ? "text-primary" : "text-muted-foreground"
+                }`}
               >
-                {step.label}
+                {step.title}
               </Typography>
             </div>
 
-            {/* Connector arrows */}
             {!isLast && (
-              <div className="flex items-center" style={{ marginTop: "2rem", transform: "translateY(-50%)" }}>
+              <div
+                className="mt-6 flex items-center md:mt-7"
+                style={{ transform: "translateY(-50%)" }}
+              >
                 <div className="flex items-center gap-0.5">
                   {Array.from({ length: 12 }).map((_, i) => (
-                    <div key={i} className="w-2 h-[1.5px] bg-gray-400" />
+                    <div
+                      key={i}
+                      className={`h-[1.5px] w-2 ${
+                        isCompleted ? "bg-red-400" : "bg-gray-300"
+                      }`}
+                    />
                   ))}
                   <svg
                     width="8"
                     height="8"
                     viewBox="0 0 8 8"
-                    className="text-gray-400 -ml-1"
+                    className={`-ml-1 ${
+                      isCompleted ? "text-red-400" : "text-gray-300"
+                    }`}
                   >
                     <path
                       d="M1 1 L6 4 L1 7"

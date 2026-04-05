@@ -1,45 +1,55 @@
 import z from "zod";
 
+import {
+  BLOOD_GROUP_OPTIONS,
+  RELATIONSHIP_OPTIONS,
+  REQUEST_TYPE_OPTIONS,
+} from "./requests.types";
+
 export const formSchema = z.object({
-  patientName: z.string().min(2).max(100),
-  bloodType: z.string().refine(
-    (val) => ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].includes(val),
-    "Please select a valid blood type",
-  ),
-  hospitalName: z.string().min(2).max(200),
-  address: z.string().min(5).max(500),
-  numberOfUnits: z.number().int().min(1).max(20),
+  patientName: z.string().trim().min(2).max(100),
+  bloodGroup: z.enum(BLOOD_GROUP_OPTIONS, {
+    error: "Please select a valid blood group",
+  }),
+  hospitalId: z.number().int().positive("Please select a hospital"),
+  hospitalAddress: z.string().trim().min(5).max(500),
+  unitsRequired: z.number().int().min(1).max(20),
   requiredDate: z
     .date()
-    .refine((val) => !Number.isNaN(val.getTime()), "Invalid date")
+    .refine((value) => !Number.isNaN(value.getTime()), "Invalid date")
     .refine(
-      (val) => val >= new Date(new Date().setHours(0, 0, 0, 0)),
+      (value) => value >= new Date(new Date().setHours(0, 0, 0, 0)),
       "Date cannot be in the past",
     ),
-  requestType: z.string().refine(
-    (val) => ["emergency", "pre-booked"].includes(val),
-    "Please select request type",
-  ),
-  relationshipToPatient: z.string().refine(
-    (val) => ["self","parent","spouse","child","sibling","relative","friend","guardian","other"].includes(val),
-    "Please select relationship to patient",
-  ),
-  contactNumber: z.string().regex(/^[0-9+\-\s()]{8,20}$/, "Please enter a valid phone number"),
-  reasonForRequest: z.string().min(10).max(500),
-  additionalNotes: z.string().max(500).optional(),
+  requestType: z.enum(REQUEST_TYPE_OPTIONS, {
+    error: "Please select request type",
+  }),
+  relationshipToPatient: z.enum(RELATIONSHIP_OPTIONS, {
+    error: "Please select relationship to patient",
+  }),
+  contactPhone: z
+    .string()
+    .trim()
+    .regex(/^[0-9+\-\s()]{8,20}$/, "Please enter a valid phone number"),
+  reason: z.string().trim().min(10).max(500),
+  additionalNotes: z.string().trim().max(500),
 });
 
 export const steps = [
   {
-    title: "Person Details",
-    fields: ["patientName", "bloodType", "hospitalName", "address"],
+    title: "Patient Details",
+    fields: ["patientName", "bloodGroup", "hospitalId", "hospitalAddress"],
   },
   {
-    title: "Requirement Details",
-    fields: ["numberOfUnits", "requiredDate", "requestType"],
+    title: "Request Details",
+    fields: ["unitsRequired", "requiredDate", "requestType"],
   },
   {
     title: "Contact & Reason",
-    fields: ["relationshipToPatient", "contactNumber", "reasonForRequest", "additionalNotes"],
+    fields: ["relationshipToPatient", "contactPhone", "reason", "additionalNotes"],
   },
-];
+  {
+    title: "Review & Submit",
+    fields: [],
+  },
+] as const;

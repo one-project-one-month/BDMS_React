@@ -1,7 +1,59 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getHospitals } from "../api/api";
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
 
-export const hospitalQueryOptions = queryOptions({
-    queryKey: ["hospitals"],
-    queryFn: getHospitals,
-})
+import type { BloodRequest, Hospital } from "../requests.types";
+import {
+  createBloodRequest,
+  getBloodRequest,
+  getBloodRequests,
+  getHospitals,
+  updateBloodRequest,
+  updateBloodRequestStatus,
+} from "../api/api";
+
+export const requestKeys = {
+  all: ["blood-requests"] as const,
+  list: () => [...requestKeys.all, "list"] as const,
+  detail: (id: number) => [...requestKeys.all, "detail", id] as const,
+  hospitals: () => [...requestKeys.all, "hospitals"] as const,
+};
+
+export const hospitalQueryOptions = queryOptions<Hospital[]>({
+  queryKey: requestKeys.hospitals(),
+  queryFn: getHospitals,
+  staleTime: 5 * 60 * 1000,
+});
+
+export const bloodRequestsQueryOptions = queryOptions<BloodRequest[]>({
+  queryKey: requestKeys.list(),
+  queryFn: getBloodRequests,
+});
+
+export const bloodRequestDetailQueryOptions = (id: number) =>
+  queryOptions<BloodRequest>({
+    queryKey: requestKeys.detail(id),
+    queryFn: () => getBloodRequest(id),
+  });
+
+export const createBloodRequestMutationOptions = mutationOptions<
+  BloodRequest,
+  unknown,
+  Parameters<typeof createBloodRequest>[0]
+>({
+  mutationFn: createBloodRequest,
+});
+
+export const updateBloodRequestMutationOptions = mutationOptions<
+  BloodRequest,
+  unknown,
+  Parameters<typeof updateBloodRequest>[0]
+>({
+  mutationFn: updateBloodRequest,
+});
+
+export const updateBloodRequestStatusMutationOptions = mutationOptions<
+  BloodRequest,
+  unknown,
+  Parameters<typeof updateBloodRequestStatus>[0]
+>({
+  mutationFn: updateBloodRequestStatus,
+});

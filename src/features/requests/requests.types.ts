@@ -17,12 +17,60 @@ export type BloodRequestStatus =
   | "rejected"
   | "fulfilled";
 
-export type BloodRequestStatusa =
-  | "pending"
-  | "cancelled"
-  | "approved"
-  | "rejected"
-  | "fulfilled";
+export type RequestType = "emergency" | "pre-booked";
+
+export type RelationshipToPatient =
+  | "self"
+  | "parent"
+  | "spouse"
+  | "child"
+  | "sibling"
+  | "relative"
+  | "friend"
+  | "guardian"
+  | "other";
+
+export const BLOOD_GROUP_OPTIONS: BloodGroup[] = [
+  "A+",
+  "A-",
+  "B+",
+  "B-",
+  "AB+",
+  "AB-",
+  "O+",
+  "O-",
+];
+
+export const REQUEST_TYPE_OPTIONS: RequestType[] = [
+  "emergency",
+  "pre-booked",
+];
+
+export const RELATIONSHIP_OPTIONS: RelationshipToPatient[] = [
+  "self",
+  "parent",
+  "spouse",
+  "child",
+  "sibling",
+  "relative",
+  "friend",
+  "guardian",
+  "other",
+];
+
+export interface BloodRequestFormValues {
+  patientName: string;
+  bloodGroup: BloodGroup;
+  hospitalId: number;
+  hospitalAddress: string;
+  unitsRequired: number;
+  requiredDate: Date;
+  requestType: RequestType;
+  relationshipToPatient: RelationshipToPatient;
+  contactPhone: string;
+  reason: string;
+  additionalNotes: string;
+}
 
 export interface BloodRequest {
   id: number;
@@ -31,27 +79,32 @@ export interface BloodRequest {
   bloodRequestCode: string;
   patientName: string;
   bloodGroup: BloodGroup;
+  hospitalName: string;
+  hospitalAddress: string;
   unitsRequired: number;
   contactPhone: string;
   urgency: BloodRequestUrgency;
-  requiredDate: Date;
+  requestType: RequestType;
+  relationshipToPatient: RelationshipToPatient;
+  requiredDate: string;
   status: BloodRequestStatus;
   reason: string;
+  additionalNotes: string | null;
   approvedBy: number | null;
-  approvedAt: Date | null;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  approvedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }
 
 export interface CreateBloodRequestPayload {
   userId: number;
   hospitalId: number;
   patientName: string;
-  bloodGroup: string;
+  bloodGroup: BloodGroup;
   unitsRequired: number;
   contactPhone: string;
-  urgency: string;
+  urgency: BloodRequestUrgency;
   requiredDate: {
     year: number;
     month: number;
@@ -63,6 +116,16 @@ export interface CreateBloodRequestPayload {
 
 export interface UpdateBloodRequestPayload extends CreateBloodRequestPayload {
   id: number;
+}
+
+export interface RequestMutationInput {
+  userId: number;
+  values: BloodRequestFormValues;
+}
+
+export interface RequestStatusUpdateInput {
+  id: number;
+  status: BloodRequestStatus;
 }
 
 export interface ApiResponse<T> {
@@ -80,7 +143,7 @@ export interface Hospital {
   email: string;
   isActive: boolean;
   isVerified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-  deletedAt: Date | null;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 }

@@ -10,9 +10,9 @@ export function FormRow({
   children: React.ReactNode;
 }) {
   return (
-    <Field className="px-4 flex flex-row items-start">
-      <FieldLabel className="text-lg font-bold tracking-tight text-gray-700">
-        {label} : 
+    <Field className="grid gap-2 px-1 md:grid-cols-[11rem_1fr] md:items-start">
+      <FieldLabel className="pt-2 text-sm font-semibold tracking-tight text-gray-700 md:text-base">
+        {label}:
       </FieldLabel>
       <div className="flex flex-col gap-1">
         {children}
