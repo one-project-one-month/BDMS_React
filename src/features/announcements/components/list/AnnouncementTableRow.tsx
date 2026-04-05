@@ -2,6 +2,7 @@ import type { AnnouncementDetailTypes } from '@/features/announcements/types/Ann
 import { useDeleteAnnouncement } from '../../hooks/useAnnouncement';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
+import { confirmDelete } from '../../utils/confirmDelete';
 
 type Props = {
   announcement: AnnouncementDetailTypes & { id: number };  
@@ -9,12 +10,16 @@ type Props = {
 
 const AnnouncementTableRow = ({announcement}: Props) => {
 
-  const { mutate: deleteAnnouncement, isPending: isDeleting} = useDeleteAnnouncement(); 
+  const { mutateAsync: deleteAnnouncement, isPending: isDeleting} = useDeleteAnnouncement(); 
 
   const navigate = useNavigate(); 
 
   const handleDelete = () => {
-    deleteAnnouncement(announcement.id); 
+    confirmDelete({
+      message: "Are you sure you want to delete?",
+      onConfirm: () => deleteAnnouncement(announcement.id),
+      toastMessage: "Announcement deleted"
+    })
   }
 
   return (

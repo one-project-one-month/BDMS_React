@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 type FormValues = {
   title: string;
@@ -67,11 +68,17 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
       updateAnnouncement({
         id: (defaultValues as any).id, 
         data, 
-      }); 
+      });  
+      toast.success("Announcement edited successfully", {
+        position: "bottom-right",
+      });
       navigate("/Announcements"); 
     } else {
       createAnnouncement(data);
-      console.log("input data: ", data);
+      //console.log("input data: ", data);
+      toast.success("Announcement created successfully", {
+        position: "bottom-right",
+      });
       navigate("/Announcements"); 
     }
     
