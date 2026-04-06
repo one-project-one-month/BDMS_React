@@ -2,7 +2,7 @@ import React from 'react'
 
 import { useParams } from 'react-router-dom'
 
-import { useAnnouncementById } from '../../hooks/useAnnouncement';
+import { useAnnouncementById } from '../../queries/useAnnouncement';
 import AnnouncementCreateFormLoader from '../create/AnnouncementCreateFormLoader';
 import CreateAnnouncementForm from '../create/AnnouncementCreateForm';
 

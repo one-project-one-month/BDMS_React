@@ -1,6 +1,6 @@
 import React from 'react'
 import AnnouncementTableRow from './AnnouncementTableRow'
-import { useAnnouncements } from '../../hooks/useAnnouncement'
+import { useAnnouncements } from '../../queries/useAnnouncement'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { SearchIcon } from 'lucide-react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'

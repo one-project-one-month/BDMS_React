@@ -11,13 +11,14 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field";
-import {  useCreateAnnouncement, useUpdateAnnouncement } from "../../hooks/useAnnouncement";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import type {  AnnouncementResponseTypes } from "../../types/AnnouncementTypes";
+import { useMutation } from "@tanstack/react-query";
+import { createAnnouncementMutationOptions, updateAnnouncementMutationOptions } from "../../queries";
 
 type FormValues = {
   title: string;
@@ -35,7 +36,6 @@ type Props = {
   defaultValues?: AnnouncementResponseTypes;
   mode: "create" | "edit";
 }
-
 
 const CreateAnnouncementForm = ({defaultValues, mode} : Props) => {
   const { register, handleSubmit, setValue, watch, reset } = useForm<FormValues>({
@@ -55,8 +55,10 @@ const CreateAnnouncementForm = ({defaultValues, mode} : Props) => {
   const month = watch("expiredAt.month"); 
   const year = watch("expiredAt.year"); 
 
-  const { mutate: createAnnouncement, isPending } = useCreateAnnouncement(); 
-  const { mutate: updateAnnouncement } = useUpdateAnnouncement(); 
+  const { mutate: createAnnouncement, isPending: isCreating } = useMutation(createAnnouncementMutationOptions);  
+
+  const {mutate: updateAnnouncement, isPending: isUpdating} = useMutation(updateAnnouncementMutationOptions); 
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -214,20 +216,20 @@ const CreateAnnouncementForm = ({defaultValues, mode} : Props) => {
         {mode === "create" && (
           <button
             type="submit"
-            disabled={isPending}
+            disabled={isCreating || isUpdating}
             className="px-4 py-2 mt-6 bg-primary text-white rounded-md w-fit mx-auto"
           >
-            {isPending ? "Creating..." : "Create Announcement"}
+            {isCreating ? "Creating..." : "Create Announcement"}
           </button>
         )}
 
         {mode === "edit" && (
           <button
             type="submit"
-            disabled={isPending}
+            disabled={isCreating || isUpdating}
             className="px-4 py-2 mt-6 bg-primary text-white rounded-md w-fit mx-auto"
           >
-            {isPending ? "Saving..." : "Save changes"}
+            {isUpdating ? "Saving..." : "Save changes"}
           </button>
         )}
         
