@@ -1,7 +1,7 @@
 
 import { createAnnouncement, deleteAnnouncement, getAnnouncementById, getAnnouncements, updateAnnouncement } from "@/services/announcementService";
 import { useQuery, useMutation, useQueryClient, queryOptions, mutationOptions} from "@tanstack/react-query"; 
-import { type Announcement, type AnnouncementDetailTypes } from "../types/AnnouncementTypes";
+import { type Announcement, type AnnouncementDetailTypes, type AnnouncementResponseTypes } from "../types/AnnouncementTypes";
 import { announcementKeys } from "./announcementKeys";
 
 
@@ -10,9 +10,12 @@ export const getAnnouncementQueryOptions = queryOptions<Announcement[]>({
     queryFn: getAnnouncements,
   }); 
 
-export const getAnnouncementByIdQueryOptions = (id: number) => queryOptions<Announcement[]>({
+export const getAnnouncementByIdQueryOptions = (id: number) => queryOptions<AnnouncementResponseTypes>({
     queryKey: announcementKeys.detail(id),
-    queryFn: () => getAnnouncementById(id),
+    queryFn: async () =>{
+      const res = await getAnnouncementById(id); 
+      return res.data[0];
+    },
     enabled: !!id,
   });
 

@@ -2,9 +2,10 @@ import React from 'react'
 
 import { useParams } from 'react-router-dom'
 
-import { useAnnouncementById } from '../../queries/useAnnouncement';
+import { getAnnouncementByIdQueryOptions } from '../../queries/useAnnouncement';
 import AnnouncementCreateFormLoader from '../create/AnnouncementCreateFormLoader';
 import CreateAnnouncementForm from '../create/AnnouncementCreateForm';
+import { useQuery } from '@tanstack/react-query';
 
 
 const AnnouncementEditSection = () => { 
@@ -12,7 +13,7 @@ const AnnouncementEditSection = () => {
   const { id } = useParams(); 
   const numericId = Number(id); 
 
-  const { data, isLoading } = useAnnouncementById(numericId); 
+  const { data, isLoading } = useQuery(getAnnouncementByIdQueryOptions(numericId)); 
 
   if (isLoading) return <AnnouncementCreateFormLoader/>; 
 

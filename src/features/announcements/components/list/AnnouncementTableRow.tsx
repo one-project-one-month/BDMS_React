@@ -1,8 +1,9 @@
 import type { AnnouncementDetailTypes, AnnouncementResponseTypes } from '@/features/announcements/types/AnnouncementTypes'
-import { useDeleteAnnouncement } from '../../queries/useAnnouncement';
+import { deleteAnnouncementMutationOptions } from '../../queries/useAnnouncement';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
 import { confirmDelete } from '../../utils/confirmDelete';
+import { useMutation } from '@tanstack/react-query';
 
 type Props = {
   announcement: AnnouncementResponseTypes;  
@@ -10,7 +11,7 @@ type Props = {
 
 const AnnouncementTableRow = ({announcement}: Props) => {
 
-  const { mutateAsync: deleteAnnouncement, isPending: isDeleting} = useDeleteAnnouncement(); 
+  const { mutateAsync: deleteAnnouncement, isPending: isDeleting} = useMutation(deleteAnnouncementMutationOptions); 
 
   const navigate = useNavigate(); 
 

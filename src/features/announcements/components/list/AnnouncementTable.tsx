@@ -1,16 +1,17 @@
 import React from 'react'
 import AnnouncementTableRow from './AnnouncementTableRow'
-import { useAnnouncements } from '../../queries/useAnnouncement'
+import { getAnnouncementQueryOptions } from '../../queries/useAnnouncement'
 import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { SearchIcon } from 'lucide-react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import TableSkeleton from '@/components/table-skeleton'
 import type { AnnouncementDetailTypes, AnnouncementResponseTypes } from '../../types/AnnouncementTypes'
+import { useQuery } from '@tanstack/react-query'
 
 
 const AnnouncementTable = () => {
 
-  const {data, isLoading} = useAnnouncements(); 
+  const {data, isLoading} = useQuery(getAnnouncementQueryOptions); 
 
   if (isLoading) return <TableSkeleton columns={7} rows={10} />; 
 
