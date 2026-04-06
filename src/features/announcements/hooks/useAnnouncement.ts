@@ -1,6 +1,7 @@
 
 import { createAnnouncement, deleteAnnouncement, getAnnouncementById, getAnnouncements, updateAnnouncement } from "@/services/announcementService";
 import { useQuery, useMutation, useQueryClient} from "@tanstack/react-query"; 
+import type { AnnouncementDetailTypes } from "../types/AnnouncementTypes";
 
 
 export const useAnnouncements = () => {
@@ -46,7 +47,7 @@ export const useUpdateAnnouncement = () => {
   const queryClient = useQueryClient(); 
 
   return useMutation({
-    mutationFn: ({id, data} : {id: number; data: any}) => updateAnnouncement(id, data), 
+    mutationFn: ({id, data} : {id: number; data: AnnouncementDetailTypes}) => updateAnnouncement(id, data), 
 
     onSuccess: () => {
       queryClient.invalidateQueries({queryKey: ["announcements"]});

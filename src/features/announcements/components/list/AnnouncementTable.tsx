@@ -5,6 +5,7 @@ import { Table, TableBody, TableCaption, TableCell, TableFooter, TableHead, Tabl
 import { SearchIcon } from 'lucide-react'
 import { InputGroup, InputGroupAddon, InputGroupInput } from '@/components/ui/input-group'
 import TableSkeleton from '@/components/table-skeleton'
+import type { AnnouncementDetailTypes, AnnouncementResponseTypes } from '../../types/AnnouncementTypes'
 
 
 const AnnouncementTable = () => {
@@ -45,7 +46,7 @@ const AnnouncementTable = () => {
         </TableHeader>
 
         <TableBody>
-          {data?.map((d: any) => (
+          {data?.map((d: AnnouncementResponseTypes) => (
             <AnnouncementTableRow
               announcement={d}
               key={d.id}

@@ -17,10 +17,11 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectVa
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import type {  AnnouncementResponseTypes } from "../../types/AnnouncementTypes";
 
 type FormValues = {
   title: string;
-  category?: string;
+  category: string;
   content: string;
   isActive: boolean;
   expiredAt: {
@@ -30,16 +31,17 @@ type FormValues = {
   };
 };
 
-type props = {
-  defaultValues?: FormValues;
-  mode: string;
+type Props = {
+  defaultValues?: AnnouncementResponseTypes;
+  mode: "create" | "edit";
 }
 
 
-const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
+const CreateAnnouncementForm = ({defaultValues, mode} : Props) => {
   const { register, handleSubmit, setValue, watch, reset } = useForm<FormValues>({
     defaultValues: defaultValues || {
       title: "",
+      category: "",
       content: "",
       isActive: true,
       expiredAt: {
@@ -50,13 +52,26 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
     },
   });
 
+  const month = watch("expiredAt.month"); 
+  const year = watch("expiredAt.year"); 
+
   const { mutate: createAnnouncement, isPending } = useCreateAnnouncement(); 
   const { mutate: updateAnnouncement } = useUpdateAnnouncement(); 
   const navigate = useNavigate();
 
   useEffect(() => {
     if (defaultValues){
-      reset(defaultValues); 
+      reset({
+        title: defaultValues.title,
+        category: defaultValues.category,
+        content: defaultValues.content,
+        isActive: defaultValues.isActive,
+        expiredAt: {
+          year: defaultValues.expiredAt.year,
+          month: defaultValues.expiredAt.month,
+          day: defaultValues.expiredAt.day,
+        },
+      });
     }
   }, [defaultValues, reset]); 
 
@@ -66,7 +81,7 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
 
     if (mode === "edit" && defaultValues){
       updateAnnouncement({
-        id: (defaultValues as any).id, 
+        id: defaultValues.id, 
         data, 
       });  
       toast.success("Announcement edited successfully", {
@@ -82,7 +97,9 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
       navigate("/Announcements"); 
     }
     
-    reset(); 
+    if (mode === "create"){
+      reset(); 
+    }
   };
 
 
@@ -144,10 +161,10 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
                 Month
               </FieldLabel>
               <Select 
-                defaultValue=""  
-                onValueChange={(val) => setValue("expiredAt.month", Number(val))}>
+                value={month?.toString()}
+                onValueChange={(val) => setValue("expiredAt.month", Number(val), {shouldValidate: true})}>
                 <SelectTrigger>
-                  <SelectValue placeholder="MM" {...register("expiredAt.month", { required: true })}/>
+                  <SelectValue placeholder="MM"/>
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -172,10 +189,10 @@ const CreateAnnouncementForm = ({defaultValues, mode} : props) => {
                 Year
               </FieldLabel>
               <Select 
-                defaultValue="" 
-                 onValueChange={(val) => setValue("expiredAt.year", Number(val))} >
+                value={year?.toString()}
+                onValueChange={(val) => setValue("expiredAt.year", Number(val), {shouldValidate: true})} >
                 <SelectTrigger >
-                  <SelectValue placeholder="YYYY" {...register("expiredAt.year", { required: true })}/>
+                  <SelectValue placeholder="YYYY" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>

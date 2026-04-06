@@ -1,4 +1,5 @@
 import { ANNOUNCEMENT_ENDPOINTS } from "@/api/endpoints/announcement.endpoints"
+import type { AnnouncementDetailTypes } from "@/features/announcements/types/AnnouncementTypes";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -24,10 +25,7 @@ export const getAnnouncementById = async (id: number) => {
   return res.json(); 
 }
 
-
-//temporarily used any for data 
-//must fix later
-export const createAnnouncement = async (data: any) => {
+export const createAnnouncement = async (data: AnnouncementDetailTypes) => {
 
   const res = await fetch(`${BASE_URL}${ANNOUNCEMENT_ENDPOINTS.CREATE}`, {
     method: "POST", 
@@ -42,7 +40,7 @@ export const createAnnouncement = async (data: any) => {
   return res.json(); 
 }
 
-export const updateAnnouncement = async (id: number, data: any) => {
+export const updateAnnouncement = async (id: number, data: AnnouncementDetailTypes) => {
 
   const res = await fetch(`${BASE_URL}${ANNOUNCEMENT_ENDPOINTS.UPDATE(id)}`, {
     method: "PUT", 

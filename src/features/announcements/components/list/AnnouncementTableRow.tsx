@@ -1,11 +1,11 @@
-import type { AnnouncementDetailTypes } from '@/features/announcements/types/AnnouncementTypes'
+import type { AnnouncementDetailTypes, AnnouncementResponseTypes } from '@/features/announcements/types/AnnouncementTypes'
 import { useDeleteAnnouncement } from '../../hooks/useAnnouncement';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { useNavigate } from 'react-router-dom';
 import { confirmDelete } from '../../utils/confirmDelete';
 
 type Props = {
-  announcement: AnnouncementDetailTypes & { id: number };  
+  announcement: AnnouncementResponseTypes;  
 }
 
 const AnnouncementTableRow = ({announcement}: Props) => {
