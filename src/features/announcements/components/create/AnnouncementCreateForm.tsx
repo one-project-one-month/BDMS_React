@@ -85,22 +85,26 @@ const CreateAnnouncementForm = ({defaultValues, mode} : Props) => {
       updateAnnouncement({
         id: defaultValues.id, 
         data, 
-      });  
-      toast.success("Announcement edited successfully", {
-        position: "bottom-right",
-      });
-      navigate("/Announcements"); 
+      }, 
+      {
+        onSuccess: () => {
+          toast.success("Announcement edited successfully", {
+            position: "bottom-right",
+          });
+          navigate("/Announcements"); 
+        }
+      }
+    );       
     } else {
-      createAnnouncement(data);
-      //console.log("input data: ", data);
-      toast.success("Announcement created successfully", {
-        position: "bottom-right",
+      createAnnouncement(data, {
+        onSuccess: () => {
+          toast.success("Announcement created successfully", {
+            position: "bottom-right",
+          });
+          navigate("/Announcements"); 
+          reset();
+        }
       });
-      navigate("/Announcements"); 
-    }
-    
-    if (mode === "create"){
-      reset(); 
     }
   };
 
