@@ -263,7 +263,7 @@ export default function DonorCreateForm() {
                 <SelectContent position="item-aligned">
                   <SelectSeparator />
                   {GENDER_OPTIONS.map((gender) => (
-                    <SelectItem key={gender} value={gender}>
+                    <SelectItem key={gender} value={gender.toLowerCase()}>
                       {gender}
                     </SelectItem>
                   ))}
