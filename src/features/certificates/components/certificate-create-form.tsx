@@ -8,7 +8,7 @@ import * as z from "zod";
 
 import { generateCertificate } from "../api/certificate-api";
 import { certificateKeys, getDonorListQueryOptions } from "../queries";
-import { extractApiErrorMessage } from "../utils/error-utils";
+import { extractApiErrorMessage } from "../utils/errorUtils";
 
 // UI Components
 import {

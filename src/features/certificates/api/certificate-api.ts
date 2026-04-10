@@ -6,7 +6,7 @@ import { CERTIFICATE_ENDPOINTS } from "@/api/endpoints/certificate.endpoints";
 import { DONATION_ENDPOINTS } from "@/api/endpoints/donation.endpoints";
 import { DONOR_ENDPOINTS } from "@/api/endpoints/donor.endpoints";
 import type { Certificate, Donor, GenerateCertificatePayload } from "../certificate.types";
-import { extractApiErrorMessage } from "../utils/error-utils";
+import { extractApiErrorMessage } from "../utils/errorUtils";
 
 const COMPLETED_DONATION_RULE_TEXT = "donor must have at least one completed donation";
 
