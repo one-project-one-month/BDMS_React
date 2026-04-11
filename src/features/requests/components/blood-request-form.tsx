@@ -104,8 +104,12 @@ export const BloodRequestForm = ({
     [initialValues],
   );
 
-  const { data: hospitals = [], isPending: isHospitalsPending } =
-    useQuery(hospitalQueryOptions);
+  const {
+    data: hospitals = [],
+    isPending: isHospitalsPending,
+    isError: isHospitalsError,
+    error: hospitalsError,
+  } = useQuery(hospitalQueryOptions);
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -185,6 +189,13 @@ export const BloodRequestForm = ({
           ? await updateMutation.mutateAsync({ id: requestId, ...payload })
           : await createMutation.mutateAsync(payload);
 
+      queryClient.setQueryData<BloodRequest[]>(
+        requestKeys.list(),
+        (currentRequests = []) => [
+          request,
+          ...currentRequests.filter((item) => item.id !== request.id),
+        ],
+      );
       await queryClient.invalidateQueries({ queryKey: requestKeys.list() });
       queryClient.setQueryData(requestKeys.detail(request.id), request);
 
@@ -225,6 +236,14 @@ export const BloodRequestForm = ({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-8 pt-6">
+        {isHospitalsError && (
+          <div className="rounded-md border border-destructive/25 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+            {hospitalsError instanceof Error
+              ? hospitalsError.message
+              : "Unable to load hospitals. Check your session and API connection."}
+          </div>
+        )}
+
         <form id="blood-request-form" onSubmit={form.handleSubmit(handleSubmit)}>
           {currentStep === 0 && (
             <div className="flex flex-col gap-5">

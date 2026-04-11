@@ -105,12 +105,7 @@ export interface CreateBloodRequestPayload {
   unitsRequired: number;
   contactPhone: string;
   urgency: BloodRequestUrgency;
-  requiredDate: {
-    year: number;
-    month: number;
-    day: number;
-    dayOfWeek: number;
-  };
+  requiredDate: string;
   reason: string;
 }
 

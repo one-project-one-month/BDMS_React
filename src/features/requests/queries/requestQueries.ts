@@ -21,17 +21,20 @@ export const hospitalQueryOptions = queryOptions<Hospital[]>({
   queryKey: requestKeys.hospitals(),
   queryFn: getHospitals,
   staleTime: 5 * 60 * 1000,
+  retry: false,
 });
 
 export const bloodRequestsQueryOptions = queryOptions<BloodRequest[]>({
   queryKey: requestKeys.list(),
   queryFn: getBloodRequests,
+  retry: false,
 });
 
 export const bloodRequestDetailQueryOptions = (id: number) =>
   queryOptions<BloodRequest>({
     queryKey: requestKeys.detail(id),
     queryFn: () => getBloodRequest(id),
+    retry: false,
   });
 
 export const createBloodRequestMutationOptions = mutationOptions<

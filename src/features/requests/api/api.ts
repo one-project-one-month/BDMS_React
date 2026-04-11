@@ -17,49 +17,12 @@ import type {
   UpdateBloodRequestPayload,
 } from "../requests.types";
 
-const MOCK_REQUEST_STORAGE_KEY = "bdms.mock-blood-requests";
-const USE_REQUEST_LOCAL_CACHE = true;
-
-const MOCK_HOSPITALS: Hospital[] = [
-  {
-    id: 1,
-    name: "Yangon General Hospital",
-    address: "Bogyoke Aung San Road, Lanmadaw Township, Yangon",
-    phone: "+95 1 000 0001",
-    email: "contact@ygh.example",
-    isActive: true,
-    isVerified: true,
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-    deletedAt: null,
-  },
-  {
-    id: 2,
-    name: "North Okkalapa General Hospital",
-    address: "North Okkalapa Township, Yangon",
-    phone: "+95 1 000 0002",
-    email: "contact@nogh.example",
-    isActive: true,
-    isVerified: true,
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-    deletedAt: null,
-  },
-  {
-    id: 3,
-    name: "Mandalay General Hospital",
-    address: "Chanayethazan Township, Mandalay",
-    phone: "+95 2 000 0003",
-    email: "contact@mgh.example",
-    isActive: true,
-    isVerified: true,
-    createdAt: "2026-01-01T00:00:00.000Z",
-    updatedAt: "2026-01-01T00:00:00.000Z",
-    deletedAt: null,
-  },
-];
-
 type UpdateRequestMutationInput = RequestMutationInput & { id: number };
+type DateOnlyLike = {
+  year: number;
+  month: number;
+  day: number;
+};
 
 const getNowIso = () => new Date().toISOString();
 
@@ -71,12 +34,43 @@ const toUrgency = (requestType: RequestType): BloodRequestUrgency =>
 
 const toRequiredDatePayload = (
   requiredDate: Date,
-): CreateBloodRequestPayload["requiredDate"] => ({
-  year: requiredDate.getFullYear(),
-  month: requiredDate.getMonth() + 1,
-  day: requiredDate.getDate(),
-  dayOfWeek: requiredDate.getDay(),
-});
+): CreateBloodRequestPayload["requiredDate"] => {
+  const year = requiredDate.getFullYear();
+  const month = String(requiredDate.getMonth() + 1).padStart(2, "0");
+  const day = String(requiredDate.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+const toIsoDateString = (
+  value: string | Date | DateOnlyLike | undefined | null,
+) => {
+  if (!value) {
+    return getNowIso();
+  }
+
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  return new Date(value.year, value.month - 1, value.day).toISOString();
+};
+
+const getApiErrorMessage = (error: unknown, fallback: string) => {
+  if (isAxiosError(error)) {
+    const responseMessage =
+      (error.response?.data as { message?: string } | undefined)?.message ??
+      error.message;
+
+    return responseMessage || fallback;
+  }
+
+  return error instanceof Error ? error.message : fallback;
+};
 
 const sortRequests = (requests: BloodRequest[]) =>
   [...requests].sort(
@@ -84,43 +78,31 @@ const sortRequests = (requests: BloodRequest[]) =>
       new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
   );
 
-const readMockRequests = (): BloodRequest[] => {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  const raw = window.localStorage.getItem(MOCK_REQUEST_STORAGE_KEY);
-  if (!raw) {
-    return [];
-  }
-
-  try {
-    return sortRequests(JSON.parse(raw) as BloodRequest[]);
-  } catch {
-    window.localStorage.removeItem(MOCK_REQUEST_STORAGE_KEY);
-    return [];
+const ensureApiBaseUrl = () => {
+  if (!HAS_API_BASE_URL) {
+    throw new Error(
+      "VITE_API_BASE_URL is not configured. Blood request API is unavailable.",
+    );
   }
 };
 
-const writeMockRequests = (requests: BloodRequest[]) => {
-  if (typeof window === "undefined") {
-    return;
+const extractApiData = <T>(payload: ApiResponse<T> | T): T => {
+  if (
+    payload &&
+    typeof payload === "object" &&
+    "isSuccess" in payload &&
+    "isError" in payload
+  ) {
+    const response = payload as ApiResponse<T>;
+
+    if (!response.isSuccess || response.isError) {
+      throw new Error(response.message || "Request failed");
+    }
+
+    return response.data;
   }
 
-  window.localStorage.setItem(
-    MOCK_REQUEST_STORAGE_KEY,
-    JSON.stringify(sortRequests(requests)),
-  );
-};
-
-const resolveHospital = (hospitalId: number, hospitals: Hospital[]) => {
-  const hospital = hospitals.find((item) => item.id === hospitalId);
-
-  if (!hospital) {
-    throw new Error("Selected hospital could not be found.");
-  }
-
-  return hospital;
+  return payload as T;
 };
 
 const normalizeRequest = (
@@ -172,10 +154,9 @@ const normalizeRequest = (
       request.relationshipToPatient ??
       fallback?.values?.relationshipToPatient ??
       "relative",
-    requiredDate:
-      request.requiredDate ??
-      fallback?.values?.requiredDate.toISOString() ??
-      getNowIso(),
+    requiredDate: toIsoDateString(
+      request.requiredDate ?? fallback?.values?.requiredDate,
+    ),
     status: request.status ?? fallback?.status ?? "pending",
     reason: request.reason ?? fallback?.values?.reason ?? "",
     additionalNotes:
@@ -202,257 +183,130 @@ const buildApiPayload = (
   reason: input.values.reason.trim(),
 });
 
-const buildStoredRequest = (
-  input: RequestMutationInput,
-  hospital: Hospital,
-  existing?: BloodRequest,
-): BloodRequest => {
-  const now = getNowIso();
-
-  return {
-    id:
-      existing?.id ??
-      Math.max(0, ...readMockRequests().map((request) => request.id)) + 1,
-    userId: existing?.userId ?? input.userId,
-    hospitalId: input.values.hospitalId,
-    bloodRequestCode:
-      existing?.bloodRequestCode ??
-      `BR-${String(Math.max(0, ...readMockRequests().map((request) => request.id)) + 1).padStart(4, "0")}`,
-    patientName: input.values.patientName.trim(),
-    bloodGroup: input.values.bloodGroup,
-    hospitalName: hospital.name,
-    hospitalAddress: input.values.hospitalAddress.trim() || hospital.address,
-    unitsRequired: input.values.unitsRequired,
-    contactPhone: input.values.contactPhone.trim(),
-    urgency: toUrgency(input.values.requestType),
-    requestType: input.values.requestType,
-    relationshipToPatient: input.values.relationshipToPatient,
-    requiredDate: input.values.requiredDate.toISOString(),
-    status: existing?.status ?? "pending",
-    reason: input.values.reason.trim(),
-    additionalNotes: input.values.additionalNotes.trim() || null,
-    approvedBy: existing?.approvedBy ?? null,
-    approvedAt: existing?.approvedAt ?? null,
-    createdAt: existing?.createdAt ?? now,
-    updatedAt: now,
-    deletedAt: existing?.deletedAt ?? null,
-  };
-};
-
-const saveMockRequest = async (
-  input: RequestMutationInput,
-  existing?: BloodRequest,
-): Promise<BloodRequest> => {
-  const hospitals = await getHospitals();
-  const hospital = resolveHospital(input.values.hospitalId, hospitals);
-  const storedRequest = buildStoredRequest(input, hospital, existing);
-  const requests = readMockRequests();
-  const remainingRequests = requests.filter(
-    (request) => request.id !== storedRequest.id,
-  );
-
-  writeMockRequests([storedRequest, ...remainingRequests]);
-  return storedRequest;
-};
-
-const setMockRequestStatus = (
-  input: RequestStatusUpdateInput,
-): BloodRequest => {
-  const requests = readMockRequests();
-  const existingRequest = requests.find((request) => request.id === input.id);
-
-  if (!existingRequest) {
-    throw new Error("Blood request not found");
-  }
-
-  const updatedRequest: BloodRequest = {
-    ...existingRequest,
-    status: input.status,
-    approvedAt:
-      input.status === "approved" || input.status === "fulfilled"
-        ? getNowIso()
-        : null,
-    updatedAt: getNowIso(),
-  };
-
-  writeMockRequests([
-    updatedRequest,
-    ...requests.filter((request) => request.id !== input.id),
-  ]);
-
-  return updatedRequest;
-};
-
 export const getHospitals = async (): Promise<Hospital[]> => {
-  if (USE_REQUEST_LOCAL_CACHE || !HAS_API_BASE_URL) {
-    return MOCK_HOSPITALS;
-  }
+  ensureApiBaseUrl();
 
   try {
-    const { data } = await api.get<ApiResponse<Hospital[]>>(
+    const { data } = await api.get<ApiResponse<Hospital[]> | Hospital[]>(
       HOSPITAL_ENDPOINTS.LIST,
     );
-
-    if (!data.isSuccess || data.isError) {
-      throw new Error(data.message || "Failed to fetch hospitals");
-    }
-
-    return data.data;
+    return extractApiData(data);
   } catch (error) {
-    if (isAxiosError(error) && !error.response) {
-      return MOCK_HOSPITALS;
-    }
-
-    throw error;
+    throw new Error(getApiErrorMessage(error, "Failed to fetch hospitals"));
   }
 };
 
 export const getBloodRequests = async (): Promise<BloodRequest[]> => {
-  if (USE_REQUEST_LOCAL_CACHE || !HAS_API_BASE_URL) {
-    return readMockRequests();
-  }
+  ensureApiBaseUrl();
 
   try {
     const hospitals = await getHospitals();
-    const { data } = await api.get<ApiResponse<BloodRequest[]>>(
+    const { data } = await api.get<ApiResponse<BloodRequest[]> | BloodRequest[]>(
       BLOOD_REQUEST_ENDPOINTS.LIST,
     );
-
-    if (!data.isSuccess || data.isError) {
-      throw new Error(data.message || "Failed to fetch blood requests");
-    }
+    const requests = extractApiData(data);
 
     return sortRequests(
-      data.data.map((request) => normalizeRequest(request, hospitals)),
+      requests.map((request) => normalizeRequest(request, hospitals)),
     );
   } catch (error) {
-    if (isAxiosError(error) && !error.response) {
-      return readMockRequests();
-    }
-
-    throw error;
+    throw new Error(
+      getApiErrorMessage(error, "Failed to fetch blood requests"),
+    );
   }
 };
 
 export const getBloodRequest = async (id: number): Promise<BloodRequest> => {
-  if (USE_REQUEST_LOCAL_CACHE || !HAS_API_BASE_URL) {
-    const request = readMockRequests().find((item) => item.id === id);
-
-    if (!request) {
-      throw new Error("Blood request not found");
-    }
-
-    return request;
-  }
+  ensureApiBaseUrl();
 
   try {
     const hospitals = await getHospitals();
-    const { data } = await api.get<ApiResponse<BloodRequest>>(
+    const { data } = await api.get<ApiResponse<BloodRequest> | BloodRequest>(
       BLOOD_REQUEST_ENDPOINTS.GET_BY_ID(id),
     );
-
-    if (!data.isSuccess || data.isError) {
-      throw new Error(data.message || "Failed to fetch blood request");
-    }
-
-    return normalizeRequest(data.data, hospitals);
+    return normalizeRequest(extractApiData(data), hospitals);
   } catch (error) {
-    if (isAxiosError(error) && !error.response) {
-      const request = readMockRequests().find((item) => item.id === id);
-
-      if (!request) {
-        throw new Error("Blood request not found");
-      }
-
-      return request;
-    }
-
-    throw error;
+    throw new Error(
+      getApiErrorMessage(error, "Failed to fetch blood request"),
+    );
   }
 };
 
 export const createBloodRequest = async (
   input: RequestMutationInput,
 ): Promise<BloodRequest> => {
-  if (USE_REQUEST_LOCAL_CACHE || !HAS_API_BASE_URL) {
-    return saveMockRequest(input);
-  }
+  ensureApiBaseUrl();
 
   try {
     const hospitals = await getHospitals();
-    const { data } = await api.post<ApiResponse<BloodRequest>>(
+    const { data } = await api.post<ApiResponse<BloodRequest> | BloodRequest | null>(
       BLOOD_REQUEST_ENDPOINTS.CREATE,
       buildApiPayload(input),
     );
+    const createdRequest = extractApiData(data);
 
-    if (!data.isSuccess || data.isError) {
-      throw new Error(data.message || "Failed to create blood request");
+    if (createdRequest && typeof createdRequest === "object" && "id" in createdRequest) {
+      return normalizeRequest(createdRequest, hospitals, {
+        userId: input.userId,
+        values: input.values,
+        status: "pending",
+      });
     }
 
-    return normalizeRequest(data.data, hospitals, {
-      userId: input.userId,
-      values: input.values,
-      status: "pending",
-    });
+    const requests = await getBloodRequests();
+    const latestRequest = requests.find(
+      (request) =>
+        request.userId === input.userId &&
+        request.patientName === input.values.patientName.trim() &&
+        request.hospitalId === input.values.hospitalId,
+    );
+
+    if (!latestRequest) {
+      throw new Error(
+        "Blood request was submitted, but the API did not return the created record.",
+      );
+    }
+
+    return latestRequest;
   } catch (error) {
-    if (isAxiosError(error) && !error.response) {
-      return saveMockRequest(input);
-    }
-
-    throw error;
+    throw new Error(
+      getApiErrorMessage(error, "Failed to create blood request"),
+    );
   }
 };
 
 export const updateBloodRequest = async (
   input: UpdateRequestMutationInput,
 ): Promise<BloodRequest> => {
-  if (USE_REQUEST_LOCAL_CACHE || !HAS_API_BASE_URL) {
-    const existingRequest = readMockRequests().find(
-      (request) => request.id === input.id,
-    );
-
-    if (!existingRequest) {
-      throw new Error("Blood request not found");
-    }
-
-    return saveMockRequest(input, existingRequest);
-  }
+  ensureApiBaseUrl();
 
   try {
-    const hospitals = await getHospitals();
     const payload: UpdateBloodRequestPayload = {
       id: input.id,
       ...buildApiPayload(input),
     };
-    const { data } = await api.put<ApiResponse<BloodRequest>>(
+    const { data } = await api.put<ApiResponse<BloodRequest> | BloodRequest | null>(
       BLOOD_REQUEST_ENDPOINTS.UPDATE,
       payload,
     );
+    const updatedRequest = extractApiData(data);
 
-    if (!data.isSuccess || data.isError) {
-      throw new Error(data.message || "Failed to update blood request");
+    if (updatedRequest && typeof updatedRequest === "object" && "id" in updatedRequest) {
+      const hospitals = await getHospitals();
+      const currentRequest = await getBloodRequest(input.id);
+
+      return normalizeRequest(updatedRequest, hospitals, {
+        userId: currentRequest.userId,
+        values: input.values,
+        status: currentRequest.status,
+      });
     }
 
-    const currentRequest = await getBloodRequest(input.id);
-    return normalizeRequest(data.data, hospitals, {
-      userId: currentRequest.userId,
-      values: input.values,
-      status: currentRequest.status,
-    });
+    return getBloodRequest(input.id);
   } catch (error) {
-    if (isAxiosError(error) && !error.response) {
-      const existingRequest = readMockRequests().find(
-        (request) => request.id === input.id,
-      );
-
-      if (!existingRequest) {
-        throw new Error("Blood request not found");
-      }
-
-      return saveMockRequest(input, existingRequest);
-    }
-
-    throw error;
+    throw new Error(
+      getApiErrorMessage(error, "Failed to update blood request"),
+    );
   }
 };
 
@@ -460,26 +314,19 @@ export const updateBloodRequestStatus = async ({
   id,
   status,
 }: RequestStatusUpdateInput): Promise<BloodRequest> => {
-  if (USE_REQUEST_LOCAL_CACHE || !HAS_API_BASE_URL) {
-    return setMockRequestStatus({ id, status });
-  }
+  ensureApiBaseUrl();
 
   try {
-    const { data } = await api.patch<ApiResponse<unknown>>(
+    const { data } = await api.patch<ApiResponse<unknown> | unknown>(
       BLOOD_REQUEST_ENDPOINTS.PATCH_STATUS(id),
       { status },
     );
-
-    if (!data.isSuccess || data.isError) {
-      throw new Error(data.message || "Failed to update request status");
-    }
+    extractApiData(data);
 
     return getBloodRequest(id);
   } catch (error) {
-    if (isAxiosError(error) && !error.response) {
-      return setMockRequestStatus({ id, status });
-    }
-
-    throw error;
+    throw new Error(
+      getApiErrorMessage(error, "Failed to update request status"),
+    );
   }
 };

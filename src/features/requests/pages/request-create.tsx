@@ -43,6 +43,10 @@ export default function RequestCreatePage() {
     () => requests.filter((request) => request.userId === user?.userId),
     [requests, user?.userId],
   );
+  const requestLoadError =
+    error instanceof Error
+      ? error.message
+      : "Unable to load your blood requests.";
   const showCreateForm = !isPending && (userRequests.length === 0 || isCreating);
 
   if (showCreateForm) {
@@ -105,9 +109,7 @@ export default function RequestCreatePage() {
       ) : isError ? (
         <Card>
           <CardContent className="py-10 text-center text-muted-foreground">
-            {error instanceof Error
-              ? error.message
-              : "Unable to load your blood requests."}
+            {requestLoadError}
           </CardContent>
         </Card>
       ) : (
