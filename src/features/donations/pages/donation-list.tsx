@@ -130,7 +130,7 @@ export default function DonationListPage() {
 
     return (
         <Card className="px-8 py-6">
-            <header className="flex items-center justify-between mb-8">
+            <header className="flex items-center justify-between mb-6">
                 <Typography as={"h1"} variant={"subtitle"}>
                     Donations
                 </Typography>
@@ -140,7 +140,7 @@ export default function DonationListPage() {
             </header>
 
             {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 mb-6 bg-secondary/10 p-4 rounded-lg">
+            <div className="flex flex-col md:flex-row gap-4 mb-4 bg-secondary/10 rounded-lg">
                 <div className="flex-1">
                     <Label htmlFor="dateFilter" className="text-xs mb-1 block">Date</Label>
                     <Input

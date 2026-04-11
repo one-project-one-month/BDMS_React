@@ -245,7 +245,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
             )}
 
             <FieldGroup>
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 mt-6">
                     <Button type="submit" disabled={isPending}>
                         {isPending ? "Submitting..." : (isEditing ? "Update" : "Submit")}
                     </Button>
