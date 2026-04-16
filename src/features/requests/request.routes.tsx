@@ -1,12 +1,27 @@
 import type { RouteObject } from "react-router-dom";
-import RequestCreatePage from "./pages/request-create";
-import RequestDetailPage from "./pages/request-detail";
-import RequestEditPage from "./pages/request-edit";
-import RequestListPage from "./pages/request-list";
+
+// -- User Pages -- //
+import UserRequestCreatePage from "./pages/user/request-create";
+import UserRequestListPage from "./pages/user/request-list";
+
+// -- Admin Pages -- //
+import AdminRequestListPage from "./pages/admin/request-list";
+import AdminRequestCreatePage from "./pages/admin/request-create";
+import AdminRequestEditPage from "./pages/admin/request-edit";
+import AdminRequestDetailPage from "./pages/admin/request-detail";
 
 export const bloodRequestUserRoutes: RouteObject = {
   path: "blood-requests",
-  element: <RequestCreatePage />,
+  children: [
+    {
+      index: true,
+      element: <UserRequestListPage />,
+    },
+    {
+      path: "create",
+      element: <UserRequestCreatePage />,
+    },
+  ],
 };
 
 export const bloodRequestAdminRoutes: RouteObject = {
@@ -14,15 +29,19 @@ export const bloodRequestAdminRoutes: RouteObject = {
   children: [
     {
       index: true,
-      element: <RequestListPage />,
+      element: <AdminRequestListPage />,
+    },
+    {
+      path: "create",
+      element: <AdminRequestCreatePage />,
     },
     {
       path: ":requestId/edit",
-      element: <RequestEditPage />,
+      element: <AdminRequestEditPage />,
     },
     {
       path: ":requestId",
-      element: <RequestDetailPage />,
+      element: <AdminRequestDetailPage />,
     },
   ],
 };

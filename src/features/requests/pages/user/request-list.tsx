@@ -1,16 +1,14 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 
-import { BloodRequestForm } from "../components/blood-request-form";
-import StepIndicator from "../components/step-indicator";
 import useAuth from "@/context/auth/useAuth";
-import { bloodRequestsQueryOptions } from "../queries";
+import { bloodRequestsQueryOptions } from "../../queries";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
-import type { BloodRequestStatus } from "../requests.types";
+import type { BloodRequestStatus } from "../../requests.types";
 
 const formatDate = (value: string) =>
   new Intl.DateTimeFormat("en-US", {
@@ -27,10 +25,8 @@ const statusTone: Record<BloodRequestStatus, string> = {
   cancelled: "bg-slate-200 text-slate-800",
 };
 
-export default function RequestCreatePage() {
+export default function RequestListPage() {
   const { user } = useAuth();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isCreating, setIsCreating] = useState(false);
 
   const {
     data: requests = [],
@@ -43,50 +39,11 @@ export default function RequestCreatePage() {
     () => requests.filter((request) => request.userId === user?.userId),
     [requests, user?.userId],
   );
+
   const requestLoadError =
     error instanceof Error
       ? error.message
       : "Unable to load your blood requests.";
-  const showCreateForm = !isPending && (userRequests.length === 0 || isCreating);
-
-  if (showCreateForm) {
-    return (
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-        <div className="space-y-3 text-center">
-          <Typography as="h1" variant="subtitle">
-            Blood Request Form
-          </Typography>
-          <Typography className="mx-auto max-w-2xl text-muted-foreground">
-            Submit the request details clearly so the coordination team can
-            review eligibility and find donors faster.
-          </Typography>
-          {userRequests.length > 0 && (
-            <div className="flex justify-center">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  setCurrentStep(0);
-                  setIsCreating(false);
-                }}
-              >
-                Back to Blood Requests
-              </Button>
-            </div>
-          )}
-        </div>
-        <StepIndicator currentStep={currentStep} />
-        <BloodRequestForm
-          currentStep={currentStep}
-          setCurrentStep={setCurrentStep}
-          onSubmitSuccess={() => {
-            setCurrentStep(0);
-            setIsCreating(false);
-          }}
-        />
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
@@ -172,12 +129,8 @@ export default function RequestCreatePage() {
             );
           })}
 
-          <button
-            type="button"
-            onClick={() => {
-              setCurrentStep(0);
-              setIsCreating(true);
-            }}
+          <Link
+            to="/client/blood-requests/create"
             className="flex min-h-72 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-primary/35 bg-background p-6 text-center shadow-sm transition hover:border-primary hover:bg-primary/5"
           >
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
@@ -191,7 +144,7 @@ export default function RequestCreatePage() {
                 Start another blood request submission.
               </Typography>
             </div>
-          </button>
+          </Link>
         </div>
       )}
     </div>
