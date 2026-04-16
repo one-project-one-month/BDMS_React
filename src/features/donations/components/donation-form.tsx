@@ -26,12 +26,12 @@ import {
 import { Button } from "@/components/ui/button";
 
 const formSchema = z.object({
-    donor_id: z.number().min(1, "Donor ID is required."),
-    hospital_id: z.number().min(1, "Hospital ID is required."),
-    blood_group: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
-    donation_date: z.string().min(1, "Donation date is required."),
+    donorId: z.number().min(1, "Donor ID is required."),
+    hospitalId: z.number().min(1, "Hospital ID is required."),
+    bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
+    donationDate: z.string().min(1, "Donation date is required."),
     status: z.enum(['pending', 'cancelled', 'approved', 'screening', 'rejected', 'completed']),
-    units_donated: z.number().nullable().optional(),
+    unitsDonated: z.number().nullable().optional(),
     remarks: z.string().optional(),
 });
 
@@ -47,12 +47,12 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
-            donor_id: initialData?.donor_id || 0,
-            hospital_id: initialData?.hospital_id || 0,
-            blood_group: initialData?.blood_group || "O+",
-            donation_date: initialData?.donation_date ? new Date(initialData.donation_date).toISOString().split('T')[0] : "",
+            donorId: initialData?.donorId || 0,
+            hospitalId: initialData?.hospitalId || 0,
+            bloodGroup: initialData?.bloodGroup || "O+",
+            donationDate: initialData?.donationDate ? new Date(initialData.donationDate).toISOString().split('T')[0] : "",
             status: initialData?.status || "pending",
-            units_donated: initialData?.units_donated || null,
+            unitsDonated: initialData?.unitsDonated || null,
             remarks: initialData?.remarks || "",
         },
     });
@@ -105,7 +105,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
             <FieldGroup className="grid grid-cols-2 gap-4">
                 {/* Donor ID */}
                 <Controller
-                    name="donor_id"
+                    name="donorId"
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
@@ -124,7 +124,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
 
                 {/* Hospital ID */}
                 <Controller
-                    name="hospital_id"
+                    name="hospitalId"
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
@@ -143,7 +143,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
 
                 {/* Blood Group */}
                 <Controller
-                    name="blood_group"
+                    name="bloodGroup"
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
@@ -165,7 +165,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
 
                 {/* Donation Date */}
                 <Controller
-                    name="donation_date"
+                    name="donationDate"
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>
@@ -203,7 +203,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
 
                 {/* Units Donated */}
                 <Controller
-                    name="units_donated"
+                    name="unitsDonated"
                     control={form.control}
                     render={({ field, fieldState }) => (
                         <Field data-invalid={fieldState.invalid}>

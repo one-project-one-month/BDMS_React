@@ -1,21 +1,26 @@
 import { useParams } from "react-router-dom";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
-import { getDonationQueryOptions } from "@/features/donations/queries/donationQueries";
+import { getDonationsQueryOptions } from "@/features/donations/queries/donationQueries";
 import DonationForm from "@/features/donations/components/donation-form";
 
 export default function DonationEditPage() {
     const { id } = useParams<{ id: string }>();
     const donationId = Number(id);
 
-    const { data: donation, isPending, isError } = useQuery(getDonationQueryOptions(donationId));
+    const { data: donations, isPending, isError } = useQuery(getDonationsQueryOptions);
+
+    const donation = useMemo(() => 
+        donations?.find(d => d.id === donationId),
+    [donations, donationId]);
 
     if (isPending) return <div className="p-8">Loading donation details...</div>;
     if (isError || !donation) return <div className="p-8 text-destructive">Failed to load donation record.</div>;
 
     return (
-        <Card className="px-8 py-6 max-w-4xl mx-auto">
+        <Card className="px-8 py-6">
             <header className="mb-6">
                 <Typography as={"h1"} variant={"subtitle"}>
                     Edit Donation

@@ -1,7 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import {
     getDonations,
-    getDonation,
     storeDonation,
     updateDonation,
     deleteDonation,
@@ -21,13 +20,6 @@ export const getDonationsQueryOptions = queryOptions({
     queryKey: donationKeys.lists(),
     queryFn: getDonations,
 });
-
-export const getDonationQueryOptions = (id: number) =>
-    queryOptions({
-        queryKey: donationKeys.detail(id),
-        queryFn: () => getDonation(id),
-        enabled: !!id,
-    });
 
 export const storeDonationMutationOptions = {
     mutationFn: storeDonation,

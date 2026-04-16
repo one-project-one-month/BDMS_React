@@ -12,14 +12,6 @@ export const getDonations = async (): Promise<Donation[]> => {
     return data.data;
 }
 
-/** Get a specific donation */
-export const getDonation = async (id: number): Promise<Donation> => {
-    const { data } = await api.get<ApiResponse<Donation>>(DONATION_ENDPOINTS.GET_BY_ID(id));
-
-    if (!data.isSuccess) throw new Error(data.message || `Failed to fetch ${DONATION_ENDPOINTS.GET_BY_ID(id)}`);
-
-    return data.data;
-}
 
 /** Store a donation record */
 export const storeDonation = async (payload: StoreDonationPayload): Promise<Donation> => {
