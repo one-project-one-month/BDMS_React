@@ -17,17 +17,17 @@ import {
 import { Input } from "@/components/ui/input"; // Assuming you have an Input component for filtering
 import { Label } from "@/components/ui/label"; // Assuming you have a Label component
 
-import DonationDataTable from "../components/donation-data-table";
-import { buildColumns } from "../components/donation-columns";
+import DonationDataTable from "../../components/donation-data-table";
+import { buildColumns } from "../../components/donation-columns";
 
 import {
     deleteDonationMutationOptions,
     getDonationsQueryOptions,
     updateDonationStatusMutationOptions,
     createDonationAppointmentMutationOptions,
-} from "../queries/donationQueries";
-import { donationKeys } from "../queries/donationQueries";
-import type { Donation, DonationStatus } from "../donation.types";
+} from "../../queries/donationQueries";
+import { donationKeys } from "../../queries/donationQueries";
+import type { Donation, DonationStatus } from "../../donation.types";
 
 export default function DonationListPage() {
     const queryClient = useQueryClient();
@@ -44,18 +44,18 @@ export default function DonationListPage() {
     const safeDonations = useMemo(() => {
         let items = donations ?? [];
         if (dateFilter) {
-            items = items.filter(d => d.donation_date.includes(dateFilter));
+            items = items.filter(d => d.donationDate.includes(dateFilter));
         }
         if (donorFilter) {
             items = items.filter(d => {
                 const name = d.donor?.username?.toLowerCase() || "";
-                return name.includes(donorFilter.toLowerCase()) || d.donor_id.toString().includes(donorFilter);
+                return name.includes(donorFilter.toLowerCase()) || d.donorId.toString().includes(donorFilter);
             });
         }
         if (hospitalFilter) {
             items = items.filter(d => {
                 const name = d.hospital?.hospitalName?.toLowerCase() || "";
-                return name.includes(hospitalFilter.toLowerCase()) || d.hospital_id.toString().includes(hospitalFilter);
+                return name.includes(hospitalFilter.toLowerCase()) || d.hospitalId.toString().includes(hospitalFilter);
             });
         }
         return items;
@@ -216,7 +216,7 @@ export default function DonationListPage() {
                     <DialogHeader>
                         <DialogTitle>Create Appointment</DialogTitle>
                         <DialogDescription>
-                            Schedule an appointment for donation {selectedDonation?.donation_code || selectedDonation?.id}.
+                            Schedule an appointment for donation {selectedDonation?.donationCode || selectedDonation?.id}.
                         </DialogDescription>
                     </DialogHeader>
                     <div className="py-4">

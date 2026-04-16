@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
-import DonationForm from "../components/donation-form";
+import DonationForm from "@/features/donations/components/donation-form";
 
 export default function DonationCreatePage() {
     return (

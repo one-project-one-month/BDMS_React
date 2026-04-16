@@ -1,8 +1,8 @@
 import type { RouteObject } from "react-router-dom";
-import DonationListPage from "./pages/donation-list";
-import DonationCreatePage from "./pages/donation-create";
-import DonationEditPage from "./pages/donation-edit";
-import DonationDetailPage from "./pages/donation-detail";
+import DonationListPage from "./pages/admin/donation-list";
+import DonationCreatePage from "./pages/admin/donation-create";
+import DonationEditPage from "./pages/admin/donation-edit";
+import DonationDetailPage from "./pages/admin/donation-detail";
 
 export const donationRoutes: RouteObject = {
     path: "donations",

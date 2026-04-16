@@ -2,8 +2,8 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
-import { getDonationQueryOptions } from "../queries/donationQueries";
-import DonationForm from "../components/donation-form";
+import { getDonationQueryOptions } from "@/features/donations/queries/donationQueries";
+import DonationForm from "@/features/donations/components/donation-form";
 
 export default function DonationEditPage() {
     const { id } = useParams<{ id: string }>();

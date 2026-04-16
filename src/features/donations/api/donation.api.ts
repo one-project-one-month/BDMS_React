@@ -63,7 +63,7 @@ export const updateDonationStatus = async (id: number, status: DonationStatus): 
 /** Create Appointment Placeholder */
 export const createDonationAppointment = async (donationId: number, appointmentDate: string): Promise<boolean> => {
     // Note: Assuming a generic POST /Appointment/create or similar. Real implementation depends on the Appointment backend logic.
-    const { data } = await api.post<ApiResponse<any>>("/Appointment/create", { donation_id: donationId, appointment_date: appointmentDate });
+    const { data } = await api.post<ApiResponse<any>>("/Appointment/create", { donationId, appointmentDate });
 
     if (!data.isSuccess) throw new Error(data.message || `Failed to create appointment for donation ${donationId}`);
 

@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getDonationQueryOptions } from "../queries/donationQueries";
+import { getDonationQueryOptions } from "@/features/donations/queries/donationQueries";
 
 export default function DonationDetailPage() {
     const { id } = useParams<{ id: string }>();

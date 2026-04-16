@@ -28,8 +28,8 @@ type ColumnHandlers = {
     onRequestCreateAppointment: (donation: Donation) => void;
 };
 
-const getStatusColor = (status: DonationStatus) => {
-    switch (status) {
+const getStatusColor = (status: string) => {
+    switch (status.toLowerCase()) {
         case 'approved': return 'bg-green-500';
         case 'pending': return 'bg-yellow-500';
         case 'completed': return 'bg-blue-500';
@@ -47,30 +47,30 @@ export const buildColumns = ({
 }: ColumnHandlers): ColumnDef<Donation>[] => {
     return [
         {
-            accessorKey: "donation_code",
+            accessorKey: "donationCode",
             header: "Code",
-            cell: ({ row }) => row.original.donation_code || "-",
+            cell: ({ row }) => row.original.donationCode || "-",
         },
         {
             id: "donor",
-            accessorFn: (row) => row.donor?.username || `Donor #${row.donor_id}`,
+            accessorFn: (row) => row.donor?.username || `Donor #${row.donorId}`,
             header: "Donor",
         },
         {
             id: "hospital",
-            accessorFn: (row) => row.hospital?.hospitalName || `Hospital #${row.hospital_id}`,
+            accessorFn: (row) => row.hospital?.hospitalName || `Hospital #${row.hospitalId}`,
             header: "Hospital",
         },
         {
-            accessorKey: "blood_group",
+            accessorKey: "bloodGroup",
             header: "Blood Group",
-            cell: ({ row }) => <Badge variant="outline">{row.original.blood_group}</Badge>
+            cell: ({ row }) => <Badge variant="outline">{row.original.bloodGroup}</Badge>
         },
         {
-            accessorKey: "donation_date",
+            accessorKey: "donationDate",
             header: "Date",
             cell: ({ row }) => {
-                const d = new Date(row.original.donation_date);
+                const d = new Date(row.original.donationDate);
                 return isNaN(d.getTime()) ? "-" : new Intl.DateTimeFormat('en-US').format(d);
             }
         },
