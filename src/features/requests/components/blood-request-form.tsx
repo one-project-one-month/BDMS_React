@@ -10,6 +10,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronLeft, ChevronsRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -42,11 +43,11 @@ import {
 import type {
   BloodRequest,
   BloodRequestFormValues,
-} from "../requests.types";
+} from "../request.types";
 import {
   BLOOD_GROUP_OPTIONS,
   RELATIONSHIP_OPTIONS,
-} from "../requests.types";
+} from "../request.types";
 import { StyledInput } from "./styled-input";
 import { StyledTextarea } from "./styled-text-area";
 import { FormRow } from "./form-row";
@@ -60,6 +61,7 @@ interface BloodRequestFormProps {
   requestId?: number;
   initialValues?: BloodRequestFormValues;
   onSubmitSuccess?: (request: BloodRequest) => void;
+  backToListPath?: string;
 }
 
 const createDefaultValues = (
@@ -226,7 +228,7 @@ export const BloodRequestForm = ({
 
   return (
     <Card className="mx-auto w-full max-w-4xl">
-      <CardHeader className="space-y-2 border-b">
+      <CardHeader className="space-y-2">
         <CardTitle className="text-xl text-primary">
           {mode === "edit" ? "Edit Blood Request" : "Request Blood Support"}
         </CardTitle>
@@ -615,8 +617,10 @@ export const BloodRequestForm = ({
               Back
             </Button>
           ) : (
-            <div />
-          )}
+            <Button asChild type="button" variant="ghost" className="text-gray-500">
+              <Link to={"/client/blood-requests"}>Back to List</Link>
+            </Button>
+          ) }
 
           {!isLastStep && (
             <Button

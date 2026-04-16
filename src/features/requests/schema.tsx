@@ -4,7 +4,7 @@ import {
   BLOOD_GROUP_OPTIONS,
   RELATIONSHIP_OPTIONS,
   REQUEST_TYPE_OPTIONS,
-} from "./requests.types";
+} from "./request.types";
 
 export const formSchema = z.object({
   patientName: z.string().trim().min(2).max(100),

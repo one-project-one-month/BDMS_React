@@ -1,5 +1,15 @@
 export type BloodRequestUrgency = "low" | "medium" | "high" | "critical";
 
+export type BloodGroupRaw =
+  | "apositive"
+  | "anegative"
+  | "bpositive"
+  | "bnegative"
+  | "abpositive"
+  | "abnegative"
+  | "opositive"
+  | "onegative";
+
 export type BloodGroup =
   | "A+"
   | "A-"
@@ -41,10 +51,7 @@ export const BLOOD_GROUP_OPTIONS: BloodGroup[] = [
   "O-",
 ];
 
-export const REQUEST_TYPE_OPTIONS: RequestType[] = [
-  "emergency",
-  "pre-booked",
-];
+export const REQUEST_TYPE_OPTIONS: RequestType[] = ["emergency", "pre-booked"];
 
 export const RELATIONSHIP_OPTIONS: RelationshipToPatient[] = [
   "self",

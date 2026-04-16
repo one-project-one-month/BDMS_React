@@ -15,7 +15,7 @@ import type {
   RequestStatusUpdateInput,
   RequestType,
   UpdateBloodRequestPayload,
-} from "../requests.types";
+} from "../request.types";
 
 type UpdateRequestMutationInput = RequestMutationInput & { id: number };
 type DateOnlyLike = {

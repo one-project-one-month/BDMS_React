@@ -1,6 +1,6 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 
-import type { BloodRequest, Hospital } from "../requests.types";
+import type { BloodRequest, Hospital } from "../request.types";
 import {
   createBloodRequest,
   getBloodRequest,
@@ -8,7 +8,7 @@ import {
   getHospitals,
   updateBloodRequest,
   updateBloodRequestStatus,
-} from "../api/api";
+} from "../api/request.api";
 
 export const requestKeys = {
   all: ["blood-requests"] as const,
