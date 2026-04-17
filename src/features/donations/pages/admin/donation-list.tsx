@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
@@ -80,9 +81,14 @@ export default function DonationListPage() {
 
     const statusMutation = useMutation({
         ...updateDonationStatusMutationOptions,
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({ queryKey: donationKeys.lists() });
+            toast.success(`Donation status updated to ${data.status}`, { position: "bottom-right" });
         },
+        onError: (error) => {
+            console.error(error);
+            toast.error("Failed to update donation status.", { position: "bottom-right" });
+        }
     });
 
     const appointmentMutation = useMutation({

@@ -16,22 +16,18 @@ import {
     FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Typography } from "@/components/ui/typography";
 
 const formSchema = z.object({
     donorId: z.number().min(1, "Donor ID is required."),
-    hospitalId: z.number().min(1, "Hospital ID is required."),
+    hospitalId: z.number().min(1, "Hospital ID is required.").min(0, "Hospital ID cannot be less than 0."),
     bloodGroup: z.enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
     donationDate: z.string().min(1, "Donation date is required."),
     status: z.enum(['pending', 'cancelled', 'approved', 'screening', 'rejected', 'completed']),
-    unitsDonated: z.number().nullable().optional(),
+    unitsDonated: z.number().min(0, "Units donated cannot be less than 0.").nullable().optional(),
+    bloodRequestId: z.number().min(0, "Blood Request ID cannot be less than 0.").nullable().optional(),
     remarks: z.string().optional(),
 });
 
@@ -53,6 +49,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
             donationDate: initialData?.donationDate ? new Date(initialData.donationDate).toISOString().split('T')[0] : "",
             status: initialData?.status || "pending",
             unitsDonated: initialData?.unitsDonated || null,
+            bloodRequestId: initialData?.bloodRequestId || null,
             remarks: initialData?.remarks || "",
         },
     });
@@ -102,7 +99,15 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
 
     return (
         <form onSubmit={form.handleSubmit(onSubmit)}>
-            <FieldGroup className="grid grid-cols-2 gap-4">
+            {isEditing && initialData?.donationCode && (
+                <FieldGroup className="mb-4">
+                    <Field>
+                        <FieldLabel className="text-dark-primary">Donation Code</FieldLabel>
+                        <Input value={initialData.donationCode} readOnly className="bg-muted font-mono" />
+                    </Field>
+                </FieldGroup>
+            )}
+            <FieldGroup className="grid grid-cols-2 gap-4 mb-4">
                 {/* Donor ID */}
                 <Controller
                     name="donorId"
@@ -133,6 +138,7 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
                                 {...field}
                                 type="number"
                                 placeholder="Enter Hospital ID"
+                                min="0"
                                 value={field.value || ''}
                                 onChange={e => field.onChange(parseInt(e.target.value) || 0)}
                             />
@@ -201,6 +207,26 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
                     )}
                 />
 
+                {/* Blood Request ID */}
+                <Controller
+                    name="bloodRequestId"
+                    control={form.control}
+                    render={({ field, fieldState }) => (
+                        <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel className="text-dark-primary">Blood Request ID (Optional)</FieldLabel>
+                            <Input
+                                {...field}
+                                type="number"
+                                placeholder="Request ID"
+                                min="0"
+                                value={field.value || ''}
+                                onChange={e => field.onChange(parseInt(e.target.value) || null)}
+                            />
+                            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+                        </Field>
+                    )}
+                />
+
                 {/* Units Donated */}
                 <Controller
                     name="unitsDonated"
@@ -212,8 +238,12 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
                                 {...field}
                                 type="number"
                                 placeholder="Units (e.g. 1)"
-                                value={field.value || ''}
-                                onChange={e => field.onChange(parseInt(e.target.value) || null)}
+                                min="0"
+                                value={field.value ?? ''}
+                                onChange={e => {
+                                    const val = e.target.value;
+                                    field.onChange(val === '' ? null : Number(val));
+                                }}
                             />
                             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                         </Field>
@@ -242,6 +272,40 @@ export default function DonationForm({ initialData, isEditing = false }: Donatio
                         <FieldError errors={[form.formState.errors.root]} />
                     </Field>
                 </FieldGroup>
+            )}
+
+            {isEditing && (
+                <div className="mt-8 pt-6 border-t border-border space-y-4">
+                    <Typography variant="body" className="font-semibold text-muted-foreground uppercase tracking-wider">
+                        System Information
+                    </Typography>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-sm">
+                        <div className="space-y-1">
+                            <span className="text-muted-foreground block">Created By</span>
+                            <span className="font-medium">User #{initialData?.createdBy || 'System'}</span>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-muted-foreground block">Created At</span>
+                            <span className="font-medium">{initialData?.createdAt ? new Date(initialData.createdAt).toLocaleString() : 'N/A'}</span>
+                        </div>
+                        <div className="space-y-1">
+                            <span className="text-muted-foreground block">Last Updated</span>
+                            <span className="font-medium">{initialData?.updatedAt ? new Date(initialData.updatedAt).toLocaleString() : 'N/A'}</span>
+                        </div>
+                        {initialData?.approvedBy && (
+                            <div className="space-y-1">
+                                <span className="text-muted-foreground block">Approved By</span>
+                                <span className="font-medium">User #{initialData.approvedBy}</span>
+                            </div>
+                        )}
+                        {initialData?.approvedAt && (
+                            <div className="space-y-1">
+                                <span className="text-muted-foreground block">Approved At</span>
+                                <span className="font-medium">{new Date(initialData.approvedAt).toLocaleString()}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
             )}
 
             <FieldGroup>

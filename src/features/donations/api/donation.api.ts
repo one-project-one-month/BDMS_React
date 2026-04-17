@@ -12,6 +12,16 @@ export const getDonations = async (): Promise<Donation[]> => {
     return data.data;
 }
 
+/** Get a specific donation by ID */
+export const getDonationById = async (id: number): Promise<Donation> => {
+    const { data } = await api.get<ApiResponse<Donation>>(DONATION_ENDPOINTS.EDIT, {
+        params: { DonationId: id }
+    });
+
+    if (!data.isSuccess) throw new Error(data.message || `Failed to fetch donation ${id}`);
+
+    return data.data;
+}
 
 /** Store a donation record */
 export const storeDonation = async (payload: StoreDonationPayload): Promise<Donation> => {
@@ -45,9 +55,9 @@ export const deleteDonation = async (id: number): Promise<boolean> => {
 
 /** Update a specific donation status */
 export const updateDonationStatus = async (id: number, status: DonationStatus): Promise<Donation> => {
-    const { data } = await api.patch<ApiResponse<Donation>>(DONATION_ENDPOINTS.UPDATE_STATUS(id), { status });
+    const { data } = await api.patch<ApiResponse<Donation>>(DONATION_ENDPOINTS.UPDATE_STATUS, { id, status });
 
-    if (!data.isSuccess) throw new Error(data.message || `Failed to update status for donation ${DONATION_ENDPOINTS.UPDATE_STATUS(id)}`);
+    if (!data.isSuccess) throw new Error(data.message || `Failed to update status for donation ${id}`);
 
     return data.data;
 }
