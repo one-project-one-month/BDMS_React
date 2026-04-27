@@ -11,6 +11,10 @@ import DemoPage from "@/components/demo";
 import ProtectedRoute from "@/features/auth/components/protected-route";
 import { authRoutes } from "@/features/auth/auth.routes";
 import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
+import {
+  bloodRequestAdminRoutes,
+  bloodRequestUserRoutes,
+} from "@/features/requests/request.routes";
 import { userRoutes } from "@/features/users/user.routes";
 import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
 import { certificateRoutes } from "@/features/certificates/certificate.routes";
@@ -62,10 +66,7 @@ export const router = createBrowserRouter([
             path: "donations",
             element: <div>Client Donations Page</div>,
           },
-          {
-            path: "blood-requests",
-            element: <div>Client Blood Requests Page</div>,
-          },
+          bloodRequestUserRoutes,
           {
             path: "appointments",
             element: <div>Client Appointments Page</div>,
@@ -130,14 +131,7 @@ export const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
-          {
-            path: "blood-requests",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Blood Requests Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          bloodRequestAdminRoutes,
           {
             path: "appointments",
             element: (
