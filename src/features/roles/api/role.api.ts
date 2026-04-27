@@ -6,15 +6,10 @@ import type { Role } from "../role.types";
 import { ROLE_ENDPOINTS } from "@/api/endpoints/role.endpoints";
 
 /** Get all roles */
-export const getRoles = async (): Promise<Role[] | null> => {
-    try {
-        const { data } = await api.get<ApiResponse<Role[]>>(ROLE_ENDPOINTS.LIST);
-        if (!data.isSuccess || data.isError) {
-            return null
-        }
-        return data.data;
-    } catch (error) {
-        console.warn(`Failed to fetch ${ROLE_ENDPOINTS.LIST}: ${error}`);
-        return null;
-    }
+export const getRoles = async (): Promise<Role[]> => {
+    const { data } = await api.get<ApiResponse<Role[]>>(ROLE_ENDPOINTS.LIST);
+
+    if (!data.isSuccess) throw new Error(data.message || `Failed to fetch ${ROLE_ENDPOINTS.LIST}`);
+
+    return data.data;
 }

@@ -8,6 +8,10 @@ export interface Hospital {
     hospitalName: string;
 }
 
+export interface Donor {
+    donorId: number;
+}
+
 export interface User {
     userId: number;
     role: Role;
@@ -15,6 +19,7 @@ export interface User {
     username: string;
     email: string;
     isActive: boolean;
+    donor: Donor | null;
 }
 
 export interface StoreUserPayload {
@@ -26,14 +31,6 @@ export interface StoreUserPayload {
 }
 
 export interface UpdateUserPayload {
-    userId: number;
-    username: string;
-    email: string;
-    userRoleId: number;
-    userHospitalId: number | null;
-}
-
-export interface DeleteUserPayload {
     userId: number;
     username: string;
     email: string;

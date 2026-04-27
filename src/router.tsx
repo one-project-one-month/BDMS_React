@@ -16,6 +16,8 @@ import {
   bloodRequestUserRoutes,
 } from "@/features/requests/request.routes";
 import { userRoutes } from "@/features/users/user.routes";
+import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
+import { certificateRoutes } from "@/features/certificates/certificate.routes";
 
 export const router = createBrowserRouter([
   {
@@ -26,10 +28,12 @@ export const router = createBrowserRouter([
         path: "/",
         element: <GuestLayout />,
         children: [
-          {
-            index: true,
-            element: <div>Home</div>,
-          },
+        /** [start] commented by KK to remove the text "Home" in guestLayout*/
+          // {
+          //   index: true,
+          //   element: <div>Home</div>,
+          // },
+         /** [end] commented by KK to remove the text "Home" in guestLayout*/ 
           {
             // TODO: remove this in production
             path: "ui",
@@ -56,7 +60,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <div>Client Dashboard Page</div>,
+            element: <ClientDashboardLayout />,
           },
           {
             path: "donations",
@@ -109,14 +113,8 @@ export const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
-          {
-            path: "certificates",
-            element: (
-              <ProtectedRoute allowed={["admin"]}>
-                <div>Admin Certificates Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          //certificates
+          certificateRoutes,
           {
             path: "settings",
             element: (

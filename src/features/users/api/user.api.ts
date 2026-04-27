@@ -2,7 +2,7 @@
 
 import api from "@/api/axios-client";
 import type { ApiResponse } from "@/features/auth/auth.types";
-import type { DeleteUserPayload, StoreUserPayload, UpdateUserPayload, User } from "../user.types";
+import type { StoreUserPayload, UpdateUserPayload, User } from "../user.types";
 import { USER_ENDPOINTS } from "@/api/endpoints/user.endpoints";
 
 /** Get all users */
@@ -42,21 +42,12 @@ export const updateUser = async (payload: UpdateUserPayload): Promise<User> => {
 }
 
 /** Delete a specific user */
-export const deleteUser = async (user: User): Promise<boolean> => {
-    const payload: DeleteUserPayload = {
-        userId: user.userId,
-        username: user.username,
-        email: user.email,
-        userRoleId: user.role.roleId,
-        userHospitalId: user.hospital?.hospitalId ?? null
-    }
-
+export const deleteUser = async (userId: number): Promise<boolean> => {
     const { data } = await api.delete<ApiResponse<null>>(
-        USER_ENDPOINTS.DELETE,
-        { data: payload }
+        USER_ENDPOINTS.DELETE(userId),
     );
 
-    if (!data.isSuccess) throw new Error(data.message || `Failed to delete ${USER_ENDPOINTS.DELETE}`);
+    if (!data.isSuccess) throw new Error(data.message || `Failed to delete ${USER_ENDPOINTS.DELETE(userId)}`);
 
     return true;
 }

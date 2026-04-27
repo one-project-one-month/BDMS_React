@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,6 +9,7 @@ import * as z from "zod";
 
 import { createUserMutationOptions, userKeys } from "../queries";
 import { getRolesQueryOptions } from "@/features/roles/queries";
+import queryClient from "@/query-client";
 
 import {
   Field,
@@ -21,19 +22,29 @@ import {
   Select,
   SelectContent,
   SelectItem,
-  SelectSeparator,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { getHospitalsQueryOptions } from "@/features/hospitals/queries";
 
-const formSchema = z.object({
-  username: z.string().min(2, "Username must be at least 2 characters."),
-  email: z.email("Please enter a valid email address."),
-  password: z.string().min(8, "Password must be at least 8 characters."),
-  userRoleId: z.number(),
-  userHospitalId: z.number().nullable(),
-});
+const formSchema = z
+  .object({
+    username: z.string().min(2, "Username must be at least 2 characters."),
+    email: z.email("Please enter a valid email address."),
+    password: z.string().min(8, "Password must be at least 8 characters."),
+    userRoleId: z.number(),
+    userHospitalId: z.number().nullable(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.userRoleId === 2 && data.userHospitalId == null) {
+      ctx.addIssue({
+        path: ["userHospitalId"],
+        code: z.ZodIssueCode.custom,
+        message: "Hospital is required for staff.",
+      });
+    }
+  });
 
 export default function UserCreateForm() {
   const [showHospital, setShowHospital] = useState(false);
@@ -49,22 +60,30 @@ export default function UserCreateForm() {
     },
   });
 
-  const { data: roles } = useQuery(getRolesQueryOptions);
+  const { data: roles } = useSuspenseQuery(getRolesQueryOptions);
   const userRoles = roles?.filter((role) => role.id !== 3);
 
+  const { data: hospitals } = useSuspenseQuery(getHospitalsQueryOptions);
+
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const handleShowHospital = (value: string) => {
     const roleId = +value;
-    setShowHospital(roleId === 2);
+    const isStaff = roleId === 2;
+
+    setShowHospital(isStaff);
+
+    if (!isStaff) {
+      form.setValue("userHospitalId", null);
+      form.clearErrors("userHospitalId");
+    }
   };
 
   /** create user mutation */
   const createUserMutation = useMutation({
     ...createUserMutationOptions,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [userKeys.list()] });
+      queryClient.invalidateQueries({ queryKey: userKeys.list() });
       toast.success("User record created successfully.", {
         position: "bottom-right",
       });
@@ -179,7 +198,7 @@ export default function UserCreateForm() {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel
-                htmlFor="user-create-form-role"
+                htmlFor="user-create-form-select-role"
                 className="text-dark-primary"
               >
                 Role
@@ -193,14 +212,13 @@ export default function UserCreateForm() {
                 }}
               >
                 <SelectTrigger
-                  id="form-rhf-select-language"
+                  id="user-create-form-select-role"
                   aria-invalid={fieldState.invalid}
                   className="min-w-30"
                 >
                   <SelectValue placeholder="Select" />
                 </SelectTrigger>
                 <SelectContent position="item-aligned">
-                  <SelectSeparator />
                   {userRoles?.map((role) => (
                     <SelectItem key={role.id} value={`${role.id}`}>
                       {role.name}
@@ -215,9 +233,45 @@ export default function UserCreateForm() {
 
         {/* hospital */}
         {showHospital && (
-          <div>
-            {/* hospital select implementation goes here after getting api */}
-          </div>
+          <Controller
+            name="userHospitalId"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel
+                  htmlFor="user-create-form-select-hospital"
+                  className="text-dark-primary"
+                >
+                  Hospital
+                </FieldLabel>
+                <Select
+                  name={field.name}
+                  value={field.value == null ? "" : String(field.value)}
+                  onValueChange={(value) => {
+                    field.onChange(Number(value));
+                  }}
+                >
+                  <SelectTrigger
+                    id="user-create-form-select-hospital"
+                    aria-invalid={fieldState.invalid}
+                    className="min-w-30"
+                  >
+                    <SelectValue placeholder="Please select hospital" />
+                  </SelectTrigger>
+                  <SelectContent position="item-aligned">
+                    {hospitals?.map((hospital) => (
+                      <SelectItem key={hospital.id} value={`${hospital.id}`}>
+                        {hospital.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
         )}
       </FieldGroup>
       {form.formState.errors.root && (
