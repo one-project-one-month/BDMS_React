@@ -12,6 +12,7 @@ import ProtectedRoute from "@/features/auth/components/protected-route";
 import { authRoutes } from "@/features/auth/auth.routes";
 import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
 import { userRoutes } from "@/features/users/user.routes";
+import { certificateRoutes } from "@/features/certificates/certificate.routes";
 
 export const router = createBrowserRouter([
   {
@@ -110,14 +111,8 @@ export const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
-          {
-            path: "certificates",
-            element: (
-              <ProtectedRoute allowed={["admin"]}>
-                <div>Admin Certificates Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          //certificates
+          certificateRoutes,
           {
             path: "settings",
             element: (
