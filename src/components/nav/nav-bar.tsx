@@ -44,12 +44,12 @@ export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
   };
 
   const profileRoute =
-    user?.roleName === "admin" || user?.roleName === "staff"
+    user?.roleName === "admin" || user?.roleName === "user"
       ? "/admin/profile"
       : "/client/profile";
 
   const dashboardRoute =
-    user?.roleName === "admin" || user?.roleName === "staff"
+    user?.roleName === "admin" || user?.roleName === "user"
       ? "/admin"
       : "/client";
 

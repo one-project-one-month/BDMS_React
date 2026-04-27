@@ -12,6 +12,7 @@ import ProtectedRoute from "@/features/auth/components/protected-route";
 import { authRoutes } from "@/features/auth/auth.routes";
 import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
 import { userRoutes } from "@/features/users/user.routes";
+import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
 import { certificateRoutes } from "@/features/certificates/certificate.routes";
 
 export const router = createBrowserRouter([
@@ -55,7 +56,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <div>Client Dashboard Page</div>,
+            element: <ClientDashboardLayout />,
           },
           {
             path: "donations",
