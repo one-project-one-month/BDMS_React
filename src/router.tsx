@@ -22,10 +22,12 @@ export const router = createBrowserRouter([
         path: "/",
         element: <GuestLayout />,
         children: [
-          {
-            index: true,
-            element: <div>Home</div>,
-          },
+        /** [start] commented by KK to remove the text "Home" in guestLayout*/
+          // {
+          //   index: true,
+          //   element: <div>Home</div>,
+          // },
+         /** [end] commented by KK to remove the text "Home" in guestLayout*/ 
           {
             // TODO: remove this in production
             path: "ui",
