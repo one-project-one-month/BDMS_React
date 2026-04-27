@@ -1,5 +1,24 @@
-export default function RequestCreatePage() {
+import { BloodRequestForm } from "../../components/blood-request-form";
+import StepIndicator from "../../components/step-indicator";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+
+export default function AdminRequestCreatePage() {
+  const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
+
   return (
-    <div>AdminRequestCreatePage</div>
-  )
+    <div className="mx-auto w-full max-w-6xl">
+      <StepIndicator currentStep={currentStep} />
+      <BloodRequestForm
+        currentStep={currentStep}
+        setCurrentStep={setCurrentStep}
+        onSubmitSuccess={() => {
+          setCurrentStep(0);
+          navigate("/admin/blood-requests");
+        }}
+        role="admin"
+      />
+    </div>
+  );
 }

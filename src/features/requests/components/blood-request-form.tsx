@@ -40,14 +40,8 @@ import {
   requestKeys,
   updateBloodRequestMutationOptions,
 } from "../queries";
-import type {
-  BloodRequest,
-  BloodRequestFormValues,
-} from "../request.types";
-import {
-  BLOOD_GROUP_OPTIONS,
-  RELATIONSHIP_OPTIONS,
-} from "../request.types";
+import type { BloodRequest, BloodRequestFormValues } from "../request.types";
+import { BLOOD_GROUP_OPTIONS, RELATIONSHIP_OPTIONS } from "../request.types";
 import { StyledInput } from "./styled-input";
 import { StyledTextarea } from "./styled-text-area";
 import { FormRow } from "./form-row";
@@ -62,6 +56,7 @@ interface BloodRequestFormProps {
   initialValues?: BloodRequestFormValues;
   onSubmitSuccess?: (request: BloodRequest) => void;
   backToListPath?: string;
+  role: string;
 }
 
 const createDefaultValues = (
@@ -96,6 +91,7 @@ export const BloodRequestForm = ({
   requestId,
   initialValues,
   onSubmitSuccess,
+  role,
 }: BloodRequestFormProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -246,7 +242,10 @@ export const BloodRequestForm = ({
           </div>
         )}
 
-        <form id="blood-request-form" onSubmit={form.handleSubmit(handleSubmit)}>
+        <form
+          id="blood-request-form"
+          onSubmit={form.handleSubmit(handleSubmit)}
+        >
           {currentStep === 0 && (
             <div className="flex flex-col gap-5">
               <Controller
@@ -301,10 +300,7 @@ export const BloodRequestForm = ({
                 name="hospitalId"
                 control={form.control}
                 render={({ field, fieldState }) => (
-                  <FormRow
-                    label="Hospital"
-                    error={fieldState.error?.message}
-                  >
+                  <FormRow label="Hospital" error={fieldState.error?.message}>
                     <Select
                       name={field.name}
                       value={field.value ? String(field.value) : undefined}
@@ -476,10 +472,7 @@ export const BloodRequestForm = ({
                         <SelectGroup>
                           <SelectLabel>Relationship</SelectLabel>
                           {RELATIONSHIP_OPTIONS.map((relationship) => (
-                            <SelectItem
-                              key={relationship}
-                              value={relationship}
-                            >
+                            <SelectItem key={relationship} value={relationship}>
                               {relationship.charAt(0).toUpperCase() +
                                 relationship.slice(1)}
                             </SelectItem>
@@ -617,10 +610,15 @@ export const BloodRequestForm = ({
               Back
             </Button>
           ) : (
-            <Button asChild type="button" variant="ghost" className="text-gray-500">
-              <Link to={"/client/blood-requests"}>Back to List</Link>
+            <Button
+              asChild
+              type="button"
+              variant="ghost"
+              className="text-gray-500"
+            >
+              <Link to={`/${role}/blood-requests`}>Back to List</Link>
             </Button>
-          ) }
+          )}
 
           {!isLastStep && (
             <Button

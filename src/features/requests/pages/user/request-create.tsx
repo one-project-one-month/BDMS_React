@@ -17,6 +17,7 @@ export default function RequestCreatePage() {
           setCurrentStep(0);
           navigate("/client/blood-requests");
         }}
+        role="client"
       />
     </div>
   );
