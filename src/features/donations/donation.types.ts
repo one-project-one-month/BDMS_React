@@ -30,6 +30,7 @@ export interface StoreDonationPayload {
     donorId: number;
     hospitalId: number;
     bloodRequestId?: number | null;
+    createdBy: number;
     donationCode?: string;
     bloodGroup: BloodGroup;
     unitsDonated?: number;
