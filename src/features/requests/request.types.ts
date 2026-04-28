@@ -79,6 +79,19 @@ export interface BloodRequestFormValues {
   additionalNotes: string;
 }
 
+export interface BloodRequestFormAdminValues {
+  userId: number;
+  patientName: string;
+  bloodGroup: BloodGroup;
+  hospitalId: number;
+  hospitalAddress: string;
+  unitsRequired: number;
+  requiredDate: Date;
+  requestType: RequestType;
+  contactPhone: string;
+  reason: string;
+}
+
 export interface BloodRequest {
   id: number;
   userId: number;
@@ -149,3 +162,43 @@ export interface Hospital {
   updatedAt: string;
   deletedAt: string | null;
 }
+
+// Admin
+
+export type BloodRequestAdmin = {
+  id: number;
+  userId: number;
+  hospitalId: number;
+  patientName: string;
+  bloodGroup: string;
+  unitsRequired: number;
+  contactPhone: string;
+  urgency: string;
+  requiredDate: string;
+  reason: string;
+};
+
+export type StoreBloodRequestPayload = {
+  userId: number;
+  hospitalId: number;
+  patientName: string;
+  bloodGroup: string;
+  unitsRequired: number;
+  contactPhone: string;
+  urgency: string;
+  requiredDate: string;
+  reason: string;
+};
+
+export type UpdateBloodRequestPayloadAdmin = {
+  id: number;
+  userId: number;
+  hospitalId: number;
+  patientName: string;
+  bloodGroup: string;
+  unitsRequired: number;
+  contactPhone: string;
+  urgency: string;
+  requiredDate: string;
+  reason: string;
+};

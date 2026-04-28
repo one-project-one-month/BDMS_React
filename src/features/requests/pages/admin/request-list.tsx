@@ -1,47 +1,83 @@
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import useAuth from "@/context/auth/useAuth";
-import { bloodRequestsQueryOptions } from "../../queries";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
-import UserRequestDataTable from "../../components/user-request-data-table";
-import { buildUserRequestColumns } from "../../components/user-request-columns";
-import { toDateInputValue } from "../../request.utils";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
-export default function AdminRequestListPage() {
-  const { user } = useAuth();
-  const [dateFilter, setDateFilter] = useState("");
+import BloodRequestDataTable from "../../components/table/blood-request-data-table";
 
-  const {
-    data: requests = [],
-    isPending,
-    isError,
-    error,
-  } = useQuery(bloodRequestsQueryOptions);
 
-  const userRequests = useMemo(
-    () => requests.filter((request) => request.userId === user?.userId),
-    [requests, user?.userId],
+import { toast } from "sonner";
+import { buildColumns } from "../../components/table/blood-request-columns";
+import type { BloodRequestAdmin } from "../../request.types";
+import {
+  deleteBloodRequestMutationOptions,
+  getBloodRequestsQueryOptions,
+} from "../../queries";
+import { bloodRequestKeys } from "../../queries/requestKeys";
+
+export default function BloodRequestListPage() {
+  const queryClient = useQueryClient();
+  const { data: bloodRequests, isPending } = useQuery(
+    getBloodRequestsQueryOptions,
   );
+  const safeBloodRequests = bloodRequests ?? [];
 
-  const filteredUserRequests = useMemo(() => {
-    if (!dateFilter) return userRequests;
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] =
+    useState<BloodRequestAdmin | null>(null);
+  const [urgencyOpen, setUrgencyOpen] = useState(false);
 
-    return userRequests.filter(
-      (request) => toDateInputValue(request.requiredDate) === dateFilter,
-    );
-  }, [userRequests, dateFilter]);
+  const deleteMutation = useMutation({
+    ...deleteBloodRequestMutationOptions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bloodRequestKeys.list() });
+      toast.success("Blood request deleted successfully.", {
+        position: "bottom-right",
+      });
+      setDeleteOpen(false);
+      setSelectedRequest(null);
+    },
+    onError: () => {
+      toast.error("Failed to delete blood request.", {
+        position: "bottom-right",
+      });
+    },
+  });
 
-  const requestLoadError =
-    error instanceof Error
-      ? error.message
-      : "Unable to load your blood requests.";
+  const handleRequestDelete = (request: BloodRequestAdmin) => {
+    setSelectedRequest(request);
+    setDeleteOpen(true);
+  };
 
-  const columns = useMemo(() => buildUserRequestColumns(), []);
+  const handleConfirmDelete = () => {
+    if (!selectedRequest || deleteMutation.isPending) return;
+    deleteMutation.mutateAsync(selectedRequest.id);
+  };
+
+  const handleRequestStatus = (request: BloodRequestAdmin) => {
+    setSelectedRequest(request);
+    setUrgencyOpen(true);
+  };
+
+  const columns = useMemo(
+    () =>
+      buildColumns({
+        onRequestDelete: handleRequestDelete,
+        onRequestStatus: handleRequestStatus,
+      }),
+    [],
+  );
 
   return (
     <Card className="px-8">
@@ -50,40 +86,72 @@ export default function AdminRequestListPage() {
           Blood Request List
         </Typography>
         <Button asChild>
-          <Link to="/admin/blood-requests/create">Create Blood Request</Link>
+          <Link to={"/admin/blood-requests/create"}>Add Request</Link>
         </Button>
       </header>
 
       <section>
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <Input
-            type="date"
-            value={dateFilter}
-            onChange={(event) => setDateFilter(event.target.value)}
-            className="w-full max-w-xs"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => setDateFilter("")}
-            disabled={!dateFilter}
-          >
-            Reset
-          </Button>
-        </div>
-
-        {isError ? (
-          <Typography className="text-destructive">
-            {requestLoadError}
-          </Typography>
-        ) : (
-          <UserRequestDataTable
-            columns={columns}
-            data={filteredUserRequests}
-            isPending={isPending}
-          />
-        )}
+        <BloodRequestDataTable
+          columns={columns}
+          data={safeBloodRequests}
+          isPending={isPending}
+        />
       </section>
+
+      {/* Delete dialog */}
+      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Blood Request</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. Are you sure you want to delete the
+              request for{" "}
+              <span className="font-medium">
+                {selectedRequest?.patientName ?? "this patient"}
+              </span>
+              ?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteMutation.isPending}
+              className="hover:bg-dark-primary"
+            >
+              {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Urgency detail dialog */}
+      <Dialog open={urgencyOpen} onOpenChange={setUrgencyOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request Urgency</DialogTitle>
+            <DialogDescription>
+              Blood request for{" "}
+              <span className="font-medium">
+                {selectedRequest?.patientName ?? "this patient"}
+              </span>{" "}
+              is currently marked as{" "}
+              <span className="font-medium capitalize">
+                {selectedRequest?.urgency ?? "—"}
+              </span>
+              .
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setUrgencyOpen(false)}>
+              Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

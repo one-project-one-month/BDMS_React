@@ -1,24 +1,19 @@
-import { BloodRequestForm } from "../../components/blood-request-form";
-import StepIndicator from "../../components/step-indicator";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { Card } from "@/components/ui/card";
+import { Typography } from "@/components/ui/typography";
+import BloodRequestCreateForm from "../../components/blood-request-form-admin";
 
 export default function AdminRequestCreatePage() {
-  const [currentStep, setCurrentStep] = useState(0);
-  const navigate = useNavigate();
-
   return (
-    <div className="mx-auto w-full max-w-6xl">
-      <StepIndicator currentStep={currentStep} />
-      <BloodRequestForm
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-        onSubmitSuccess={() => {
-          setCurrentStep(0);
-          navigate("/admin/blood-requests");
-        }}
-        role="admin"
-      />
-    </div>
+    <Card className="px-8">
+      <header className="mb-6">
+        <Typography as={"h1"} variant={"subtitle"}>
+          Add Blood Request
+        </Typography>
+      </header>
+
+      <section>
+        <BloodRequestCreateForm />
+      </section>
+    </Card>
   );
 }

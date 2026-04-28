@@ -56,7 +56,6 @@ interface BloodRequestFormProps {
   initialValues?: BloodRequestFormValues;
   onSubmitSuccess?: (request: BloodRequest) => void;
   backToListPath?: string;
-  role: string;
 }
 
 const createDefaultValues = (
@@ -91,7 +90,6 @@ export const BloodRequestForm = ({
   requestId,
   initialValues,
   onSubmitSuccess,
-  role,
 }: BloodRequestFormProps) => {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -500,7 +498,6 @@ export const BloodRequestForm = ({
                   </FormRow>
                 )}
               />
-
               <Controller
                 name="reason"
                 control={form.control}
@@ -514,7 +511,6 @@ export const BloodRequestForm = ({
                   </FormRow>
                 )}
               />
-
               <Controller
                 name="additionalNotes"
                 control={form.control}
@@ -616,7 +612,7 @@ export const BloodRequestForm = ({
               variant="ghost"
               className="text-gray-500"
             >
-              <Link to={`/${role}/blood-requests`}>Back to List</Link>
+              <Link to={`/client/blood-requests`}>Back to List</Link>
             </Button>
           )}
 

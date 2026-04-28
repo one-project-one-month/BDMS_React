@@ -6,6 +6,7 @@ import { HOSPITAL_ENDPOINTS } from "@/api/endpoints/hospital.endpoint";
 import type {
   ApiResponse,
   BloodRequest,
+  BloodRequestAdmin,
   BloodRequestFormValues,
   BloodRequestStatus,
   BloodRequestUrgency,
@@ -14,7 +15,9 @@ import type {
   RequestMutationInput,
   RequestStatusUpdateInput,
   RequestType,
+  StoreBloodRequestPayload,
   UpdateBloodRequestPayload,
+  UpdateBloodRequestPayloadAdmin,
 } from "../request.types";
 
 type UpdateRequestMutationInput = RequestMutationInput & { id: number };
@@ -134,11 +137,12 @@ const normalizeRequest = (
     id: request.id ?? 0,
     userId: request.userId ?? fallback?.userId ?? 0,
     hospitalId: request.hospitalId ?? fallback?.values?.hospitalId ?? 0,
-    bloodRequestCode: request.bloodRequestCode ?? `BR-${String(request.id ?? 0).padStart(4, "0")}`,
+    bloodRequestCode:
+      request.bloodRequestCode ??
+      `BR-${String(request.id ?? 0).padStart(4, "0")}`,
     patientName: request.patientName ?? fallback?.values?.patientName ?? "",
     bloodGroup: request.bloodGroup ?? fallback?.values?.bloodGroup ?? "A+",
-    hospitalName:
-      request.hospitalName ?? hospital?.name ?? "Unknown hospital",
+    hospitalName: request.hospitalName ?? hospital?.name ?? "Unknown hospital",
     hospitalAddress:
       request.hospitalAddress ??
       fallback?.values?.hospitalAddress ??
@@ -146,8 +150,7 @@ const normalizeRequest = (
       "",
     unitsRequired:
       request.unitsRequired ?? fallback?.values?.unitsRequired ?? 1,
-    contactPhone:
-      request.contactPhone ?? fallback?.values?.contactPhone ?? "",
+    contactPhone: request.contactPhone ?? fallback?.values?.contactPhone ?? "",
     urgency: request.urgency ?? toUrgency(requestType),
     requestType,
     relationshipToPatient:
@@ -201,9 +204,9 @@ export const getBloodRequests = async (): Promise<BloodRequest[]> => {
 
   try {
     const hospitals = await getHospitals();
-    const { data } = await api.get<ApiResponse<BloodRequest[]> | BloodRequest[]>(
-      BLOOD_REQUEST_ENDPOINTS.LIST,
-    );
+    const { data } = await api.get<
+      ApiResponse<BloodRequest[]> | BloodRequest[]
+    >(BLOOD_REQUEST_ENDPOINTS.LIST);
     const requests = extractApiData(data);
 
     return sortRequests(
@@ -226,9 +229,7 @@ export const getBloodRequest = async (id: number): Promise<BloodRequest> => {
     );
     return normalizeRequest(extractApiData(data), hospitals);
   } catch (error) {
-    throw new Error(
-      getApiErrorMessage(error, "Failed to fetch blood request"),
-    );
+    throw new Error(getApiErrorMessage(error, "Failed to fetch blood request"));
   }
 };
 
@@ -239,13 +240,16 @@ export const createBloodRequest = async (
 
   try {
     const hospitals = await getHospitals();
-    const { data } = await api.post<ApiResponse<BloodRequest> | BloodRequest | null>(
-      BLOOD_REQUEST_ENDPOINTS.CREATE,
-      buildApiPayload(input),
-    );
+    const { data } = await api.post<
+      ApiResponse<BloodRequest> | BloodRequest | null
+    >(BLOOD_REQUEST_ENDPOINTS.CREATE, buildApiPayload(input));
     const createdRequest = extractApiData(data);
 
-    if (createdRequest && typeof createdRequest === "object" && "id" in createdRequest) {
+    if (
+      createdRequest &&
+      typeof createdRequest === "object" &&
+      "id" in createdRequest
+    ) {
       return normalizeRequest(createdRequest, hospitals, {
         userId: input.userId,
         values: input.values,
@@ -285,13 +289,16 @@ export const updateBloodRequest = async (
       id: input.id,
       ...buildApiPayload(input),
     };
-    const { data } = await api.put<ApiResponse<BloodRequest> | BloodRequest | null>(
-      BLOOD_REQUEST_ENDPOINTS.UPDATE,
-      payload,
-    );
+    const { data } = await api.put<
+      ApiResponse<BloodRequest> | BloodRequest | null
+    >(BLOOD_REQUEST_ENDPOINTS.UPDATE, payload);
     const updatedRequest = extractApiData(data);
 
-    if (updatedRequest && typeof updatedRequest === "object" && "id" in updatedRequest) {
+    if (
+      updatedRequest &&
+      typeof updatedRequest === "object" &&
+      "id" in updatedRequest
+    ) {
       const hospitals = await getHospitals();
       const currentRequest = await getBloodRequest(input.id);
 
@@ -329,4 +336,83 @@ export const updateBloodRequestStatus = async ({
       getApiErrorMessage(error, "Failed to update request status"),
     );
   }
+};
+
+// Admin
+
+export const getBloodRequestsAdmin = async (): Promise<BloodRequestAdmin[]> => {
+  const { data } = await api.get<ApiResponse<BloodRequestAdmin[]>>(
+    BLOOD_REQUEST_ENDPOINTS.LIST,
+  );
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message || `Failed to fetch ${BLOOD_REQUEST_ENDPOINTS.LIST}`,
+    );
+
+  return data.data;
+};
+
+export const deleteBloodRequest = async (
+  requestId: number,
+): Promise<boolean> => {
+  const { data } = await api.delete<ApiResponse<null>>(
+    BLOOD_REQUEST_ENDPOINTS.DELETE(requestId),
+  );
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message ||
+        `Failed to delete ${BLOOD_REQUEST_ENDPOINTS.DELETE(requestId)}`,
+    );
+
+  return true;
+};
+
+export const storeBloodRequest = async (
+  payload: StoreBloodRequestPayload,
+): Promise<BloodRequestAdmin> => {
+  const { data } = await api.post<ApiResponse<BloodRequestAdmin>>(
+    BLOOD_REQUEST_ENDPOINTS.CREATE,
+    payload,
+  );
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message || `Failed to store ${BLOOD_REQUEST_ENDPOINTS.CREATE}`,
+    );
+
+  return data.data;
+};
+
+export const getBloodRequestAdmin = async (
+  id: number,
+): Promise<BloodRequestAdmin> => {
+  const { data } = await api.get<ApiResponse<BloodRequestAdmin>>(
+    BLOOD_REQUEST_ENDPOINTS.GET_BY_ID(id),
+  );
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message ||
+        `Failed to fetch ${BLOOD_REQUEST_ENDPOINTS.GET_BY_ID(id)}`,
+    );
+
+  return data.data;
+};
+
+export const updateBloodRequestAdmin = async (
+  payload: UpdateBloodRequestPayloadAdmin,
+): Promise<BloodRequestAdmin> => {
+  const { data } = await api.put<ApiResponse<BloodRequestAdmin>>(
+    BLOOD_REQUEST_ENDPOINTS.UPDATE,
+    payload,
+  );
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message || `Failed to update ${BLOOD_REQUEST_ENDPOINTS.UPDATE}`,
+    );
+
+  return data.data;
 };
