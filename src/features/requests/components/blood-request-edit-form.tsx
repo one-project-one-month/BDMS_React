@@ -123,7 +123,7 @@ export default function BloodRequestEditForm({ id }: { id: number }) {
           render={({ field, fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel>Patient Name</FieldLabel>
-              <Input {...field} placeholder="Enter patient name" />
+              <Input {...field} disabled placeholder="Enter patient name" />
               {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
             </Field>
           )}
@@ -152,6 +152,7 @@ export default function BloodRequestEditForm({ id }: { id: number }) {
               <Select
                 value={field.value}
                 onValueChange={(val) => field.onChange(bloodGroupToStore(val))}
+                disabled
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select blood group" />

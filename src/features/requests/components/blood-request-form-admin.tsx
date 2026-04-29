@@ -1,4 +1,8 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from "@tanstack/react-query";
 import { Controller, useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,6 +32,8 @@ import { Button } from "@/components/ui/button";
 import { getUsersQueryOptions } from "@/features/users/queries";
 import { getHospitalsQueryOptions } from "@/features/hospitals/queries";
 import { bloodRequestKeys } from "../queries/requestKeys";
+import { formatBloodGroup } from "../request.utils";
+import { getDonorsQueryOptions } from "@/features/donors/queries";
 
 const BLOOD_GROUP_OPTIONS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const URGENCY_OPTIONS = ["Low", "Medium", "High", "Critical"];
@@ -79,6 +85,7 @@ export default function BloodRequestCreateForm() {
   const { data: hospitals, isPending: isHospitalsLoading } = useQuery(
     getHospitalsQueryOptions,
   );
+  const { data: donors } = useSuspenseQuery(getDonorsQueryOptions);
 
   const createBloodRequestMutation = useMutation({
     ...createBloodRequestAdminMutationOptions,
@@ -135,9 +142,21 @@ export default function BloodRequestCreateForm() {
                   const selectedUser = users?.find(
                     (u) => u.userId === Number(value),
                   );
+                  const selectedDonor = donors.find(
+                    (donor) => donor.userId === selectedUser?.userId,
+                  );
                   form.setValue("patientName", selectedUser?.username ?? "", {
                     shouldValidate: true,
                   });
+                  form.setValue(
+                    "bloodGroup",
+                    selectedDonor?.bloodGroup
+                      ? formatBloodGroup(selectedDonor.bloodGroup)
+                      : "",
+                    {
+                      shouldValidate: true,
+                    },
+                  );
                 }}
                 disabled={isUsersLoading}
               >
@@ -266,12 +285,14 @@ export default function BloodRequestCreateForm() {
                 name={field.name}
                 value={field.value}
                 onValueChange={field.onChange}
+                disabled
               >
                 <SelectTrigger
                   id="blood-request-create-form-bloodGroup"
                   aria-invalid={fieldState.invalid}
+                  className="bg-muted text-muted-foreground cursor-not-allowed"
                 >
-                  <SelectValue placeholder="Select blood group" />
+                  <SelectValue placeholder="Auto-filled from selected user" />
                 </SelectTrigger>
                 <SelectContent position="item-aligned">
                   <SelectSeparator />
