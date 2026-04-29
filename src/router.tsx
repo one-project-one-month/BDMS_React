@@ -11,7 +11,15 @@ import DemoPage from "@/components/demo";
 import ProtectedRoute from "@/features/auth/components/protected-route";
 import { authRoutes } from "@/features/auth/auth.routes";
 import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
+import {
+  bloodRequestAdminRoutes,
+  bloodRequestUserRoutes,
+} from "@/features/requests/request.routes";
 import { userRoutes } from "@/features/users/user.routes";
+import { donorRoutes } from "./features/donors/donor.routes";
+import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
+import { certificateRoutes } from "@/features/certificates/certificate.routes";
+import { donationRoutes } from "./features/donations/donation.routes";
 import { announcementRoutes } from "./features/announcements/announcement.routes";
 
 export const router = createBrowserRouter([
@@ -23,10 +31,12 @@ export const router = createBrowserRouter([
         path: "/",
         element: <GuestLayout />,
         children: [
-          {
-            index: true,
-            element: <div>Home</div>,
-          },
+          /** [start] commented by KK to remove the text "Home" in guestLayout*/
+          // {
+          //   index: true,
+          //   element: <div>Home</div>,
+          // },
+          /** [end] commented by KK to remove the text "Home" in guestLayout*/
           {
             // TODO: remove this in production
             path: "ui",
@@ -53,16 +63,13 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <div>Client Dashboard Page</div>,
+            element: <ClientDashboardLayout />,
           },
           {
             path: "donations",
             element: <div>Client Donations Page</div>,
           },
-          {
-            path: "blood-requests",
-            element: <div>Client Blood Requests Page</div>,
-          },
+          bloodRequestUserRoutes,
           {
             path: "appointments",
             element: <div>Client Appointments Page</div>,
@@ -93,17 +100,15 @@ export const router = createBrowserRouter([
           },
           /** user */
           userRoutes,
-          {
-            path: "donors",
-            element: (
-              <ProtectedRoute allowed={["admin"]}>
-                <div>Admin Donors Page</div>
-              </ProtectedRoute>
-            ),
-          },
-
-          // Admin Announcements 
-          announcementRoutes,
+          donorRoutes,
+          // {
+          //   path: "donors",
+          //   element: (
+          //     <ProtectedRoute allowed={["admin"]}>
+          //       <DonorPage />
+          //     </ProtectedRoute>
+          //   ),
+          // },
           {
             path: "announcements",
             element: (
@@ -112,14 +117,8 @@ export const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
-          {
-            path: "certificates",
-            element: (
-              <ProtectedRoute allowed={["admin"]}>
-                <div>Admin Certificates Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          //certificates
+          certificateRoutes,
           {
             path: "settings",
             element: (
@@ -128,14 +127,8 @@ export const router = createBrowserRouter([
               </ProtectedRoute>
             ),
           },
-          {
-            path: "donations",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Donations Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          // donations
+          donationRoutes,
           {
             path: "blood-requests",
             element: (
