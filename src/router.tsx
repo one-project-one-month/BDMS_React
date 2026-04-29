@@ -101,6 +101,7 @@ export const router = createBrowserRouter([
           /** user */
           userRoutes,
           donorRoutes,
+          announcementRoutes,
           // {
           //   path: "donors",
           //   element: (
@@ -109,14 +110,14 @@ export const router = createBrowserRouter([
           //     </ProtectedRoute>
           //   ),
           // },
-          {
-            path: "announcements",
-            element: (
-              <ProtectedRoute allowed={["admin"]}>
-                <div>Admin Announcements Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          // {
+          //   path: "announcements",
+          //   element: (
+          //     <ProtectedRoute allowed={["admin"]}>
+          //       <div>Admin Announcements Page</div>
+          //     </ProtectedRoute>
+          //   ),
+          // },
           //certificates
           certificateRoutes,
           {
