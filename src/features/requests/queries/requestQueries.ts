@@ -3,10 +3,13 @@ import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import type {
   BloodRequest,
   BloodRequestAdmin,
+  BloodRequestStatus,
+  BloodRequestStatusAdmin,
   Hospital,
 } from "../request.types";
 import {
   createBloodRequest,
+  createBloodRequestAppointment,
   deleteBloodRequest,
   getBloodRequest,
   getBloodRequestAdmin,
@@ -17,6 +20,7 @@ import {
   updateBloodRequest,
   updateBloodRequestAdmin,
   updateBloodRequestStatus,
+  updateBloodRequestStatusAdmin,
 } from "../api/request.api";
 import { bloodRequestKeys } from "./requestKeys";
 
@@ -107,3 +111,13 @@ export const updateBloodRequestAdminMutationOptions = mutationOptions<
 >({
   mutationFn: updateBloodRequestAdmin,
 });
+
+export const updateBloodRequestStatusAdminMutationOptions = {
+  mutationFn: ({ id, status }: { id: number; status: BloodRequestStatus }) =>
+    updateBloodRequestStatusAdmin(id, status),
+};
+
+export const createBloodRequestAppointmentMutationOptions = {
+  mutationFn: ({ id, date }: { id: number; date: string }) =>
+    createBloodRequestAppointment(id, date),
+};

@@ -9,6 +9,7 @@ import type {
   BloodRequestAdmin,
   BloodRequestFormValues,
   BloodRequestStatus,
+  BloodRequestStatusAdmin,
   BloodRequestUrgency,
   CreateBloodRequestPayload,
   Hospital,
@@ -18,6 +19,7 @@ import type {
   StoreBloodRequestPayload,
   UpdateBloodRequestPayload,
   UpdateBloodRequestPayloadAdmin,
+  UpdateBloodRequestStatusPayloadAdmin,
 } from "../request.types";
 
 type UpdateRequestMutationInput = RequestMutationInput & { id: number };
@@ -415,4 +417,63 @@ export const updateBloodRequestAdmin = async (
     );
 
   return data.data;
+};
+
+// export const updateBloodRequestStatusAdmin = async (
+//   id: number,
+//   status: BloodRequestStatus,
+// ): Promise<BloodRequestAdmin> => {
+//   const { data } = await api.patch<ApiResponse<BloodRequestAdmin>>(
+//     BLOOD_REQUEST_ENDPOINTS.PATCH_STATUS(id),
+//     { donorId: id, status },
+//   );
+
+//   if (!data.isSuccess)
+//     throw new Error(
+//       data.message || `Failed to update status for blood request ${id}`,
+//     );
+
+//   return data.data;
+// };
+
+export const updateBloodRequestStatusAdmin = async (
+  id: number,
+  status: BloodRequestStatus,
+): Promise<BloodRequestAdmin> => {
+  const existingData = await getBloodRequestAdmin(id);
+
+  const payload: UpdateBloodRequestStatusPayloadAdmin = {
+    ...existingData,
+    status,
+  };
+
+  const { data } = await api.put<ApiResponse<BloodRequestAdmin>>(
+    BLOOD_REQUEST_ENDPOINTS.UPDATE,
+    payload,
+  );
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message || `Failed to update status for blood request ${id}`,
+    );
+
+  return data.data;
+};
+
+export const createBloodRequestAppointment = async (
+  donationId: number,
+  appointmentDate: string,
+): Promise<boolean> => {
+  // Note: Assuming a generic POST /Appointment/create or similar. Real implementation depends on the Appointment backend logic.
+  const { data } = await api.post<ApiResponse<any>>("/Appointment/create", {
+    donationId,
+    appointmentDate,
+  });
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message || `Failed to create appointment for donation ${donationId}`,
+    );
+
+  return true;
 };

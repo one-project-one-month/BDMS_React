@@ -27,6 +27,14 @@ export type BloodRequestStatus =
   | "rejected"
   | "fulfilled";
 
+export type BloodRequestStatusAdmin =
+  | "screening"
+  | "pending"
+  | "cancelled"
+  | "approved"
+  | "rejected"
+  | "completed";
+
 export type RequestType = "emergency" | "pre-booked";
 
 export type RelationshipToPatient =
@@ -176,6 +184,7 @@ export type BloodRequestAdmin = {
   urgency: string;
   requiredDate: string;
   reason: string;
+  status: string;
 };
 
 export type StoreBloodRequestPayload = {
@@ -201,4 +210,18 @@ export type UpdateBloodRequestPayloadAdmin = {
   urgency: string;
   requiredDate: string;
   reason: string;
+};
+
+export type UpdateBloodRequestStatusPayloadAdmin = {
+  id: number;
+  userId: number;
+  hospitalId: number;
+  patientName: string;
+  bloodGroup: string;
+  unitsRequired: number;
+  contactPhone: string;
+  urgency: string;
+  requiredDate: string;
+  reason: string;
+  status: string;
 };
