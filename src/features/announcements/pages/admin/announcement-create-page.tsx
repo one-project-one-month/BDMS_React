@@ -1,14 +1,19 @@
-import AnnouncementCreateSection from '@/features/announcements/components/create/AnnouncementCreateSection'
-import React from 'react'
+import { Card } from "@/components/ui/card";
+import { Typography } from "@/components/ui/typography";
+import AnnouncementCreateSection from "../../components/create/AnnouncementCreateSection";
 
-type Props = {}
-
-const AnnouncementCreatePage = (props: Props) => {
+export default function AnnouncementCreatePage() {
   return (
-    <div>
-      <AnnouncementCreateSection />
-    </div>
-  )
-}
+    <Card className="px-8">
+      <header className="mb-6">
+        <Typography as={"h1"} variant={"subtitle"}>
+          Create User
+        </Typography>
+      </header>
 
-export default AnnouncementCreatePage
+      <section>
+        <AnnouncementCreateSection />
+      </section>
+    </Card>
+  );
+}

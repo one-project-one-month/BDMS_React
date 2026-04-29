@@ -1,23 +1,22 @@
 import type { RouteObject } from "react-router-dom";
-import AnnouncementPage from "./pages/website/announcement-page";
 import AnnouncementCreatePage from "./pages/admin/announcement-create-page";
 import AnnouncementEditPage from "./pages/admin/announcement-edit-page";
-
+import AnnouncementListPage from "./pages/admin/announcement-list";
 
 export const announcementRoutes: RouteObject = {
-  path: "admins", 
+  path: "announcements",
   children: [
     {
-      index: true, 
-      element: <AnnouncementPage/>,
-    }, 
+      index: true,
+      element: <AnnouncementListPage />,
+    },
     {
-      path: "create", 
-      element: <AnnouncementCreatePage/>,
-    }, 
+      path: "create",
+      element: <AnnouncementCreatePage />,
+    },
     {
-      path: ":announcementId/edit", 
-      element: <AnnouncementEditPage/>    
-    }
-  ]
-}
+      path: ":announcementId/edit",
+      element: <AnnouncementEditPage />,
+    },
+  ],
+};
