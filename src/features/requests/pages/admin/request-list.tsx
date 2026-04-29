@@ -13,16 +13,25 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import BloodRequestDataTable from "../../components/table/blood-request-data-table";
 
-
 import { toast } from "sonner";
 import { buildColumns } from "../../components/table/blood-request-columns";
-import type { BloodRequestAdmin } from "../../request.types";
+import type {
+  BloodRequestAdmin,
+  BloodRequestStatus,
+  BloodRequestStatusAdmin,
+} from "../../request.types";
 import {
+  createBloodRequestAppointmentMutationOptions,
   deleteBloodRequestMutationOptions,
   getBloodRequestsQueryOptions,
+  updateBloodRequestStatusAdminMutationOptions,
+  // updateBloodRequestStatusMutationOptions,
+  // createBloodRequestAppointmentMutationOptions,
 } from "../../queries";
 import { bloodRequestKeys } from "../../queries/requestKeys";
 
@@ -31,13 +40,28 @@ export default function BloodRequestListPage() {
   const { data: bloodRequests, isPending } = useQuery(
     getBloodRequestsQueryOptions,
   );
-  const safeBloodRequests = bloodRequests ?? [];
 
+  // --- Filter state ---
+  const [dateFilter, setDateFilter] = useState("");
+
+  // --- Filtered data ---
+  const safeBloodRequests = useMemo(() => {
+    let items = bloodRequests ?? [];
+    if (dateFilter) {
+      items = items.filter((r) => r.requiredDate?.includes(dateFilter));
+    }
+    return items;
+  }, [bloodRequests, dateFilter]);
+
+  // --- Dialog state ---
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] =
     useState<BloodRequestAdmin | null>(null);
   const [urgencyOpen, setUrgencyOpen] = useState(false);
+  const [appointmentOpen, setAppointmentOpen] = useState(false);
+  const [appointmentDate, setAppointmentDate] = useState("");
 
+  // --- Mutations ---
   const deleteMutation = useMutation({
     ...deleteBloodRequestMutationOptions,
     onSuccess: () => {
@@ -55,6 +79,40 @@ export default function BloodRequestListPage() {
     },
   });
 
+  const statusMutation = useMutation({
+    ...updateBloodRequestStatusAdminMutationOptions,
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: bloodRequestKeys.list() });
+      toast.success(`Blood request status updated to ${data.status}.`, {
+        position: "bottom-right",
+      });
+    },
+    onError: () => {
+      toast.error("Failed to update blood request status.", {
+        position: "bottom-right",
+      });
+    },
+  });
+
+  const appointmentMutation = useMutation({
+    ...createBloodRequestAppointmentMutationOptions,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bloodRequestKeys.list() });
+      toast.success("Appointment created successfully.", {
+        position: "bottom-right",
+      });
+      setAppointmentOpen(false);
+      setSelectedRequest(null);
+      setAppointmentDate("");
+    },
+    onError: () => {
+      toast.error("Failed to create appointment.", {
+        position: "bottom-right",
+      });
+    },
+  });
+
+  // --- Handlers ---
   const handleRequestDelete = (request: BloodRequestAdmin) => {
     setSelectedRequest(request);
     setDeleteOpen(true);
@@ -65,22 +123,39 @@ export default function BloodRequestListPage() {
     deleteMutation.mutateAsync(selectedRequest.id);
   };
 
-  const handleRequestStatus = (request: BloodRequestAdmin) => {
+  const handleRequestStatus = (
+    request: BloodRequestAdmin,
+    newStatus: BloodRequestStatus,
+  ) => {
+    statusMutation.mutateAsync({ id: request.id, status: newStatus });
+  };
+
+  const handleRequestCreateAppointment = (request: BloodRequestAdmin) => {
     setSelectedRequest(request);
-    setUrgencyOpen(true);
+    setAppointmentOpen(true);
+  };
+
+  const handleConfirmAppointment = () => {
+    if (!selectedRequest || !appointmentDate || appointmentMutation.isPending)
+      return;
+    appointmentMutation.mutateAsync({
+      id: selectedRequest.id,
+      date: appointmentDate,
+    });
   };
 
   const columns = useMemo(
     () =>
       buildColumns({
         onRequestDelete: handleRequestDelete,
-        onRequestStatus: handleRequestStatus,
+        onRequestStatusChange: handleRequestStatus,
+        onRequestCreateAppointment: handleRequestCreateAppointment,
       }),
     [],
   );
 
   return (
-    <Card className="px-8">
+    <Card className="px-8 py-6">
       <header className="flex items-center justify-between mb-6">
         <Typography as={"h1"} variant={"subtitle"}>
           Blood Request List
@@ -90,6 +165,28 @@ export default function BloodRequestListPage() {
         </Button>
       </header>
 
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row gap-4 mb-4 bg-secondary/10 rounded-lg">
+        <div className="flex-1">
+          <Label htmlFor="dateFilter" className="text-xs mb-1 block">
+            Date
+          </Label>
+          <Input
+            className="max-w-[300px]"
+            id="dateFilter"
+            type="date"
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            placeholder="Filter by date..."
+          />
+        </div>
+        <div className="flex items-end">
+          <Button variant="outline" onClick={() => setDateFilter("")}>
+            Clear
+          </Button>
+        </div>
+      </div>
+
       <section>
         <BloodRequestDataTable
           columns={columns}
@@ -98,7 +195,7 @@ export default function BloodRequestListPage() {
         />
       </section>
 
-      {/* Delete dialog */}
+      {/* Delete Dialog */}
       <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <DialogContent>
           <DialogHeader>
@@ -128,7 +225,7 @@ export default function BloodRequestListPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Urgency detail dialog */}
+      {/* Urgency Detail Dialog */}
       <Dialog open={urgencyOpen} onOpenChange={setUrgencyOpen}>
         <DialogContent>
           <DialogHeader>
@@ -148,6 +245,46 @@ export default function BloodRequestListPage() {
           <DialogFooter>
             <Button variant="outline" onClick={() => setUrgencyOpen(false)}>
               Close
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Create Appointment Dialog */}
+      <Dialog open={appointmentOpen} onOpenChange={setAppointmentOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Appointment</DialogTitle>
+            <DialogDescription>
+              Schedule an appointment for{" "}
+              <span className="font-medium">
+                {selectedRequest?.patientName ?? "this patient"}
+              </span>
+              .
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Label htmlFor="appointmentDate">Appointment Date & Time</Label>
+            <Input
+              id="appointmentDate"
+              type="datetime-local"
+              value={appointmentDate}
+              onChange={(e) => setAppointmentDate(e.target.value)}
+              className="mt-2"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAppointmentOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmAppointment}
+              disabled={appointmentMutation.isPending || !appointmentDate}
+              className="bg-primary text-white"
+            >
+              {appointmentMutation.isPending
+                ? "Creating..."
+                : "Confirm Appointment"}
             </Button>
           </DialogFooter>
         </DialogContent>
