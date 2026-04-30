@@ -128,14 +128,15 @@ export const router = createBrowserRouter([
           },
           // donations
           donationRoutes,
-          {
-            path: "blood-requests",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Blood Requests Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          bloodRequestAdminRoutes,
+          // {
+          //   path: "blood-requests",
+          //   element: (
+          //     <ProtectedRoute allowed={["admin", "staff"]}>
+          //       <div>Admin Blood Requests Page</div>
+          //     </ProtectedRoute>
+          //   ),
+          // },
           {
             path: "appointments",
             element: (

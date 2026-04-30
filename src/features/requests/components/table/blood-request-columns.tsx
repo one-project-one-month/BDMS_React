@@ -1,8 +1,5 @@
-import type { Donation, DonationStatus } from "../donation.types";
-import type { ColumnDef } from "@tanstack/react-table";
-
 import { Edit, Eye, MoreHorizontal, Trash2, CalendarPlus } from "lucide-react";
-
+import type { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -19,16 +16,27 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import type {
+  BloodRequestAdmin,
+  BloodRequestStatusAdmin,
+} from "../../request.types";
 
-const basePath = "/admin/donations";
+const basePath = "/admin/blood-requests";
 
 type ColumnHandlers = {
-  onRequestDelete: (donation: Donation) => void;
+  onRequestDelete: (request: BloodRequestAdmin) => void;
   onRequestStatusChange: (
-    donation: Donation,
-    newStatus: DonationStatus,
+    request: BloodRequestAdmin,
+    newStatus: BloodRequestStatusAdmin,
   ) => void;
-  onRequestCreateAppointment: (donation: Donation) => void;
+  onRequestCreateAppointment: (request: BloodRequestAdmin) => void;
+};
+
+const URGENCY_STYLES: Record<string, string> = {
+  critical: "bg-red-600 text-white",
+  high: "bg-orange-500 text-white",
+  medium: "bg-yellow-400 text-yellow-900",
+  low: "bg-green-400 text-green-900",
 };
 
 const getStatusColor = (status: string) => {
@@ -37,71 +45,89 @@ const getStatusColor = (status: string) => {
       return "bg-green-500";
     case "pending":
       return "bg-yellow-500";
-    case "completed":
-      return "bg-blue-500";
+
     case "cancelled":
     case "rejected":
       return "bg-destructive";
-    case "screening":
+    case "fulfilled":
       return "bg-purple-500";
     default:
       return "bg-secondary";
   }
 };
 
+const formatBloodGroup = (bloodGroup: string): string => {
+  return bloodGroup.replace("negative", "-").replace("positive", "+");
+};
+
 export const buildColumns = ({
   onRequestDelete,
   onRequestStatusChange,
   onRequestCreateAppointment,
-}: ColumnHandlers): ColumnDef<Donation>[] => {
+}: ColumnHandlers): ColumnDef<BloodRequestAdmin>[] => {
   return [
     {
-      accessorKey: "donationCode",
-      header: "Code",
-      cell: ({ row }) => row.original.donationCode || "-",
-    },
-    {
-      id: "donor",
-      accessorFn: (row) => row.donor?.username || `Donor #${row.donorId}`,
-      header: "Donor",
-    },
-    {
-      id: "hospital",
-      accessorFn: (row) =>
-        row.hospital?.hospitalName || `Hospital #${row.hospitalId}`,
-      header: "Hospital",
+      accessorKey: "patientName",
+      header: "Patient Name",
     },
     {
       accessorKey: "bloodGroup",
       header: "Blood Group",
       cell: ({ row }) => (
-        <Badge variant="outline">{row.original.bloodGroup}</Badge>
+        <Badge className="bg-red-500 text-white hover:bg-red-600 capitalize">
+          {formatBloodGroup(row.original.bloodGroup)}
+        </Badge>
       ),
     },
     {
-      accessorKey: "donationDate",
-      header: "Date",
+      accessorKey: "unitsRequired",
+      header: "Units Required",
+      cell: ({ row }) => (
+        <span className="font-medium">
+          {row.original.unitsRequired} unit(s)
+        </span>
+      ),
+    },
+    {
+      accessorKey: "urgency",
+      header: "Urgency",
       cell: ({ row }) => {
-        const d = new Date(row.original.donationDate);
-        return isNaN(d.getTime())
-          ? "-"
-          : new Intl.DateTimeFormat("en-US").format(d);
+        const urgency = row.original.urgency?.toLowerCase();
+        return (
+          <Badge
+            className={cn(
+              "capitalize",
+              URGENCY_STYLES[urgency] ?? "bg-gray-300 text-gray-800",
+            )}
+          >
+            {row.original.urgency}
+          </Badge>
+        );
       },
+    },
+    {
+      accessorKey: "requiredDate",
+      header: "Required Date",
+      cell: ({ row }) => <span>{row.original.requiredDate ?? "—"}</span>,
+    },
+    {
+      accessorKey: "contactPhone",
+      header: "Contact Phone",
     },
     {
       accessorKey: "status",
       header: "Status",
       cell: ({ row }) => {
-        const donation = row.original;
+        const request = row.original;
         return (
           <Badge
             variant="outline"
             className={cn(
               "text-white capitalize",
-              getStatusColor(donation.status),
+              getStatusColor(request.status),
             )}
           >
-            {donation.status}
+            {request.status}
           </Badge>
         );
       },
@@ -110,7 +136,7 @@ export const buildColumns = ({
       id: "actions",
       header: "Actions",
       cell: ({ row }) => {
-        const donation = row.original;
+        const request = row.original;
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -120,10 +146,10 @@ export const buildColumns = ({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              {donation.status === "approved" && (
+              {request.status === "approved" && (
                 <>
                   <DropdownMenuItem
-                    onClick={() => onRequestCreateAppointment(donation)}
+                    onClick={() => onRequestCreateAppointment(request)}
                     className="cursor-pointer text-primary"
                   >
                     <CalendarPlus className="mr-2 h-4 w-4" />
@@ -135,7 +161,7 @@ export const buildColumns = ({
 
               <DropdownMenuItem asChild className="cursor-pointer">
                 <Link
-                  to={`${basePath}/${donation.id}`}
+                  to={`${basePath}/${request.id}`}
                   className="flex items-center gap-2"
                 >
                   <Eye className="size-4 shrink-0" />
@@ -145,11 +171,11 @@ export const buildColumns = ({
 
               <DropdownMenuItem asChild className="cursor-pointer">
                 <Link
-                  to={`${basePath}/${donation.id}/edit`}
+                  to={`${basePath}/${request.id}/edit`}
                   className="flex items-center gap-2"
                 >
                   <Edit className="size-4 shrink-0" />
-                  <span>Edit</span>
+                  <span>Edit Request</span>
                 </Link>
               </DropdownMenuItem>
 
@@ -159,22 +185,23 @@ export const buildColumns = ({
                 </DropdownMenuSubTrigger>
                 <DropdownMenuSubContent>
                   <DropdownMenuRadioGroup
-                    value={donation.status}
+                    value={request.status}
                     onValueChange={(v) =>
-                      onRequestStatusChange(donation, v as DonationStatus)
+                      onRequestStatusChange(
+                        request,
+                        v as BloodRequestStatusAdmin,
+                      )
                     }
                   >
                     <DropdownMenuRadioItem value="pending">
                       Pending
                     </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="screening">
-                      Screening
-                    </DropdownMenuRadioItem>
+
                     <DropdownMenuRadioItem value="approved">
                       Approved
                     </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="completed">
-                      Completed
+                    <DropdownMenuRadioItem value="fulfilled">
+                      Fulfilled
                     </DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="rejected">
                       Rejected
@@ -189,10 +216,10 @@ export const buildColumns = ({
               <DropdownMenuSeparator />
               <DropdownMenuItem
                 className="flex items-center text-primary hover:text-secondary! hover:bg-dark-primary! transition-colors duration-200 cursor-pointer"
-                onClick={() => onRequestDelete(donation)}
+                onClick={() => onRequestDelete(request)}
               >
                 <Trash2 className="size-4 shrink-0 text-inherit" />
-                <span>Delete</span>
+                <span>Delete Request</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

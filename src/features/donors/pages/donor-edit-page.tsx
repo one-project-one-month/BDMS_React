@@ -19,7 +19,7 @@ export default function DonorEditPage() {
       <Card className="px-8">
         <header className="mb-6">
           <Typography as="h1" variant="subtitle">
-            Donor Detail
+            Edit Donor
           </Typography>
         </header>
         <section className="space-y-4">
