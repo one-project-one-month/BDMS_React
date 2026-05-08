@@ -29,6 +29,7 @@ type ColumnHandlers = {
     newStatus: AppointmentStatus,
   ) => void;
   onRequestComplete: (appointment: Appointment) => void;
+  onRequestEditTime: (appointment: Appointment) => void;
   donorNameByDonationId?: Record<number, string>;
 };
 
@@ -56,6 +57,41 @@ const formatDateTime = (value: string | null | undefined) => {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(date);
+};
+
+const formatAppointmentSchedule = (
+  appointmentDate: string | null | undefined,
+  appointmentTime: string | null | undefined,
+) => {
+  if (!appointmentDate && !appointmentTime) {
+    return "-";
+  }
+
+  const formattedDate = appointmentDate
+    ? formatDateTime(`${appointmentDate}T00:00:00`)
+        .replace(/,?\s\d{1,2}:\d{2}\s?[AP]M/i, "")
+    : "-";
+
+  if (!appointmentTime) {
+    return formattedDate;
+  }
+
+  const timeParts = appointmentTime.split(":");
+  const hours = Number(timeParts[0] ?? 0);
+  const minutes = Number(timeParts[1] ?? 0);
+
+  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+    return `${formattedDate} ${appointmentTime}`.trim();
+  }
+
+  const timeDate = new Date();
+  timeDate.setHours(hours, minutes, 0, 0);
+
+  const formattedTime = new Intl.DateTimeFormat("en-US", {
+    timeStyle: "short",
+  }).format(timeDate);
+
+  return `${formattedDate} ${formattedTime}`.trim();
 };
 
 const getDonationLabel = (appointment: Appointment) =>
@@ -86,6 +122,7 @@ export const buildColumns = ({
   onRequestDelete,
   onRequestStatusChange,
   onRequestComplete,
+  onRequestEditTime,
   donorNameByDonationId,
 }: ColumnHandlers): ColumnDef<Appointment>[] => {
   return [
@@ -114,7 +151,11 @@ export const buildColumns = ({
     {
       accessorKey: "appointmentDate",
       header: "Appointment",
-      cell: ({ row }) => formatDateTime(row.original.appointmentDate),
+      cell: ({ row }) =>
+        formatAppointmentSchedule(
+          row.original.appointmentDate,
+          row.original.appointmentTime,
+        ),
     },
     {
       accessorKey: "remarks",
@@ -182,14 +223,12 @@ export const buildColumns = ({
                 </Link>
               </DropdownMenuItem>
 
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <Link
-                  to={`${basePath}/${appointment.id}/edit`}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="size-4 shrink-0" />
-                  <span>Edit</span>
-                </Link>
+              <DropdownMenuItem
+                onClick={() => onRequestEditTime(appointment)}
+                className="cursor-pointer"
+              >
+                <Edit className="size-4 shrink-0" />
+                <span>Edit Date & Time</span>
               </DropdownMenuItem>
 
               <DropdownMenuSub>

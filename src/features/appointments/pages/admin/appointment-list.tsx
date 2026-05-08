@@ -31,6 +31,7 @@ import {
   completeAppointmentMutationOptions,
   deleteAppointmentMutationOptions,
   getAppointmentsQueryOptions,
+  updateAppointmentTimeMutationOptions,
   updateAppointmentStatusMutationOptions,
 } from "../../queries";
 
@@ -46,8 +47,27 @@ export default function AppointmentListPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [searchFilter, setSearchFilter] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
+  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentTime, setAppointmentTime] = useState("");
+
+  const toTimeInputValue = (value: string | null | undefined) => {
+    if (!value) {
+      return "";
+    }
+
+    return value.length >= 5 ? value.slice(0, 5) : value;
+  };
+
+  const toApiTimeValue = (value: string) => {
+    if (!value) {
+      return value;
+    }
+
+    return value.length === 5 ? `${value}:00` : value;
+  };
 
   const donorNameByDonationId = useMemo(() => {
     const donationList = donations ?? [];
@@ -173,9 +193,36 @@ export default function AppointmentListPage() {
     },
   });
 
+  const editTimeMutation = useMutation({
+    ...updateAppointmentTimeMutationOptions,
+    onSuccess: () => {
+      invalidateAppointments();
+      setEditOpen(false);
+      setSelectedAppointment(null);
+      setAppointmentDate("");
+      setAppointmentTime("");
+      toast.success("Appointment time updated successfully.", {
+        position: "bottom-right",
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to update appointment time.", {
+        position: "bottom-right",
+      });
+    },
+  });
+
   const handleRequestDelete = (appointment: Appointment) => {
     setSelectedAppointment(appointment);
     setDeleteOpen(true);
+  };
+
+  const handleRequestEditTime = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setAppointmentDate(appointment.appointmentDate ?? "");
+    setAppointmentTime(toTimeInputValue(appointment.appointmentTime));
+    setEditOpen(true);
   };
 
   const handleConfirmDelete = () => {
@@ -197,12 +244,30 @@ export default function AppointmentListPage() {
     completeMutation.mutateAsync(appointment.id);
   };
 
+  const handleConfirmEditTime = () => {
+    if (
+      !selectedAppointment ||
+      !appointmentDate ||
+      !appointmentTime ||
+      editTimeMutation.isPending
+    ) {
+      return;
+    }
+
+    editTimeMutation.mutateAsync({
+      id: selectedAppointment.id,
+      appointmentDate,
+      appointmentTime: toApiTimeValue(appointmentTime),
+    });
+  };
+
   const columns = useMemo(
     () =>
       buildColumns({
         onRequestDelete: handleRequestDelete,
         onRequestStatusChange: handleRequestStatusChange,
         onRequestComplete: handleRequestComplete,
+        onRequestEditTime: handleRequestEditTime,
         donorNameByDonationId,
       }),
     [donorNameByDonationId],
@@ -288,6 +353,58 @@ export default function AppointmentListPage() {
               disabled={deleteMutation.isPending}
             >
               {deleteMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Appointment Date & Time</DialogTitle>
+            <DialogDescription>
+              Update the appointment schedule for{" "}
+              <span className="font-medium">
+                #{selectedAppointment?.id ?? ""}
+              </span>
+              .
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="editAppointmentDate">Appointment Date</Label>
+              <Input
+                id="editAppointmentDate"
+                type="date"
+                value={appointmentDate}
+                onChange={(event) => setAppointmentDate(event.target.value)}
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="editAppointmentTime">Appointment Time</Label>
+              <Input
+                id="editAppointmentTime"
+                type="time"
+                value={appointmentTime}
+                onChange={(event) => setAppointmentTime(event.target.value)}
+                className="mt-2"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmEditTime}
+              disabled={
+                editTimeMutation.isPending ||
+                !appointmentDate ||
+                !appointmentTime
+              }
+            >
+              {editTimeMutation.isPending ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </DialogContent>
