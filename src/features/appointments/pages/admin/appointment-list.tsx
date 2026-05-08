@@ -1,7 +1,11 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
+import { getDonationsQueryOptions } from "@/features/donations/queries/donationQueries";
+import { getDonorsQueryOptions } from "@/features/donors/queries";
+import { getUsersQueryOptions } from "@/features/users/queries";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -35,12 +39,46 @@ export default function AppointmentListPage() {
   const { data: appointments, isPending } = useQuery(
     getAppointmentsQueryOptions,
   );
+  const { data: donations } = useQuery(getDonationsQueryOptions);
+  const { data: donors } = useQuery(getDonorsQueryOptions);
+  const { data: users } = useQuery(getUsersQueryOptions);
 
   const [statusFilter, setStatusFilter] = useState("");
   const [searchFilter, setSearchFilter] = useState("");
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] =
     useState<Appointment | null>(null);
+
+  const donorNameByDonationId = useMemo(() => {
+    const donationList = donations ?? [];
+    const donorList = donors ?? [];
+    const userList = users ?? [];
+    const userNameById = new Map(
+      userList.map((user) => [user.userId, user.username]),
+    );
+    const donorNameById = donorList.reduce<Record<number, string>>(
+      (acc, donor) => {
+        const username = userNameById.get(donor.userId);
+
+        if (username) {
+          acc[donor.id] = username;
+        }
+
+        return acc;
+      },
+      {},
+    );
+
+    return donationList.reduce<Record<number, string>>((acc, donation) => {
+      const donorName = donorNameById[donation.donorId];
+
+      if (donorName) {
+        acc[donation.id] = donorName;
+      }
+
+      return acc;
+    }, {});
+  }, [donations, donors, users]);
 
   const safeAppointments = useMemo(() => {
     let items = appointments ?? [];
@@ -56,25 +94,28 @@ export default function AppointmentListPage() {
     if (searchFilter.trim()) {
       const query = searchFilter.toLowerCase();
       items = items.filter((appointment) => {
-        const donationCode =
-          appointment.donation?.donationCode?.toLowerCase() ?? "";
-        const donorName = appointment.donor?.username?.toLowerCase() ?? "";
-        const hospitalName =
-          appointment.hospital?.hospitalName?.toLowerCase() ?? "";
+        const donationCode = appointment.donationId
+          ? donations
+              ?.find((donation) => donation.id === appointment.donationId)
+              ?.donationCode?.toLowerCase() ?? ""
+          : "";
+        const donorName =
+          (appointment.donationId != null
+            ? donorNameByDonationId[appointment.donationId]?.toLowerCase()
+            : "") ??
+          "";
 
         return (
           String(appointment.id).includes(query) ||
           String(appointment.donationId ?? "").includes(query) ||
-          String(appointment.donorId ?? "").includes(query) ||
           donationCode.includes(query) ||
-          donorName.includes(query) ||
-          hospitalName.includes(query)
+          donorName.includes(query)
         );
       });
     }
 
     return items;
-  }, [appointments, searchFilter, statusFilter]);
+  }, [appointments, donations, donorNameByDonationId, searchFilter, statusFilter]);
 
   const invalidateAppointments = () =>
     queryClient.invalidateQueries({ queryKey: appointmentKeys.lists() });
@@ -162,8 +203,9 @@ export default function AppointmentListPage() {
         onRequestDelete: handleRequestDelete,
         onRequestStatusChange: handleRequestStatusChange,
         onRequestComplete: handleRequestComplete,
+        donorNameByDonationId,
       }),
-    [],
+    [donorNameByDonationId],
   );
 
   return (
@@ -172,6 +214,9 @@ export default function AppointmentListPage() {
         <Typography as="h1" variant="subtitle">
           Appointments
         </Typography>
+        <Button asChild>
+          <Link to="/admin/appointments/create">Create Appointment</Link>
+        </Button>
       </header>
 
       <div className="mb-4 flex flex-col gap-4 rounded-lg bg-secondary/10 md:flex-row">

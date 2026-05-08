@@ -29,6 +29,7 @@ type ColumnHandlers = {
     newStatus: AppointmentStatus,
   ) => void;
   onRequestComplete: (appointment: Appointment) => void;
+  donorNameByDonationId?: Record<number, string>;
 };
 
 const APPOINTMENT_STATUS_OPTIONS: AppointmentStatus[] = [
@@ -57,10 +58,35 @@ const formatDateTime = (value: string | null | undefined) => {
   }).format(date);
 };
 
+const getDonationLabel = (appointment: Appointment) =>
+  appointment.donation?.donationCode ||
+  (appointment.donationId != null ? `#${appointment.donationId}` : "-");
+
+const getDonorLabel = (
+  appointment: Appointment,
+  donorNameByDonationId?: Record<number, string>,
+) =>
+  (appointment.donationId != null
+    ? donorNameByDonationId?.[appointment.donationId]
+    : null) ||
+  (appointment.donationId != null
+    ? `Donation #${appointment.donationId}`
+    : "-");
+
+const getHospitalLabel = (appointment: Appointment) =>
+  appointment.hospital?.hospitalName ||
+  appointment.donation?.hospital?.hospitalName ||
+  (appointment.hospitalId != null
+    ? `Hospital #${appointment.hospitalId}`
+    : appointment.donation?.hospitalId != null
+      ? `Hospital #${appointment.donation.hospitalId}`
+      : "-");
+
 export const buildColumns = ({
   onRequestDelete,
   onRequestStatusChange,
   onRequestComplete,
+  donorNameByDonationId,
 }: ColumnHandlers): ColumnDef<Appointment>[] => {
   return [
     {
@@ -69,23 +95,21 @@ export const buildColumns = ({
     },
     {
       id: "donation",
-      accessorFn: (row) => row.donation?.donationCode || row.donationId || "-",
+      accessorFn: (row) => getDonationLabel(row),
       header: "Donation",
-      cell: ({ row }) => row.original.donation?.donationCode || row.original.donationId || "-",
+      cell: ({ row }) => getDonationLabel(row.original),
     },
     {
       id: "donor",
-      accessorFn: (row) => row.donor?.username || row.donorId || "-",
+      accessorFn: (row) => getDonorLabel(row, donorNameByDonationId),
       header: "Donor",
-      cell: ({ row }) => row.original.donor?.username || row.original.donorId || "-",
+      cell: ({ row }) => getDonorLabel(row.original, donorNameByDonationId),
     },
     {
       id: "hospital",
-      accessorFn: (row) =>
-        row.hospital?.hospitalName || row.hospitalId || "-",
+      accessorFn: (row) => getHospitalLabel(row),
       header: "Hospital",
-      cell: ({ row }) =>
-        row.original.hospital?.hospitalName || row.original.hospitalId || "-",
+      cell: ({ row }) => getHospitalLabel(row.original),
     },
     {
       accessorKey: "appointmentDate",
@@ -182,7 +206,10 @@ export const buildColumns = ({
                         : undefined
                     }
                     onValueChange={(value) =>
-                      onRequestStatusChange(appointment, value as AppointmentStatus)
+                      onRequestStatusChange(
+                        appointment,
+                        value as AppointmentStatus,
+                      )
                     }
                   >
                     {APPOINTMENT_STATUS_OPTIONS.map((status) => (
