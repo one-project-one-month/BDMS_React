@@ -13,10 +13,13 @@ export type AppointmentStatus =
 
 export interface Appointment {
   id: number;
+  userId?: number | null;
   donationId: number | null;
+  bloodRequestId?: number | null;
   donorId?: number | null;
   hospitalId?: number | null;
   appointmentDate: string;
+  appointmentTime?: string | null;
   status: AppointmentStatus;
   remarks?: string | null;
   completedAt?: string | null;
