@@ -20,6 +20,7 @@ import { donorRoutes } from "./features/donors/donor.routes";
 import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
 import { certificateRoutes } from "@/features/certificates/certificate.routes";
 import { donationRoutes } from "./features/donations/donation.routes";
+import { appointmentRoutes } from "@/features/appointments/appointment.routes";
 
 export const router = createBrowserRouter([
   {
@@ -129,6 +130,7 @@ export const router = createBrowserRouter([
           // donations
           donationRoutes,
           bloodRequestAdminRoutes,
+          appointmentRoutes,
           // {
           //   path: "blood-requests",
           //   element: (
@@ -137,14 +139,6 @@ export const router = createBrowserRouter([
           //     </ProtectedRoute>
           //   ),
           // },
-          {
-            path: "appointments",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Appointments Page</div>
-              </ProtectedRoute>
-            ),
-          },
           {
             path: "medical-records",
             element: (

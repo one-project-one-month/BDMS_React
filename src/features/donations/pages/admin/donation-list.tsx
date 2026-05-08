@@ -76,7 +76,7 @@ export default function DonationListPage() {
 
   // Appointment State
   const [appointmentOpen, setAppointmentOpen] = useState(false);
-  const [appointmentDate, setAppointmentDate] = useState("");
+  const [appointmentRemarks, setAppointmentRemarks] = useState("");
 
   const deleteMutation = useMutation({
     ...deleteDonationMutationOptions,
@@ -109,7 +109,16 @@ export default function DonationListPage() {
       queryClient.invalidateQueries({ queryKey: donationKeys.lists() });
       setAppointmentOpen(false);
       setSelectedDonation(null);
-      setAppointmentDate("");
+      setAppointmentRemarks("");
+      toast.success("Appointment created successfully.", {
+        position: "bottom-right",
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+      toast.error("Failed to create appointment.", {
+        position: "bottom-right",
+      });
     },
   });
 
@@ -136,11 +145,11 @@ export default function DonationListPage() {
   };
 
   const handleConfirmAppointment = () => {
-    if (!selectedDonation || !appointmentDate || appointmentMutation.isPending)
-      return;
+    if (!selectedDonation || appointmentMutation.isPending) return;
+
     appointmentMutation.mutateAsync({
-      id: selectedDonation.id,
-      date: appointmentDate,
+      donationId: selectedDonation.id,
+      remarks: appointmentRemarks.trim() || undefined,
     });
   };
 
@@ -256,17 +265,18 @@ export default function DonationListPage() {
           <DialogHeader>
             <DialogTitle>Create Appointment</DialogTitle>
             <DialogDescription>
-              Schedule an appointment for donation{" "}
+              Create an appointment for donation{" "}
               {selectedDonation?.donationCode || selectedDonation?.id}.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <Label htmlFor="appointmentDate">Appointment Date & Time</Label>
+            <Label htmlFor="appointmentRemarks">Remarks</Label>
             <Input
-              id="appointmentDate"
-              type="datetime-local"
-              value={appointmentDate}
-              onChange={(e) => setAppointmentDate(e.target.value)}
+              id="appointmentRemarks"
+              type="text"
+              value={appointmentRemarks}
+              onChange={(e) => setAppointmentRemarks(e.target.value)}
+              placeholder="Optional appointment remarks"
               className="mt-2"
             />
           </div>
@@ -276,7 +286,7 @@ export default function DonationListPage() {
             </Button>
             <Button
               onClick={handleConfirmAppointment}
-              disabled={appointmentMutation.isPending || !appointmentDate}
+              disabled={appointmentMutation.isPending}
               className="bg-primary text-white"
             >
               {appointmentMutation.isPending
