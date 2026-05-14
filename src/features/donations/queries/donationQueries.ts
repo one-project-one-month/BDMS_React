@@ -1,4 +1,5 @@
-import { queryOptions } from "@tanstack/react-query";
+import { mutationOptions, queryOptions } from "@tanstack/react-query";
+import { createAppointmentFromDonation } from "@/features/appointments/api/appointment.api";
 import {
   getDonations,
   getDonationById,
@@ -6,7 +7,6 @@ import {
   updateDonation,
   deleteDonation,
   updateDonationStatus,
-  createDonationAppointment,
 } from "../api/donation.api";
 
 export const donationKeys = {
@@ -50,7 +50,12 @@ export const updateDonationStatusMutationOptions = {
   }) => updateDonationStatus(id, status),
 };
 
-export const createDonationAppointmentMutationOptions = {
-  mutationFn: ({ id, date }: { id: number; date: string }) =>
-    createDonationAppointment(id, date),
-};
+export const createDonationAppointmentMutationOptions = mutationOptions({
+  mutationFn: ({
+    donationId,
+    remarks,
+  }: {
+    donationId: number;
+    remarks?: string;
+  }) => createAppointmentFromDonation(donationId, { remarks }),
+});
