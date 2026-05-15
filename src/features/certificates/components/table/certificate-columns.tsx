@@ -12,13 +12,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const basePath = "/admin/certificates";
+type BuildColumnsOptions = {
+  basePath?: string;
+};
 
-export const buildColumns = (): ColumnDef<Certificate>[] => {
+const formatIssuedDate = (value: string | undefined) => {
+  if (!value) {
+    return "-";
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return "-";
+  }
+
+  return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(parsed);
+};
+
+export const buildColumns = ({
+  basePath = "/admin/certificates",
+}: BuildColumnsOptions = {}): ColumnDef<Certificate>[] => {
   return [
     {
       accessorKey: "certificateTitle",
       header: "Title",
+    },
+    {
+      id: "issuedAt",
+      header: "Date Issued",
+      cell: ({ row }) =>
+        formatIssuedDate(row.original.createdAt ?? row.original.issuedAt),
     },
     {
       id: "actions",
