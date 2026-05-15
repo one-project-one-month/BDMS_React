@@ -3,13 +3,13 @@ import { isAxiosError } from "axios";
 import api, { HAS_API_BASE_URL } from "@/api/axios-client";
 import { BLOOD_REQUEST_ENDPOINTS } from "@/api/endpoints/blood-request.endpoints";
 import { HOSPITAL_ENDPOINTS } from "@/api/endpoints/hospital.endpoint";
+import { getDonors } from "@/features/donors/api/donor.api";
 import type {
   ApiResponse,
   BloodRequest,
   BloodRequestAdmin,
   BloodRequestFormValues,
   BloodRequestStatus,
-  BloodRequestStatusAdmin,
   BloodRequestUrgency,
   CreateBloodRequestPayload,
   Hospital,
@@ -19,7 +19,6 @@ import type {
   StoreBloodRequestPayload,
   UpdateBloodRequestPayload,
   UpdateBloodRequestPayloadAdmin,
-  UpdateBloodRequestStatusPayloadAdmin,
 } from "../request.types";
 
 type UpdateRequestMutationInput = RequestMutationInput & { id: number };
@@ -108,6 +107,17 @@ const extractApiData = <T>(payload: ApiResponse<T> | T): T => {
   }
 
   return payload as T;
+};
+
+const getDonorIdByUserId = async (userId: number): Promise<number> => {
+  const donors = await getDonors();
+  const donor = donors.find((item) => item.userId === userId);
+
+  if (!donor) {
+    throw new Error(`No donor found for userId ${userId}`);
+  }
+
+  return donor.id;
 };
 
 const normalizeRequest = (
@@ -326,9 +336,11 @@ export const updateBloodRequestStatus = async ({
   ensureApiBaseUrl();
 
   try {
+    const request = await getBloodRequest(id);
+    const donorId = await getDonorIdByUserId(request.userId);
     const { data } = await api.patch<ApiResponse<unknown> | unknown>(
       BLOOD_REQUEST_ENDPOINTS.PATCH_STATUS(id),
-      { status },
+      { status, donorId },
     );
     extractApiData(data);
 
@@ -440,24 +452,21 @@ export const updateBloodRequestStatusAdmin = async (
   id: number,
   status: BloodRequestStatus,
 ): Promise<BloodRequestAdmin> => {
-  const existingData = await getBloodRequestAdmin(id);
-
-  const payload: UpdateBloodRequestStatusPayloadAdmin = {
-    ...existingData,
-    status,
-  };
-
-  const { data } = await api.put<ApiResponse<BloodRequestAdmin>>(
-    BLOOD_REQUEST_ENDPOINTS.UPDATE,
-    payload,
-  );
-
-  if (!data.isSuccess)
-    throw new Error(
-      data.message || `Failed to update status for blood request ${id}`,
+  try {
+    const request = await getBloodRequestAdmin(id);
+    const donorId = await getDonorIdByUserId(request.userId);
+    const { data } = await api.patch<ApiResponse<unknown> | unknown>(
+      BLOOD_REQUEST_ENDPOINTS.PATCH_STATUS(id),
+      { status, donorId },
     );
+    extractApiData(data);
 
-  return data.data;
+    return getBloodRequestAdmin(id);
+  } catch (error) {
+    throw new Error(
+      getApiErrorMessage(error, "Failed to update blood request status"),
+    );
+  }
 };
 
 export const createBloodRequestAppointment = async (
