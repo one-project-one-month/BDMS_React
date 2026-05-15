@@ -94,20 +94,25 @@ const formSchema = z.object({
 interface DonationFormProps {
   initialData?: Donation;
   isEditing?: boolean;
+  returnPath?: string;
+  donorIdOverride?: number;
 }
 
 export default function DonationForm({
   initialData,
   isEditing = false,
+  returnPath = "/admin/donations",
+  donorIdOverride,
 }: DonationFormProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const isDonorLocked = donorIdOverride != null;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      donorId: initialData?.donorId || 0,
+      donorId: initialData?.donorId || donorIdOverride || 0,
       hospitalId: initialData?.hospitalId || 0,
       bloodGroup: initialData?.bloodGroup,
       donationDate: initialData?.donationDate
@@ -125,6 +130,14 @@ export default function DonationForm({
   const { data: hospitals } = useSuspenseQuery(getHospitalsQueryOptions);
 
   const selectedDonorId = form.watch("donorId");
+
+  useEffect(() => {
+    if (donorIdOverride == null) {
+      return;
+    }
+
+    form.setValue("donorId", donorIdOverride, { shouldValidate: true });
+  }, [donorIdOverride, form]);
 
   useEffect(() => {
     if (!selectedDonorId) {
@@ -151,7 +164,7 @@ export default function DonationForm({
       toast.success("Donation record created successfully.", {
         position: "bottom-right",
       });
-      navigate("/admin/donations");
+      navigate(returnPath);
     },
     onError: (error) => {
       console.error(error);
@@ -176,7 +189,7 @@ export default function DonationForm({
       toast.success("Donation updated successfully.", {
         position: "bottom-right",
       });
-      navigate("/admin/donations");
+      navigate(returnPath);
     },
     onError: (error) => {
       console.error(error);
@@ -199,6 +212,7 @@ export default function DonationForm({
 
     const payload = {
       ...values,
+      donorId: donorIdOverride ?? values.donorId,
       createdBy: user.userId,
     };
 
@@ -239,6 +253,7 @@ export default function DonationForm({
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 value={field.value ? String(field.value) : undefined}
+                disabled={isDonorLocked}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select donor NRC" />
@@ -487,7 +502,7 @@ export default function DonationForm({
             {isPending ? "Submitting..." : isEditing ? "Update" : "Submit"}
           </Button>
           <Button variant={"outline"} asChild>
-            <Link to={"/admin/donations"}>Cancel</Link>
+            <Link to={returnPath}>Cancel</Link>
           </Button>
         </div>
       </FieldGroup>
