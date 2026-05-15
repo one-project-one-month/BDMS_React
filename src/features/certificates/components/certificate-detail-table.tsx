@@ -7,7 +7,15 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { getCertificateDetailQueryOptions, getDonorListQueryOptions } from "../queries";
 import type { Certificate } from "../certificate.types";
 
-export default function CertificateDetailTable({ id }: { id: number }) {
+type CertificateDetailTableProps = {
+  id: number;
+  backPath?: string;
+};
+
+export default function CertificateDetailTable({
+  id,
+  backPath = "/admin/certificates",
+}: CertificateDetailTableProps) {
   const { data: certificate } = useSuspenseQuery(getCertificateDetailQueryOptions(id));
   const { data: donors } = useSuspenseQuery(getDonorListQueryOptions);
 
@@ -76,7 +84,7 @@ export default function CertificateDetailTable({ id }: { id: number }) {
 
       <div>
         <Button asChild variant="outline">
-          <Link to="/admin/certificates">Back to Certificate List</Link>
+          <Link to={backPath}>Back to Certificate List</Link>
         </Button>
       </div>
     </>
