@@ -23,7 +23,7 @@ export interface UserProfile {
 
 export type DonorProfile = unknown;
 
-export type Role = "admin" | "staff" | "user";
+export type Role = "admin" | "staff" | "user" | "donor";
 export type AuthMode = "admin" | "user";
 
 export interface ApiResponse<T> {
