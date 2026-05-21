@@ -18,9 +18,19 @@ import {
 import { userRoutes } from "@/features/users/user.routes";
 import { donorRoutes } from "./features/donors/donor.routes";
 import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
-import { certificateRoutes } from "@/features/certificates/certificate.routes";
+import {
+  certificateRoutes,
+  clientCertificateRoutes,
+} from "@/features/certificates/certificate.routes";
 import { donationRoutes } from "./features/donations/donation.routes";
 import { announcementRoutes } from "./features/announcements/announcement.routes";
+import { medicalRecordRoutes } from "@/features/medical-records/medical-records.routes";
+import {
+  appointmentRoutes,
+  clientAppointmentRoutes,
+} from "@/features/appointments/appointment.routes";
+import { bloodInventoryRoutes } from "@/features/blood-inventories/blood-inventory.routes";
+import AdminDashboardPage from "@/features/admin-dashboard/pages/admin-dashboard";
 
 export const router = createBrowserRouter([
   {
@@ -70,14 +80,8 @@ export const router = createBrowserRouter([
             element: <div>Client Donations Page</div>,
           },
           bloodRequestUserRoutes,
-          {
-            path: "appointments",
-            element: <div>Client Appointments Page</div>,
-          },
-          {
-            path: "certificates",
-            element: <div>Client Certificates Page</div>,
-          },
+          clientAppointmentRoutes,
+          clientCertificateRoutes,
           {
             path: "profile",
             element: <div>Client Profile Page</div>,
@@ -96,7 +100,7 @@ export const router = createBrowserRouter([
         children: [
           {
             index: true,
-            element: <div>Admin Dashboard Page</div>,
+            element: <AdminDashboardPage />,
           },
           /** user */
           userRoutes,
@@ -130,38 +134,10 @@ export const router = createBrowserRouter([
           },
           // donations
           donationRoutes,
-          {
-            path: "blood-requests",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Blood Requests Page</div>
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "appointments",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Appointments Page</div>
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "medical-records",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Medical Records Page</div>
-              </ProtectedRoute>
-            ),
-          },
-          {
-            path: "blood-inventories",
-            element: (
-              <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Blood Inventories Page</div>
-              </ProtectedRoute>
-            ),
-          },
+          bloodRequestAdminRoutes,
+          appointmentRoutes,
+          medicalRecordRoutes,
+          bloodInventoryRoutes,
           {
             path: "profile",
             element: (
