@@ -28,7 +28,7 @@ export default function AdminDashboardPage() {
   if (isError || !metrics) {
     return (
       <Card className="p-8 max-w-lg mx-auto mt-12 text-center space-y-4">
-        <Typography variant="h3" className="text-destructive">Failed to Load Dashboard</Typography>
+        <Typography variant="subtitle" className="text-destructive font-bold">Failed to Load Dashboard</Typography>
         <Typography className="text-muted-foreground">
           An error occurred while connecting to the C# Web API. Ensure your backend is running.
         </Typography>
@@ -59,7 +59,7 @@ export default function AdminDashboardPage() {
       <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <Typography as="h1" variant="subtitle" className="capitalize">
-            Welcome back, {user?.username || "Officer"}
+            Welcome back, {user?.userName || "Officer"}
           </Typography>
           <Typography className="text-muted-foreground text-sm mt-1">
             System overview and quick controls for the Blood Donation Management platform.

@@ -9,7 +9,7 @@ type AppointmentStatusInfo = {
 
 // Assumption based on the current frontend status order.
 // Update these values if the backend confirms a different enum mapping.
-const APPOINTMENT_STATUS_CODE_MAP: Partial<Record<number, AppointmentStatus>> = {
+const APPOINTMENT_STATUS_CODE_MAP: Partial<Record<number, string>> = {
   1: "pending",
   2: "scheduled",
   3: "confirmed",

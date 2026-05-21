@@ -31,6 +31,8 @@ import {
 } from "@/features/appointments/appointment.routes";
 import { bloodInventoryRoutes } from "@/features/blood-inventories/blood-inventory.routes";
 import AdminDashboardPage from "@/features/admin-dashboard/pages/admin-dashboard";
+import SettingsPage from "@/features/roles/pages/settings-page";
+import ProfilePage from "@/features/users/pages/profile-page";
 
 export const router = createBrowserRouter([
   {
@@ -84,7 +86,7 @@ export const router = createBrowserRouter([
           clientCertificateRoutes,
           {
             path: "profile",
-            element: <div>Client Profile Page</div>,
+            element: <ProfilePage />,
           },
         ],
       },
@@ -128,7 +130,7 @@ export const router = createBrowserRouter([
             path: "settings",
             element: (
               <ProtectedRoute allowed={["admin"]}>
-                <div>Admin Settings Page</div>
+                <SettingsPage />
               </ProtectedRoute>
             ),
           },
@@ -142,7 +144,7 @@ export const router = createBrowserRouter([
             path: "profile",
             element: (
               <ProtectedRoute allowed={["admin", "staff"]}>
-                <div>Admin Profile Page</div>
+                <ProfilePage />
               </ProtectedRoute>
             ),
           },

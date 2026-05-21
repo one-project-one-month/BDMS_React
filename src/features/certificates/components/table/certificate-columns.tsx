@@ -12,9 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const basePath = "/admin/certificates";
-
-export const buildColumns = (): ColumnDef<Certificate>[] => {
+export const buildColumns = (basePath: string = "/admin/certificates"): ColumnDef<Certificate>[] => {
   return [
     {
       accessorKey: "certificateTitle",

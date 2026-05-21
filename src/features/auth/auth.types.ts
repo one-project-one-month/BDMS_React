@@ -21,7 +21,22 @@ export interface UserProfile {
     donor?: DonorProfile | null;
 }
 
-export type DonorProfile = unknown;
+export interface DonorProfile {
+    id: number;
+    userId: number;
+    nicNo: string;
+    dateOfBirth: string;
+    gender: string;
+    bloodGroup: string;
+    lastDonationDate: string | null;
+    remarks: string | null;
+    emergencyContact: string | null;
+    emergencyPhone: string | null;
+    address: string | null;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
 
 export type Role = "admin" | "staff" | "user";
 export type AuthMode = "admin" | "user";

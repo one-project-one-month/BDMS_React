@@ -33,7 +33,7 @@ type ColumnHandlers = {
   donorNameByDonationId?: Record<number, string>;
 };
 
-const APPOINTMENT_STATUS_OPTIONS: AppointmentStatus[] = [
+const APPOINTMENT_STATUS_OPTIONS: string[] = [
   "pending",
   "scheduled",
   "confirmed",
@@ -239,9 +239,9 @@ export const buildColumns = ({
                   <DropdownMenuRadioGroup
                     value={
                       APPOINTMENT_STATUS_OPTIONS.includes(
-                        statusInfo.value as AppointmentStatus,
+                        statusInfo.value as any
                       )
-                        ? statusInfo.value
+                        ? (statusInfo.value as string)
                         : undefined
                     }
                     onValueChange={(value) =>

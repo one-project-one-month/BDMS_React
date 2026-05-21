@@ -50,7 +50,7 @@ const getDonorIdFromProfile = (profile: unknown) => {
   );
 };
 
-const columns = buildColumns({ basePath: "/client/certificates" });
+const columns = buildColumns("/client/certificates");
 
 export default function ClientCertificateListPage() {
   const { user } = useAuth();

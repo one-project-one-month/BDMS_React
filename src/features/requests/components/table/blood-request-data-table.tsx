@@ -17,11 +17,11 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import TableSkeleton from "@/components/table-skeleton";
-import type { BloodRequestAdmin } from "../../request.types";
+import type { BloodRequest } from "../../request.types";
 
 interface BloodRequestDataTableProps {
-  columns: ColumnDef<BloodRequestAdmin, unknown>[];
-  data: BloodRequestAdmin[];
+  columns: ColumnDef<BloodRequest, unknown>[];
+  data: BloodRequest[];
   isPending: boolean;
 }
 

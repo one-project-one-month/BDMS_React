@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button";
 // import { getBloodRequestQueryOptions } from "../queries";
 import { getUserQueryOptions } from "@/features/users/queries";
 import { getHospitalQueryOptions } from "@/features/hospitals/queries";
-import { getBloodRequestQueryOptions } from "../../queries";
+import { bloodRequestDetailQueryOptions } from "../../queries";
+import type { BloodRequest } from "../../request.types";
 // import { formatBloodGroup } from "../utils";
 
 const URGENCY_STYLES: Record<string, string> = {
@@ -21,7 +22,7 @@ const formatBloodGroup = (bloodGroup: string): string => {
 };
 
 export default function BloodRequestDetailTable({ id }: { id: number }) {
-  const { data: request } = useSuspenseQuery(getBloodRequestQueryOptions(id));
+  const request = useSuspenseQuery(bloodRequestDetailQueryOptions(id)).data as BloodRequest;
   console.log("blood request", request);
   const { data: user } = useSuspenseQuery(getUserQueryOptions(request.userId));
   const { data: hospital } = useSuspenseQuery(

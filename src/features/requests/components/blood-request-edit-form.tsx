@@ -8,8 +8,8 @@ import * as z from "zod";
 import { useMutation, useSuspenseQuery } from "@tanstack/react-query";
 import queryClient from "@/query-client";
 import {
-  getBloodRequestQueryOptions,
-  updateBloodRequestAdminMutationOptions,
+  bloodRequestDetailQueryOptions,
+  updateBloodRequestMutationOptions,
 } from "../queries";
 
 import {
@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { bloodRequestKeys } from "../queries/requestKeys";
+import type { BloodRequest } from "../request.types";
 
 const BLOOD_GROUP_OPTIONS = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const URGENCY_OPTIONS = ["Low", "Medium", "High", "Critical"];
@@ -67,7 +68,7 @@ const formSchema = z.object({
 export default function BloodRequestEditForm({ id }: { id: number }) {
   const navigate = useNavigate();
 
-  const { data: request } = useSuspenseQuery(getBloodRequestQueryOptions(id));
+  const request = useSuspenseQuery(bloodRequestDetailQueryOptions(id)).data as BloodRequest;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,14 +80,14 @@ export default function BloodRequestEditForm({ id }: { id: number }) {
       bloodGroup: bloodGroupToDisplay(request.bloodGroup),
       unitsRequired: request.unitsRequired,
       contactPhone: request.contactPhone,
-      urgency: request.urgency,
-      requiredDate: request.requiredDate,
+      urgency: request.urgency.charAt(0).toUpperCase() + request.urgency.slice(1),
+      requiredDate: request.requiredDate.split("T")[0],
       reason: request.reason,
     },
   });
 
   const updateMutation = useMutation({
-    ...updateBloodRequestAdminMutationOptions,
+    ...updateBloodRequestMutationOptions,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: bloodRequestKeys.list() });
       toast.success("Blood request updated successfully.", {
@@ -110,7 +111,24 @@ export default function BloodRequestEditForm({ id }: { id: number }) {
   });
 
   async function onSubmit(payload: z.infer<typeof formSchema>) {
-    await updateMutation.mutateAsync(payload);
+    await updateMutation.mutateAsync({
+      id: payload.id,
+      userId: payload.userId,
+      values: {
+        patientName: payload.patientName,
+        bloodGroup: bloodGroupToStore(payload.bloodGroup) as any,
+        hospitalId: payload.hospitalId,
+        hospitalAddress: "",
+        unitsRequired: payload.unitsRequired,
+        requiredDate: new Date(payload.requiredDate),
+        requestType: (payload.urgency.toLowerCase() === "critical" || payload.urgency.toLowerCase() === "high" ? "emergency" : "pre-booked") as any,
+        relationshipToPatient: "other",
+        contactPhone: payload.contactPhone,
+        reason: payload.reason,
+        additionalNotes: "",
+        urgency: payload.urgency.toLowerCase() as any,
+      } as any,
+    });
   }
 
   return (

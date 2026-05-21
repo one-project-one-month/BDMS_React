@@ -17,19 +17,19 @@ import {
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import type {
-  BloodRequestAdmin,
-  BloodRequestStatusAdmin,
+  BloodRequest,
+  BloodRequestStatus,
 } from "../../request.types";
 
 const basePath = "/admin/blood-requests";
 
 type ColumnHandlers = {
-  onRequestDelete: (request: BloodRequestAdmin) => void;
+  onRequestDelete: (request: BloodRequest) => void;
   onRequestStatusChange: (
-    request: BloodRequestAdmin,
-    newStatus: BloodRequestStatusAdmin,
+    request: BloodRequest,
+    newStatus: BloodRequestStatus,
   ) => void;
-  onRequestCreateAppointment: (request: BloodRequestAdmin) => void;
+  onRequestCreateAppointment: (request: BloodRequest) => void;
 };
 
 const URGENCY_STYLES: Record<string, string> = {
@@ -64,7 +64,7 @@ export const buildColumns = ({
   onRequestDelete,
   onRequestStatusChange,
   onRequestCreateAppointment,
-}: ColumnHandlers): ColumnDef<BloodRequestAdmin>[] => {
+}: ColumnHandlers): ColumnDef<BloodRequest>[] => {
   return [
     {
       accessorKey: "patientName",
@@ -189,7 +189,7 @@ export const buildColumns = ({
                     onValueChange={(v) =>
                       onRequestStatusChange(
                         request,
-                        v as BloodRequestStatusAdmin,
+                        v as BloodRequestStatus,
                       )
                     }
                   >

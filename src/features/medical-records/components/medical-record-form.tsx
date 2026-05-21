@@ -292,7 +292,7 @@ export default function MedicalRecordForm({
         <Controller
           name="hospitalId"
           control={form.control}
-          render={({ field, fieldState }) => (
+          render={({ fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel className="text-dark-primary">
                 Hospital
@@ -531,7 +531,7 @@ export default function MedicalRecordForm({
         <Controller
           name="screenedBy"
           control={form.control}
-          render={({ field, fieldState }) => (
+          render={({ fieldState }) => (
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel className="text-dark-primary">Screened By</FieldLabel>
               <Input

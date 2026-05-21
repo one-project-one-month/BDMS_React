@@ -94,11 +94,15 @@ const formSchema = z.object({
 interface DonationFormProps {
   initialData?: Donation;
   isEditing?: boolean;
+  donorIdOverride?: number;
+  returnPath?: string;
 }
 
 export default function DonationForm({
   initialData,
   isEditing = false,
+  donorIdOverride,
+  returnPath,
 }: DonationFormProps) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -107,7 +111,7 @@ export default function DonationForm({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      donorId: initialData?.donorId || 0,
+      donorId: initialData?.donorId || donorIdOverride || 0,
       hospitalId: initialData?.hospitalId || 0,
       bloodGroup: initialData?.bloodGroup,
       donationDate: initialData?.donationDate
@@ -151,7 +155,7 @@ export default function DonationForm({
       toast.success("Donation record created successfully.", {
         position: "bottom-right",
       });
-      navigate("/admin/donations");
+      navigate(returnPath || "/admin/donations");
     },
     onError: (error) => {
       console.error(error);
@@ -176,7 +180,7 @@ export default function DonationForm({
       toast.success("Donation updated successfully.", {
         position: "bottom-right",
       });
-      navigate("/admin/donations");
+      navigate(returnPath || "/admin/donations");
     },
     onError: (error) => {
       console.error(error);
@@ -239,6 +243,7 @@ export default function DonationForm({
               <Select
                 onValueChange={(value) => field.onChange(Number(value))}
                 value={field.value ? String(field.value) : undefined}
+                disabled={!!donorIdOverride}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select donor NRC" />
@@ -487,7 +492,7 @@ export default function DonationForm({
             {isPending ? "Submitting..." : isEditing ? "Update" : "Submit"}
           </Button>
           <Button variant={"outline"} asChild>
-            <Link to={"/admin/donations"}>Cancel</Link>
+            <Link to={returnPath || "/admin/donations"}>Cancel</Link>
           </Button>
         </div>
       </FieldGroup>

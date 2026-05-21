@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Droplet, RefreshCw, CheckCircle, Flame, Plus, MinusCircle } from "lucide-react";
+import { Droplet, RefreshCw, Plus, MinusCircle } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
@@ -244,7 +244,7 @@ export default function BloodInventoryListPage() {
                 <SelectItem value="all">All Hospitals</SelectItem>
                 {hospitals.map((h) => (
                   <SelectItem key={h.id} value={h.id.toString()}>
-                    {h.hospitalName}
+                    {h.name}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -315,7 +315,7 @@ export default function BloodInventoryListPage() {
                           {item.expiredAt || "N/A"}
                         </span>
                       </TableCell>
-                      <TableCell>{matchingHospital?.hospitalName || `Hospital #${item.hospitalId}`}</TableCell>
+                      <TableCell>{matchingHospital?.name || `Hospital #${item.hospitalId}`}</TableCell>
                       <TableCell>{getStatusBadge(item.status)}</TableCell>
                       <TableCell>
                         {item.requestId ? (

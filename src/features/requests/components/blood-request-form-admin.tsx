@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import * as z from "zod";
 
 import { useQuery } from "@tanstack/react-query";
-import { createBloodRequestAdminMutationOptions } from "../queries";
+import { createBloodRequestMutationOptions } from "../queries";
 
 import {
   Field,
@@ -88,7 +88,7 @@ export default function BloodRequestCreateForm() {
   const { data: donors } = useSuspenseQuery(getDonorsQueryOptions);
 
   const createBloodRequestMutation = useMutation({
-    ...createBloodRequestAdminMutationOptions,
+    ...createBloodRequestMutationOptions,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: bloodRequestKeys.list() });
       toast.success("Blood request created successfully.", {
@@ -112,7 +112,23 @@ export default function BloodRequestCreateForm() {
   });
 
   async function onSubmit(payload: z.infer<typeof formSchema>) {
-    createBloodRequestMutation.mutateAsync(payload);
+    await createBloodRequestMutation.mutateAsync({
+      userId: payload.userId,
+      values: {
+        patientName: payload.patientName,
+        bloodGroup: formatBloodGroup(payload.bloodGroup as any) as any,
+        hospitalId: payload.hospitalId,
+        hospitalAddress: "",
+        unitsRequired: payload.unitsRequired,
+        requiredDate: new Date(payload.requiredDate),
+        requestType: (payload.urgency.toLowerCase() === "critical" || payload.urgency.toLowerCase() === "high" ? "emergency" : "pre-booked") as any,
+        relationshipToPatient: "other",
+        contactPhone: payload.contactPhone,
+        reason: payload.reason,
+        additionalNotes: "",
+        urgency: payload.urgency.toLowerCase() as any,
+      } as any,
+    });
   }
 
   return (
@@ -151,7 +167,7 @@ export default function BloodRequestCreateForm() {
                   form.setValue(
                     "bloodGroup",
                     selectedDonor?.bloodGroup
-                      ? formatBloodGroup(selectedDonor.bloodGroup)
+                      ? formatBloodGroup(selectedDonor.bloodGroup as any)
                       : "",
                     {
                       shouldValidate: true,

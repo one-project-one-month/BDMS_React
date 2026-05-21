@@ -178,7 +178,7 @@ const buildApiPayload = (
   bloodGroup: input.values.bloodGroup,
   unitsRequired: input.values.unitsRequired,
   contactPhone: input.values.contactPhone.trim(),
-  urgency: toUrgency(input.values.requestType),
+  urgency: ((input.values as any).urgency as BloodRequestUrgency) || toUrgency(input.values.requestType),
   requiredDate: toRequiredDatePayload(input.values.requiredDate),
   reason: input.values.reason.trim(),
 });
