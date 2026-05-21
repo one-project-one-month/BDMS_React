@@ -112,7 +112,7 @@ export default function MedicalRecordDetailTable({ id }: { id: number }) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-[10px] border">
+      <div className="w-full overflow-x-auto rounded-[10px] border">
         <Table>
           <TableBody>
             <TableRow className="divide-x">

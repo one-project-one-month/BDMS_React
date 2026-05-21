@@ -26,7 +26,7 @@ export default function ProfilePage() {
   return (
     <div className="space-y-8 max-w-6xl mx-auto">
       {/* Premium Ambient Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-dark-primary via-slate-950 to-dark-primary rounded-3xl p-6 md:p-10 text-white shadow-xl border border-white/5">
+      <div className="relative overflow-hidden bg-gradient-to-r from-dark-primary via-slate-950 to-dark-primary rounded-3xl p-6 sm:p-8 md:p-10 text-white shadow-xl border border-white/5 transition-all duration-500 hover:border-white/10">
         <div className="absolute right-0 top-0 size-72 bg-gradient-to-br from-primary/30 to-rose-500/0 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute left-1/3 bottom-0 size-60 bg-gradient-to-tr from-rose-500/15 to-primary/0 rounded-full blur-2xl pointer-events-none" />
 
@@ -88,7 +88,7 @@ export default function ProfilePage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-xs pt-4 border-t border-white/10 relative z-10">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3.5 text-xs pt-4 border-t border-white/10 relative z-10">
                 <div>
                   <span className="text-red-200 block font-semibold">NIC NUMBER</span>
                   <span className="font-mono font-bold text-white text-sm">{donor.nicNo}</span>
@@ -108,8 +108,8 @@ export default function ProfilePage() {
               </div>
             </Card>
           ) : (
-            <Card className="p-6 text-center space-y-4 border border-dashed border-muted-foreground/30 bg-muted/10 rounded-2xl">
-              <Heart className="size-12 mx-auto text-muted-foreground/40 stroke-[1.5]" />
+            <Card className="p-6 text-center space-y-4 border border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300 rounded-2xl">
+              <Heart className="size-12 mx-auto text-primary/60 stroke-[1.5] animate-pulse" />
               <div className="space-y-1.5">
                 <Typography className="font-bold text-foreground">Not Registered as a Donor</Typography>
                 <Typography className="text-xs text-muted-foreground max-w-xs mx-auto">
@@ -120,7 +120,7 @@ export default function ProfilePage() {
           )}
 
           {/* Account Details Panel */}
-          <Card className="p-5 shadow-sm rounded-2xl space-y-4">
+          <Card className="p-5 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl space-y-4 border border-muted/50">
             <CardHeader className="p-0 pb-3 border-b flex flex-row items-center gap-2">
               <Activity className="size-4.5 text-primary" />
               <Typography className="font-bold text-sm text-foreground">Account Diagnostics</Typography>
@@ -145,7 +145,7 @@ export default function ProfilePage() {
         {/* Right Columns: Primary details */}
         <div className="lg:col-span-2 space-y-6">
           {/* Detailed Profiles */}
-          <Card className="p-6 shadow-sm rounded-2xl">
+          <Card className="p-6 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border border-muted/50">
             <CardHeader className="flex flex-row items-center gap-2 pb-4 border-b">
               <User className="size-5 text-primary" />
               <Typography variant="body" className="font-bold text-foreground">
@@ -199,7 +199,7 @@ export default function ProfilePage() {
           </Card>
 
           {/* Active Security Permissions Badge Section */}
-          <Card className="p-6 shadow-sm rounded-2xl">
+          <Card className="p-6 shadow-sm hover:shadow-md transition-shadow duration-300 rounded-2xl border border-muted/50">
             <CardHeader className="flex flex-row items-center gap-2 pb-4 border-b">
               <Lock className="size-5 text-primary" />
               <Typography variant="body" className="font-bold text-foreground">
@@ -215,7 +215,7 @@ export default function ProfilePage() {
               ) : (
                 <div className="flex flex-wrap gap-2">
                   {permissions.map((perm) => (
-                    <Badge key={perm} variant="secondary" className="font-mono text-[11px] px-2.5 py-1 border rounded-md">
+                    <Badge key={perm} variant="secondary" className="font-mono text-[11px] px-2.5 py-1 border rounded-md hover:bg-primary/10 hover:text-primary hover:border-primary/20 transition-all duration-200 cursor-default">
                       {perm}
                     </Badge>
                   ))}

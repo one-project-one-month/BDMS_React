@@ -268,7 +268,7 @@ export default function BloodInventoryListPage() {
         </div>
 
         {/* Ledger Table */}
-        <div className="rounded-md border bg-card">
+        <div className="w-full overflow-x-auto rounded-md border bg-card">
           <Table>
             <TableHeader>
               <TableRow>

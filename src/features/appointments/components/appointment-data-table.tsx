@@ -45,7 +45,7 @@ export default function AppointmentDataTable({
   });
 
   return (
-    <div className="overflow-hidden rounded-[10px] border">
+    <div className="w-full overflow-x-auto rounded-[10px] border">
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (

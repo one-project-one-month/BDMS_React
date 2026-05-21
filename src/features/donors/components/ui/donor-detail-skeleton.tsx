@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 
 export default function DonorDetailSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[10px] border">
+    <div className="w-full overflow-x-auto rounded-[10px] border">
       <Table>
         <TableBody>
           {Array.from({ length: 10 }).map((_, index) => (

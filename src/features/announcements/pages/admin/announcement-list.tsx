@@ -66,12 +66,12 @@ export default function AnnouncementListPage() {
   );
 
   return (
-    <Card className="px-8">
-      <header className="flex items-center justify-between mb-6">
+    <Card className="px-4 sm:px-6 md:px-8 py-6">
+      <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <Typography as={"h1"} variant={"subtitle"}>
           Announcement List
         </Typography>
-        <Button asChild>
+        <Button asChild className="w-full sm:w-auto text-center justify-center">
           <Link to={"/admin/announcements/create"}>Create Announcement</Link>
         </Button>
       </header>

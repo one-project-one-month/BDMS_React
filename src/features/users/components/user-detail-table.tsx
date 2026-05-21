@@ -18,7 +18,7 @@ export default function UserDetailTable({ id }: { id: number }) {
           <Link to={"/admin/users"}>Back to User List</Link>
         </Button>
       </div>
-      <div className="overflow-hidden rounded-[10px] border">
+      <div className="w-full overflow-x-auto rounded-[10px] border">
         <Table>
           <TableBody>
             <TableRow className="divide-x">

@@ -156,11 +156,11 @@ export default function SettingsPage() {
   return (
     <div className="space-y-8">
       {/* Header Banner */}
-      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 rounded-2xl text-white shadow-xl">
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-gradient-to-r from-dark-primary via-slate-950 to-dark-primary p-6 rounded-2xl text-white shadow-xl">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <div className="bg-primary/20 p-2 rounded-lg text-primary-foreground border border-primary/30">
-              <Shield className="size-6 text-indigo-400" />
+              <Shield className="size-6 text-primary" />
             </div>
             <h3 className="text-xl md:text-2xl text-white font-extrabold tracking-tight">
               Role & Permissions Matrix
