@@ -52,7 +52,7 @@ export function DashboardSidebar({
     {
       label: "dashboard",
       path: dashboardRoute,
-      roles: ["admin", "staff", "user", "donor"],
+      roles: ["admin", "staff", "user"],
       icon: DashboardIcon,
     },
 
@@ -60,25 +60,25 @@ export function DashboardSidebar({
     {
       label: "donations",
       path: "/client/donations",
-      roles: ["user", "donor"],
+      roles: ["user"],
       icon: DonationIcon,
     },
     {
       label: "blood requests",
       path: "/client/blood-requests",
-      roles: ["user", "donor"],
+      roles: ["user"],
       icon: BloodRequestIcon,
     },
     {
       label: "appointments",
       path: "/client/appointments",
-      roles: ["user", "donor"],
+      roles: ["user"],
       icon: AppointmentIcon,
     },
     {
       label: "certificates",
       path: "/client/certificates",
-      roles: ["user", "donor"],
+      roles: ["user"],
       icon: Award,
     },
 

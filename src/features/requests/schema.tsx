@@ -46,12 +46,7 @@ export const steps = [
   },
   {
     title: "Contact & Reason",
-    fields: [
-      "relationshipToPatient",
-      "contactPhone",
-      "reason",
-      "additionalNotes",
-    ],
+    fields: ["relationshipToPatient", "contactPhone", "reason", "additionalNotes"],
   },
   {
     title: "Review & Submit",

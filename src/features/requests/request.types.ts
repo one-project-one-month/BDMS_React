@@ -27,14 +27,6 @@ export type BloodRequestStatus =
   | "rejected"
   | "fulfilled";
 
-export type BloodRequestStatusAdmin =
-  | "screening"
-  | "pending"
-  | "cancelled"
-  | "approved"
-  | "rejected"
-  | "completed";
-
 export type RequestType = "emergency" | "pre-booked";
 
 export type RelationshipToPatient =
@@ -85,19 +77,6 @@ export interface BloodRequestFormValues {
   contactPhone: string;
   reason: string;
   additionalNotes: string;
-}
-
-export interface BloodRequestFormAdminValues {
-  userId: number;
-  patientName: string;
-  bloodGroup: BloodGroup;
-  hospitalId: number;
-  hospitalAddress: string;
-  unitsRequired: number;
-  requiredDate: Date;
-  requestType: RequestType;
-  contactPhone: string;
-  reason: string;
 }
 
 export interface BloodRequest {
@@ -170,58 +149,3 @@ export interface Hospital {
   updatedAt: string;
   deletedAt: string | null;
 }
-
-// Admin
-
-export type BloodRequestAdmin = {
-  id: number;
-  userId: number;
-  hospitalId: number;
-  patientName: string;
-  bloodGroup: string;
-  unitsRequired: number;
-  contactPhone: string;
-  urgency: string;
-  requiredDate: string;
-  reason: string;
-  status: string;
-};
-
-export type StoreBloodRequestPayload = {
-  userId: number;
-  hospitalId: number;
-  patientName: string;
-  bloodGroup: string;
-  unitsRequired: number;
-  contactPhone: string;
-  urgency: string;
-  requiredDate: string;
-  reason: string;
-};
-
-export type UpdateBloodRequestPayloadAdmin = {
-  id: number;
-  userId: number;
-  hospitalId: number;
-  patientName: string;
-  bloodGroup: string;
-  unitsRequired: number;
-  contactPhone: string;
-  urgency: string;
-  requiredDate: string;
-  reason: string;
-};
-
-export type UpdateBloodRequestStatusPayloadAdmin = {
-  id: number;
-  userId: number;
-  hospitalId: number;
-  patientName: string;
-  bloodGroup: string;
-  unitsRequired: number;
-  contactPhone: string;
-  urgency: string;
-  requiredDate: string;
-  reason: string;
-  status: string;
-};

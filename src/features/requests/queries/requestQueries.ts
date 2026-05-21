@@ -1,28 +1,14 @@
 import { mutationOptions, queryOptions } from "@tanstack/react-query";
 
-import type {
-  BloodRequest,
-  BloodRequestAdmin,
-  BloodRequestStatus,
-  BloodRequestStatusAdmin,
-  Hospital,
-} from "../request.types";
+import type { BloodRequest, Hospital } from "../request.types";
 import {
   createBloodRequest,
-  createBloodRequestAppointment,
-  deleteBloodRequest,
   getBloodRequest,
-  getBloodRequestAdmin,
   getBloodRequests,
-  getBloodRequestsAdmin,
   getHospitals,
-  storeBloodRequest,
   updateBloodRequest,
-  updateBloodRequestAdmin,
   updateBloodRequestStatus,
-  updateBloodRequestStatusAdmin,
 } from "../api/request.api";
-import { bloodRequestKeys } from "./requestKeys";
 
 export const requestKeys = {
   all: ["blood-requests"] as const,
@@ -74,50 +60,3 @@ export const updateBloodRequestStatusMutationOptions = mutationOptions<
 >({
   mutationFn: updateBloodRequestStatus,
 });
-
-// Admin
-
-export const deleteBloodRequestMutationOptions = mutationOptions<
-  boolean,
-  unknown,
-  Parameters<typeof deleteBloodRequest>[0]
->({
-  mutationFn: deleteBloodRequest,
-});
-
-export const getBloodRequestsQueryOptions = queryOptions<BloodRequestAdmin[]>({
-  queryKey: bloodRequestKeys.list(),
-  queryFn: getBloodRequestsAdmin,
-});
-
-export const createBloodRequestAdminMutationOptions = mutationOptions<
-  BloodRequestAdmin,
-  unknown,
-  Parameters<typeof storeBloodRequest>[0]
->({
-  mutationFn: storeBloodRequest,
-});
-
-export const getBloodRequestQueryOptions = (id: number) =>
-  queryOptions<BloodRequestAdmin>({
-    queryKey: bloodRequestKeys.detail(id),
-    queryFn: () => getBloodRequestAdmin(id),
-  });
-
-export const updateBloodRequestAdminMutationOptions = mutationOptions<
-  BloodRequestAdmin,
-  unknown,
-  Parameters<typeof updateBloodRequestAdmin>[0]
->({
-  mutationFn: updateBloodRequestAdmin,
-});
-
-export const updateBloodRequestStatusAdminMutationOptions = {
-  mutationFn: ({ id, status }: { id: number; status: BloodRequestStatus }) =>
-    updateBloodRequestStatusAdmin(id, status),
-};
-
-export const createBloodRequestAppointmentMutationOptions = {
-  mutationFn: ({ id, date }: { id: number; date: string }) =>
-    createBloodRequestAppointment(id, date),
-};

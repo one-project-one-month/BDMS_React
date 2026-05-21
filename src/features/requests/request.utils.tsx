@@ -20,7 +20,7 @@ export const toDateInputValue = (value: string) => {
   }
 };
 
-export const formatBloodGroup = (value: BloodGroupRaw | BloodGroup | string) => {
+export const formatBloodGroup = (value: BloodGroupRaw | BloodGroup) => {
   if (value in bloodGroupLabelMap) {
     return bloodGroupLabelMap[value as BloodGroupRaw];
   }
