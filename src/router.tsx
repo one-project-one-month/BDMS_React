@@ -22,7 +22,10 @@ import {
   certificateRoutes,
   clientCertificateRoutes,
 } from "@/features/certificates/certificate.routes";
-import { donationRoutes } from "./features/donations/donation.routes";
+import {
+  clientDonationRoutes,
+  donationRoutes,
+} from "./features/donations/donation.routes";
 import { announcementRoutes } from "./features/announcements/announcement.routes";
 import { medicalRecordRoutes } from "@/features/medical-records/medical-records.routes";
 import {
@@ -68,7 +71,7 @@ export const router = createBrowserRouter([
       {
         path: "/client",
         element: (
-          <ProtectedRoute allowed={["user"]}>
+          <ProtectedRoute allowed={["user", "donor"]}>
             <DashboardLayout />
           </ProtectedRoute>
         ),
@@ -77,10 +80,7 @@ export const router = createBrowserRouter([
             index: true,
             element: <ClientDashboardLayout />,
           },
-          {
-            path: "donations",
-            element: <div>Client Donations Page</div>,
-          },
+          clientDonationRoutes,
           bloodRequestUserRoutes,
           clientAppointmentRoutes,
           clientCertificateRoutes,

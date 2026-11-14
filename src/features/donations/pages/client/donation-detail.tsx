@@ -184,10 +184,10 @@ export default function ClientDonationDetailPage() {
         </Link>
       </Button>
 
-      <Card className="px-8 py-6">
-        <header className="flex flex-col items-start justify-between gap-6 border-b bg-secondary/10 px-8 py-10 md:flex-row md:items-center">
-          <div>
-            <div className="mb-2 flex items-center gap-3">
+      <Card className="overflow-hidden px-0 py-0 sm:py-6">
+        <header className="flex flex-col items-start justify-between gap-6 border-b bg-secondary/10 px-4 py-6 sm:px-8 sm:py-10 lg:flex-row lg:items-center">
+          <div className="min-w-0">
+            <div className="mb-2 flex flex-wrap items-center gap-3">
               <Badge
                 className={cn(
                   "gap-1.5 px-3 py-1 text-white capitalize",
@@ -208,27 +208,27 @@ export default function ClientDonationDetailPage() {
             <Typography
               as="h1"
               variant="title"
-              className="text-3xl font-bold tracking-tight"
+              className="text-2xl font-bold tracking-tight [overflow-wrap:anywhere] sm:text-3xl"
             >
               Donation {donation.donationCode || `#${donation.id}`}
             </Typography>
           </div>
-          <div className="flex flex-col items-end">
+          <div className="flex w-full min-w-0 flex-col items-start lg:w-auto lg:items-end">
             <Typography
               variant="body"
               className="mb-1 text-xs font-semibold uppercase tracking-widest text-muted-foreground"
             >
               Donation Code
             </Typography>
-            <div className="flex items-center gap-2 font-mono text-xl font-bold text-primary">
+            <div className="flex max-w-full items-center gap-2 font-mono text-base font-bold text-primary [overflow-wrap:anywhere] sm:text-xl">
               <Hash className="size-5" />
               {donation.donationCode || "PENDING"}
             </div>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 gap-10 p-8 md:grid-cols-3">
-          <div className="space-y-8 md:col-span-2">
+        <div className="grid min-w-0 grid-cols-1 gap-8 p-4 sm:p-8 lg:grid-cols-3 lg:gap-10">
+          <div className="min-w-0 space-y-8 lg:col-span-2">
             <section>
               <Typography
                 variant="subtitle"
@@ -237,7 +237,7 @@ export default function ClientDonationDetailPage() {
                 <Activity className="size-5" />
                 Donation Overview
               </Typography>
-              <div className="grid grid-cols-1 gap-6 rounded-xl border border-secondary/20 bg-secondary/5 p-6 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-6 rounded-xl border border-secondary/20 bg-secondary/5 p-4 sm:grid-cols-2 sm:p-6">
                 <div>
                   <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                     Hospital
