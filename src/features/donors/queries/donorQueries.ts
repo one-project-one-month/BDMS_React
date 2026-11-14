@@ -2,6 +2,7 @@ import { mutationOptions, queryOptions } from "@tanstack/react-query";
 import { donorKeys } from "./donorKeys";
 import {
   activateDonor,
+  becomeDonor,
   deactivateDonor,
   deleteDonor,
   getDonor,
@@ -37,6 +38,17 @@ export const createDonorMutationOptions = mutationOptions<
   Parameters<typeof storeDonor>[0]
 >({
   mutationFn: storeDonor,
+});
+
+/**
+ * Mutation: apply to become a donor (self-service).
+ */
+export const becomeDonorMutationOptions = mutationOptions<
+  Donor,
+  unknown,
+  Parameters<typeof becomeDonor>[0]
+>({
+  mutationFn: becomeDonor,
 });
 
 /**

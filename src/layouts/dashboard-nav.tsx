@@ -1,8 +1,9 @@
-import type { FormEvent } from "react";
+import { useState, type FormEvent } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import { DashboardNavSkeleton } from "@/components/dashboard-nav-skeleton";
+import BecomeDonorDialog from "@/features/donors/components/become-donor-dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,6 +22,7 @@ interface DashboardTopNavbarProps {
 export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
   const { user, logout } = useAuth();
   const isUserRole = user?.roleName === "user";
+  const [becomeOpen, setBecomeOpen] = useState(false);
 
   const handleLogout = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -92,6 +94,7 @@ export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
                   type="button"
                   variant="outline"
                   website="outline"
+                  onClick={() => setBecomeOpen(true)}
                   className="h-10 border-primary bg-transparent px-4 text-primary shadow-none hover:bg-primary hover:text-primary-foreground"
                 >
                   <svg
@@ -211,6 +214,8 @@ export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
           )}
         </div>
       </div>
+
+      <BecomeDonorDialog open={becomeOpen} onOpenChange={setBecomeOpen} />
     </header>
   );
 }

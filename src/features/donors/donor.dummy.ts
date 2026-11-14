@@ -14,6 +14,7 @@ export const dummyDonors: Donor[] = [
     emergencyPhone: "0771234567",
     address: "123 Main St, Colombo",
     isActive: true,
+    status: "approved",
   },
   {
     id: 2,
@@ -28,6 +29,7 @@ export const dummyDonors: Donor[] = [
     emergencyPhone: "0779876543",
     address: "456 Lake Rd, Kandy",
     isActive: true,
+    status: "approved",
   },
   {
     id: 3,
@@ -42,6 +44,7 @@ export const dummyDonors: Donor[] = [
     emergencyPhone: "0712345678",
     address: "789 Hill Ave, Galle",
     isActive: false,
+    status: "pending",
   },
   {
     id: 4,
@@ -56,6 +59,7 @@ export const dummyDonors: Donor[] = [
     emergencyPhone: "0756789012",
     address: "22 Beach Rd, Negombo",
     isActive: true,
+    status: "approved",
   },
   {
     id: 5,
@@ -70,6 +74,7 @@ export const dummyDonors: Donor[] = [
     emergencyPhone: "0723456789",
     address: "5 Temple St, Matara",
     isActive: true,
+    status: "approved",
   },
 ];
 

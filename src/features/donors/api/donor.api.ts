@@ -1,6 +1,7 @@
 import api from "@/api/axios-client";
 import type { ApiResponse } from "@/features/auth/auth.types";
 import type {
+  BecomeDonorPayload,
   Donor,
   StoreDonorPayload,
   UpdateDonorPayload,
@@ -43,6 +44,23 @@ export const storeDonor = async (
   if (!data.isSuccess)
     throw new Error(
       data.message || `Failed to store ${DONOR_ENDPOINTS.CREATE}`,
+    );
+
+  return data.data;
+};
+
+/** Apply to become a donor (self-service, created as pending) */
+export const becomeDonor = async (
+  payload: BecomeDonorPayload,
+): Promise<Donor> => {
+  const { data } = await api.post<ApiResponse<Donor>>(
+    DONOR_ENDPOINTS.BECOME,
+    payload,
+  );
+
+  if (!data.isSuccess)
+    throw new Error(
+      data.message || `Failed to submit ${DONOR_ENDPOINTS.BECOME}`,
     );
 
   return data.data;

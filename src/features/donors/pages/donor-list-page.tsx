@@ -52,14 +52,14 @@ export default function DonorListPage() {
     ...activateDonorMutationOptions,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: donorKeys.list() });
-      toast.success("Donor activated successfully.", {
+      toast.success("Donor approved successfully.", {
         position: "bottom-right",
       });
       setSelectedDonor(null);
       setStatusOpen(false);
     },
     onError: () => {
-      toast.error("Failed donor activation.", {
+      toast.error("Failed donor approval.", {
         position: "bottom-right",
       });
     },
@@ -169,9 +169,15 @@ export default function DonorListPage() {
         {!selectedDonor?.isActive ? (
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Activate Donor</DialogTitle>
+              <DialogTitle>
+                {selectedDonor?.status === "pending"
+                  ? "Approve Donor"
+                  : "Activate Donor"}
+              </DialogTitle>
               <DialogDescription>
-                Are you sure you want to activate{" "}
+                {selectedDonor?.status === "pending"
+                  ? "Approve the donor application from "
+                  : "Are you sure you want to activate "}
                 <span className="font-medium">
                   {selectedDonor?.nicNo ?? "this donor"}
                 </span>
@@ -187,7 +193,11 @@ export default function DonorListPage() {
                 disabled={activateMutation.isPending}
                 className="bg-green-400 hover:bg-green-500"
               >
-                {activateMutation.isPending ? "Activating..." : "Activate"}
+                {activateMutation.isPending
+                  ? "Approving..."
+                  : selectedDonor?.status === "pending"
+                    ? "Approve"
+                    : "Activate"}
               </Button>
             </DialogFooter>
           </DialogContent>
