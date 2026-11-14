@@ -86,16 +86,21 @@ export const buildColumns = ({
       header: "Status",
       cell: ({ row }) => {
         const donor = row.original;
+        const isPending = donor.status === "pending";
         return (
           <Badge
             variant="outline"
             className={cn(
               "cursor-pointer text-secondary",
-              donor.isActive ? "bg-green-400" : "bg-destructive",
+              isPending
+                ? "bg-yellow-300"
+                : donor.isActive
+                  ? "bg-green-400"
+                  : "bg-destructive",
             )}
             onClick={() => onRequestStatus(donor)}
           >
-            {donor.isActive ? "Active" : "Inactive"}
+            {isPending ? "Pending" : donor.isActive ? "Active" : "Inactive"}
           </Badge>
         );
       },

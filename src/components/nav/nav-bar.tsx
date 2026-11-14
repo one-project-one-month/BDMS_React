@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import useAuth from "@/context/auth/useAuth";
+import BecomeDonorDialog from "@/features/donors/components/become-donor-dialog";
 
 interface NavbarProps {
   isLoggedIn?: boolean;
@@ -57,6 +58,7 @@ export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
 
   const [currentPage, setCurrentPage] = useState<NavKey>("home");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [becomeOpen, setBecomeOpen] = useState(false);
 
   const authItems: NavItem[] = [
     { key: "home", label: "Home", href: "/" },
@@ -263,6 +265,7 @@ export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
                     <Button
                       variant="outline"
                       website="outline"
+                      onClick={() => setBecomeOpen(true)}
                       className="rounded-[10px] border-2 border-secondary bg-transparent p-5 text-secondary shadow-none hover:bg-secondary hover:text-primary focus-visible:ring-[3px] focus-visible:ring-primary-foreground/50 font-semibold"
                     >
                       <svg
@@ -519,6 +522,10 @@ export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
                       <Button
                         variant="outline"
                         website="outline"
+                        onClick={() => {
+                          setBecomeOpen(true);
+                          setMobileMenuOpen(false);
+                        }}
                         className="rounded-[10px] border-2 border-secondary bg-transparent p-5 text-secondary shadow-none hover:bg-secondary hover:text-primary focus-visible:ring-[3px] focus-visible:ring-primary-foreground/50 font-semibold"
                       >
                         <svg
@@ -638,6 +645,8 @@ export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
           </Container>
         </div>
       )}
+
+      <BecomeDonorDialog open={becomeOpen} onOpenChange={setBecomeOpen} />
     </nav>
   );
 }

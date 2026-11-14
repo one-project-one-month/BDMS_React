@@ -296,7 +296,8 @@ export default function DonationForm({
             <Field data-invalid={fieldState.invalid}>
               <FieldLabel className="text-dark-primary">Blood Group</FieldLabel>
               <Select
-                onValueChange={field.onChange}
+                // Radix fires an empty change right after the auto-filled value is set; ignore it
+                onValueChange={(value) => value && field.onChange(value)}
                 value={field.value}
                 disabled={!isEditing}
               >

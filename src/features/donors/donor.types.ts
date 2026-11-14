@@ -11,6 +11,19 @@ export interface Donor {
   emergencyPhone: string;
   address: string;
   isActive: boolean;
+  status: string;
+}
+
+export interface BecomeDonorPayload {
+  nicNo: string;
+  dateOfBirth: string;
+  gender: string;
+  bloodGroup: string;
+  lastDonationDate: string | null;
+  remarks?: string | undefined;
+  emergencyContact: string;
+  emergencyPhone: string;
+  address: string;
 }
 
 export interface StoreDonorPayload {
