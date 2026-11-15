@@ -1,22 +1,19 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
 import { Typography } from "@/components/ui/typography";
+import useAuth from "@/context/auth/useAuth";
+import { getDonationsQueryOptions } from "@/features/donations/queries";
+import { DashboardCard } from "./dashboard-card";
 
 export function TotalBloodDonation() {
+  const { user } = useAuth();
+  const { data: donations = [] } = useQuery(getDonationsQueryOptions);
 
+  const donorId = user?.donor?.id;
+  const count = donorId == null ? 0 : donations.filter((d) => d.donorId === donorId).length;
 
-    return (
-        <Card className="shadow">
-            <CardHeader >
-                <Typography className="text-dark-primary font-semibold text-center ">My Donations</Typography>
-            </CardHeader>
-
-            <CardContent className="flex items-center justify-center ">
-                <Typography
-                    className="text-7xl! font-bold text-primary">
-                    12
-                </Typography>
-            </CardContent>
-        </Card>
-    );
-
+  return (
+    <DashboardCard title="My Donations" titleClassName="font-bold">
+      <Typography className="text-primary text-[clamp(3.5rem,7vw,8rem)]! font-black leading-none">{count}</Typography>
+    </DashboardCard>
+  );
 }

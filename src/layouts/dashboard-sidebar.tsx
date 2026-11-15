@@ -155,7 +155,7 @@ export function DashboardSidebar({
     : [];
 
   const itemBaseClass =
-    "flex w-full items-center gap-4 py-3 ps-4 pe-2 text-left rounded-s-[10px] transition-colors duration-300";
+    "flex w-full items-center gap-4 py-[clamp(0.5rem,1.6vh,1rem)] ps-4 pe-2 text-left rounded-s-[10px] transition-colors duration-300";
 
   const activeItemClass = "bg-sidebar-accent/45 text-secondary";
 
@@ -181,7 +181,7 @@ export function DashboardSidebar({
 
       <aside
         className={cn(
-          "fixed left-0 top-0 z-50 flex overflow-y-auto min-h-screen h-screen w-72.5 flex-col bg-sidebar text-sidebar-foreground transition-transform duration-300 py-4 md:py-8 space-y-6 no-scrollbar",
+          "fixed left-0 top-0 z-50 flex overflow-y-auto h-dvh w-72.5 flex-col bg-sidebar text-sidebar-foreground transition-transform duration-300 py-4 md:py-8 space-y-[clamp(1rem,4vh,3rem)] no-scrollbar",
           "border-r border-primary/15 border-b shadow",
           "lg:static lg:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-[110%]",
@@ -275,8 +275,8 @@ export function DashboardSidebar({
 
         {/* Sidebar items */}
         {role ? (
-          <div className="flex items-center justify-end ps-20">
-            <nav className="flex flex-1 flex-col items-end gap-2">
+          <div className="flex min-h-0 flex-1 items-center justify-end ps-20">
+            <nav className="flex flex-col items-end gap-[clamp(0.25rem,1.2vh,1rem)]">
               {filteredMenuItems.map((item) => (
                 <Link
                   key={item.label}

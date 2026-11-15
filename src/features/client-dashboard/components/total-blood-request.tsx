@@ -1,19 +1,18 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { useQuery } from "@tanstack/react-query";
 import { Typography } from "@/components/ui/typography";
+import useAuth from "@/context/auth/useAuth";
+import { bloodRequestsQueryOptions } from "@/features/requests/queries";
+import { DashboardCard } from "./dashboard-card";
 
 export function TotalBloodRequest() {
-    return (
-        <Card className="shadow">
-            <CardHeader >
-                <Typography className="text-dark-primary font-semibold text-center ">My Requests</Typography>
-            </CardHeader>
-            <CardContent className="flex items-center justify-center ">
-                <Typography
-                    className="text-7xl! font-bold text-primary">
-                    12
-                </Typography>
-            </CardContent>
-        </Card>
-    );
+  const { user } = useAuth();
+  const { data: requests = [] } = useQuery(bloodRequestsQueryOptions);
 
+  const count = requests.filter((r) => r.userId === user?.userId).length;
+
+  return (
+    <DashboardCard title="My Requests" titleClassName="font-bold">
+      <Typography className="text-primary text-[clamp(3.5rem,7vw,8rem)]! font-black leading-none">{count}</Typography>
+    </DashboardCard>
+  );
 }
