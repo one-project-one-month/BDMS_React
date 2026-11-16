@@ -23,7 +23,6 @@ const formatBloodGroup = (bloodGroup: string): string => {
 
 export default function BloodRequestDetailTable({ id }: { id: number }) {
   const request = useSuspenseQuery(bloodRequestDetailQueryOptions(id)).data as BloodRequest;
-  console.log("blood request", request);
   const { data: user } = useSuspenseQuery(getUserQueryOptions(request.userId));
   const { data: hospital } = useSuspenseQuery(
     getHospitalQueryOptions(request.hospitalId),
