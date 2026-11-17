@@ -9,6 +9,7 @@ import { Typography } from "@/components/ui/typography";
 import useAuth from "@/context/auth/useAuth";
 import { getDonorsQueryOptions } from "@/features/donors/queries";
 import DonationDataTable from "../../components/donation-data-table";
+import DonorRequiredCard from "../../components/donor-required-card";
 import { clientDonationColumns } from "../../components/client-donation-columns";
 import { getDonationsQueryOptions } from "../../queries";
 
@@ -175,9 +176,7 @@ export default function ClientDonationListPage() {
             {donationLoadError}
           </Typography>
         ) : donorId == null && !isDonorListPending ? (
-          <Typography className="text-muted-foreground">
-            No donor profile was found for this account yet.
-          </Typography>
+          <DonorRequiredCard />
         ) : (
           <DonationDataTable
             columns={clientDonationColumns}

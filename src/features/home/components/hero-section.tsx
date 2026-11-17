@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import Container from "../../../components/container"
 import  Section  from "../../../components/section";
 import { Typography } from "@/components/ui/typography";
+import { Link } from "react-router-dom";
 
 const HeroSection: React.FC = () => {
   return (
@@ -29,10 +30,12 @@ const HeroSection: React.FC = () => {
 
             <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Button
+                asChild
                 variant="secondary"
                 size="lg"
                 className="min-w-[150px] bg-white text-primary shadow-none hover:bg-white/90"
               >
+                <Link to="/client/donations/create">
                 <svg
                   width="20"
                   height="20"
@@ -46,13 +49,16 @@ const HeroSection: React.FC = () => {
 
                 </svg>
                 Donate
+                </Link>
               </Button>
 
               <Button
+                asChild
                 variant="secondary"
                 size="lg"
                 className="min-w-[150px] bg-white text-primary shadow-none hover:bg-white/90"
               >
+                <Link to="/client/blood-requests/create">
                 <svg
                   width="20"
                   height="20"
@@ -66,6 +72,7 @@ const HeroSection: React.FC = () => {
 </svg>
 
                 Request
+                </Link>
               </Button>
             </div>
           </div>

@@ -6,6 +6,7 @@ import { Typography } from "@/components/ui/typography";
 import useAuth from "@/context/auth/useAuth";
 import { getDonorsQueryOptions } from "@/features/donors/queries";
 import DonationForm from "@/features/donations/components/donation-form";
+import DonorRequiredCard from "@/features/donations/components/donor-required-card";
 
 type DonorProfileRecord = Record<string, unknown>;
 
@@ -71,9 +72,7 @@ export default function ClientDonationCreatePage() {
         {isPending ? (
           <Typography>Loading donor profile...</Typography>
         ) : donorId == null ? (
-          <Typography className="text-muted-foreground">
-            No donor profile was found for this account yet.
-          </Typography>
+          <DonorRequiredCard />
         ) : (
           <DonationForm
             donorIdOverride={donorId}
