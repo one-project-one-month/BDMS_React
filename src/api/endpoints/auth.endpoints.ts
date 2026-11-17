@@ -1,6 +1,9 @@
 export const AUTH_ENDPOINTS = {
-    LOGIN: "/auth/login",
-    REGISTER: "/auth/register",
-    PROFILE: "/auth/me",
-    LOGOUT: "/auth/logout",
+    ADMIN_PROFILE: "/Auth/me",
+    USER_PROFILE: "/UserAuth/me",
+    ADMIN_LOGIN: "/Auth/login",
+    ADMIN_LOGOUT: "/Auth/logout",
+    USER_LOGIN: "/UserAuth/login",
+    USER_LOGOUT: "/UserAuth/logout",
+    USER_REGISTER: "/UserAuth/register",
 } as const;

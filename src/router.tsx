@@ -1,27 +1,166 @@
 import { createBrowserRouter } from "react-router-dom";
+
 import GuestLayout from "@/layouts/guest-layout";
+import DashboardLayout from "@/layouts/dashboard-layout";
+
+import ForbiddenPage from "@/pages/forbidden-page";
+import NotFoundPage from "@/pages/not-found-page";
+import ErrorPage from "@/pages/error-page";
+
 import DemoPage from "@/components/demo";
+import ProtectedRoute from "@/features/auth/components/protected-route";
+import { authRoutes } from "@/features/auth/auth.routes";
+import AnnouncementPage from "@/features/announcements/pages/website/announcement-page";
+import {
+  bloodRequestAdminRoutes,
+  bloodRequestUserRoutes,
+} from "@/features/requests/request.routes";
+import { userRoutes } from "@/features/users/user.routes";
+import { donorRoutes } from "./features/donors/donor.routes";
+import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
+import {
+  certificateRoutes,
+  clientCertificateRoutes,
+} from "@/features/certificates/certificate.routes";
+import {
+  clientDonationRoutes,
+  donationRoutes,
+} from "./features/donations/donation.routes";
+import { announcementRoutes } from "./features/announcements/announcement.routes";
+import { medicalRecordRoutes } from "@/features/medical-records/medical-records.routes";
+import {
+  appointmentRoutes,
+  clientAppointmentRoutes,
+} from "@/features/appointments/appointment.routes";
+import { bloodInventoryRoutes } from "@/features/blood-inventories/blood-inventory.routes";
+import AdminDashboardPage from "@/features/admin-dashboard/pages/admin-dashboard";
+import SettingsPage from "@/features/roles/pages/settings-page";
+import ProfilePage from "@/features/users/pages/profile-page";
 
 export const router = createBrowserRouter([
   {
-    path: "/",
-    element: <GuestLayout />,
+    errorElement: <ErrorPage />,
     children: [
+      /** public routes */
       {
-        path: "/ui",
-        element: <DemoPage />,
+        path: "/",
+        element: <GuestLayout />,
+        children: [
+          /** [start] commented by KK to remove the text "Home" in guestLayout*/
+          // {
+          //   index: true,
+          //   element: <div>Home</div>,
+          // },
+          /** [end] commented by KK to remove the text "Home" in guestLayout*/
+          {
+            // TODO: remove this in production
+            path: "ui",
+            element: <DemoPage />,
+          },
+          {
+            path: "announcements",
+            element: <AnnouncementPage />,
+          },
+        ],
       },
+
+      /** auth routes */
+      authRoutes,
+
+      /** user dashboard */
       {
-        index: true, // home
+        path: "/client",
+        element: (
+          <ProtectedRoute allowed={["user", "donor"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <ClientDashboardLayout />,
+          },
+          clientDonationRoutes,
+          bloodRequestUserRoutes,
+          clientAppointmentRoutes,
+          clientCertificateRoutes,
+          {
+            path: "profile",
+            element: <ProfilePage />,
+          },
+        ],
       },
+
+      /** admin / staff dashboard */
       {
-        path: "/announcements", // announcements
+        path: "/admin",
+        element: (
+          <ProtectedRoute allowed={["admin", "staff"]}>
+            <DashboardLayout />
+          </ProtectedRoute>
+        ),
+        children: [
+          {
+            index: true,
+            element: <AdminDashboardPage />,
+          },
+          /** user */
+          userRoutes,
+          donorRoutes,
+          announcementRoutes,
+          // {
+          //   path: "donors",
+          //   element: (
+          //     <ProtectedRoute allowed={["admin"]}>
+          //       <DonorPage />
+          //     </ProtectedRoute>
+          //   ),
+          // },
+          // {
+          //   path: "announcements",
+          //   element: (
+          //     <ProtectedRoute allowed={["admin"]}>
+          //       <div>Admin Announcements Page</div>
+          //     </ProtectedRoute>
+          //   ),
+          // },
+          //certificates
+          certificateRoutes,
+          {
+            path: "settings",
+            element: (
+              <ProtectedRoute allowed={["admin"]}>
+                <SettingsPage />
+              </ProtectedRoute>
+            ),
+          },
+          // donations
+          donationRoutes,
+          bloodRequestAdminRoutes,
+          appointmentRoutes,
+          medicalRecordRoutes,
+          bloodInventoryRoutes,
+          {
+            path: "profile",
+            element: (
+              <ProtectedRoute allowed={["admin", "staff"]}>
+                <ProfilePage />
+              </ProtectedRoute>
+            ),
+          },
+        ],
       },
+
+      /** forbidden */
       {
-        path: "/login", // login
+        path: "unauthorized",
+        element: <ForbiddenPage />,
       },
+
+      /** 404 */
       {
-        path: "/register", // register
+        path: "*",
+        element: <NotFoundPage />,
       },
     ],
   },
