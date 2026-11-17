@@ -6,7 +6,10 @@ import { DashboardCard } from "./dashboard-card";
 
 export function TotalBloodDonation() {
   const { user } = useAuth();
-  const { data: donations = [] } = useQuery(getDonationsQueryOptions);
+  const { data: donations = [] } = useQuery({
+    ...getDonationsQueryOptions,
+    enabled: user?.permissions?.includes("donations.view") ?? false,
+  });
 
   const donorId = user?.donor?.id;
   const count = donorId == null ? 0 : donations.filter((d) => d.donorId === donorId).length;

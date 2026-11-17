@@ -29,6 +29,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import useAuth from "@/context/auth/useAuth";
+import { authKeys } from "@/features/auth/queries";
 import { becomeDonorMutationOptions, donorKeys } from "../queries";
 
 const formSchema = z.object({
@@ -77,6 +79,7 @@ export default function BecomeDonorDialog({
 }: BecomeDonorDialogProps) {
   const [hasLastDonation, setHasLastDonation] = useState(false);
   const queryClient = useQueryClient();
+  const { user } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -97,6 +100,8 @@ export default function BecomeDonorDialog({
     ...becomeDonorMutationOptions,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: donorKeys.list() });
+      // Refresh the session so the pending donor status shows immediately
+      queryClient.invalidateQueries({ queryKey: authKeys.me() });
       toast.success("Donor application submitted. Awaiting approval.", {
         position: "bottom-right",
       });
@@ -119,6 +124,27 @@ export default function BecomeDonorDialog({
 
   function onSubmit(payload: z.infer<typeof formSchema>) {
     becomeMutation.mutate(payload);
+  }
+
+  // One application per account: once a donor record exists, the form is never shown again
+  if (user?.donor) {
+    const isPending = user.donor.status === "pending";
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {isPending ? "Application pending" : "Already a donor"}
+            </DialogTitle>
+            <DialogDescription>
+              {isPending
+                ? "Your donor application has already been submitted and is awaiting approval."
+                : "This account already has a donor profile."}
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+    );
   }
 
   return (

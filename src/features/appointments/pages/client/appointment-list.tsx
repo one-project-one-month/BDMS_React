@@ -59,7 +59,10 @@ export default function ClientAppointmentListPage() {
     isError,
     error,
   } = useQuery(getAppointmentsQueryOptions);
-  const { data: donations = [] } = useQuery(getDonationsQueryOptions);
+  const { data: donations = [] } = useQuery({
+    ...getDonationsQueryOptions,
+    enabled: user?.permissions?.includes("donations.view") ?? false,
+  });
 
   const donationById = useMemo(() => buildDonationLookup(donations), [donations]);
   const currentDonorId = getDonorId(user?.donor);

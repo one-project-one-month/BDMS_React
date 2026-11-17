@@ -34,6 +34,7 @@ export interface DonorProfile {
     emergencyPhone: string | null;
     address: string | null;
     isActive: boolean;
+    status?: string;
     createdAt: string;
     updatedAt: string;
 }
