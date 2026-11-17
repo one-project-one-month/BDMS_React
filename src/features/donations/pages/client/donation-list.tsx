@@ -1,54 +1,17 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
+import { isAxiosError } from "axios";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 import useAuth from "@/context/auth/useAuth";
-import { getDonorsQueryOptions } from "@/features/donors/queries";
 import DonationDataTable from "../../components/donation-data-table";
 import DonorRequiredCard from "../../components/donor-required-card";
 import { clientDonationColumns } from "../../components/client-donation-columns";
 import { getDonationsQueryOptions } from "../../queries";
-
-type DonorProfileRecord = Record<string, unknown>;
-
-const getNestedRecord = (value: unknown, key: string) => {
-  if (!value || typeof value !== "object" || !(key in value)) {
-    return undefined;
-  }
-
-  const nested = (value as DonorProfileRecord)[key];
-  return nested && typeof nested === "object"
-    ? (nested as DonorProfileRecord)
-    : undefined;
-};
-
-const getPositiveNumber = (value: unknown) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-};
-
-const getDonorIdFromProfile = (profile: unknown) => {
-  if (!profile || typeof profile !== "object") {
-    return undefined;
-  }
-
-  const record = profile as DonorProfileRecord;
-  const nestedDonor = getNestedRecord(record, "donor");
-
-  return (
-    getPositiveNumber(record.donorId) ??
-    getPositiveNumber(record.donorID) ??
-    getPositiveNumber(record.donorProfileId) ??
-    getPositiveNumber(record.id) ??
-    getPositiveNumber(nestedDonor?.donorId) ??
-    getPositiveNumber(nestedDonor?.donorID) ??
-    getPositiveNumber(nestedDonor?.id)
-  );
-};
 
 export default function ClientDonationListPage() {
   const { user } = useAuth();
@@ -56,36 +19,24 @@ export default function ClientDonationListPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [hospitalFilter, setHospitalFilter] = useState("");
 
-  const {
-    data: donors = [],
-    isPending: isDonorListPending,
-    isError: isDonorListError,
-    error: donorListError,
-  } = useQuery(getDonorsQueryOptions);
-
-  const donorId = useMemo(() => {
-    const directDonorId = getDonorIdFromProfile(user?.donor);
-    if (directDonorId != null) {
-      return directDonorId;
-    }
-
-    return donors.find((donor) => donor.userId === user?.userId)?.id;
-  }, [donors, user?.donor, user?.userId]);
+  // Without an approved donor profile the API returns 403, so skip the request and show the guard
+  const donorId = user?.donor?.id;
+  const canView =
+    donorId != null &&
+    user?.donor?.status !== "pending" &&
+    !!user?.permissions?.includes("donations.view");
 
   const {
     data: donations = [],
-    isPending: isDonationsPending,
-    isError: isDonationsError,
-    error: donationsError,
-  } = useQuery(getDonationsQueryOptions);
+    isPending,
+    isError,
+    error,
+  } = useQuery({ ...getDonationsQueryOptions, enabled: canView });
 
-  const clientDonations = useMemo(() => {
-    if (donorId == null) {
-      return [];
-    }
-
-    return donations.filter((donation) => donation.donorId === donorId);
-  }, [donations, donorId]);
+  const clientDonations = useMemo(
+    () => donations.filter((donation) => donation.donorId === donorId),
+    [donations, donorId],
+  );
 
   const filteredDonations = useMemo(() => {
     let items = clientDonations;
@@ -116,11 +67,8 @@ export default function ClientDonationListPage() {
     return items;
   }, [clientDonations, dateFilter, hospitalFilter, statusFilter]);
 
-  const loadError = donorListError ?? donationsError;
-  const donationLoadError =
-    loadError instanceof Error
-      ? loadError.message
-      : "Unable to load your donations.";
+  const isForbidden = isAxiosError(error) && error.response?.status === 403;
+  const showGuard = !canView || isForbidden;
 
   return (
     <Card className="px-8 py-6">
@@ -129,62 +77,66 @@ export default function ClientDonationListPage() {
           <Typography as="h1" variant="subtitle">
             My Donations
           </Typography>
-          <Button asChild>
-            <Link to="/client/donations/create">Create Donation</Link>
-          </Button>
+          {!showGuard && (
+            <Button asChild>
+              <Link to="/client/donations/create">Create Donation</Link>
+            </Button>
+          )}
         </div>
       </header>
 
-      <section>
-        <div className="mb-4 flex flex-wrap items-center gap-3">
-          <Input
-            type="date"
-            value={dateFilter}
-            onChange={(event) => setDateFilter(event.target.value)}
-            className="w-full max-w-xs"
-          />
-          <Input
-            type="text"
-            value={statusFilter}
-            onChange={(event) => setStatusFilter(event.target.value)}
-            placeholder="Filter by status"
-            className="w-full max-w-xs"
-          />
-          <Input
-            type="text"
-            value={hospitalFilter}
-            onChange={(event) => setHospitalFilter(event.target.value)}
-            placeholder="Filter by hospital"
-            className="w-full max-w-xs"
-          />
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              setDateFilter("");
-              setStatusFilter("");
-              setHospitalFilter("");
-            }}
-            disabled={!dateFilter && !statusFilter && !hospitalFilter}
-          >
-            Reset
-          </Button>
-        </div>
+      {showGuard ? (
+        <DonorRequiredCard />
+      ) : (
+        <section>
+          <div className="mb-4 flex flex-wrap items-center gap-3">
+            <Input
+              type="date"
+              value={dateFilter}
+              onChange={(event) => setDateFilter(event.target.value)}
+              className="w-full max-w-xs"
+            />
+            <Input
+              type="text"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              placeholder="Filter by status"
+              className="w-full max-w-xs"
+            />
+            <Input
+              type="text"
+              value={hospitalFilter}
+              onChange={(event) => setHospitalFilter(event.target.value)}
+              placeholder="Filter by hospital"
+              className="w-full max-w-xs"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setDateFilter("");
+                setStatusFilter("");
+                setHospitalFilter("");
+              }}
+              disabled={!dateFilter && !statusFilter && !hospitalFilter}
+            >
+              Reset
+            </Button>
+          </div>
 
-        {isDonorListError || isDonationsError ? (
-          <Typography className="text-destructive">
-            {donationLoadError}
-          </Typography>
-        ) : donorId == null && !isDonorListPending ? (
-          <DonorRequiredCard />
-        ) : (
-          <DonationDataTable
-            columns={clientDonationColumns}
-            data={filteredDonations}
-            isPending={isDonorListPending || isDonationsPending}
-          />
-        )}
-      </section>
+          {isError ? (
+            <Typography className="text-destructive">
+              {error instanceof Error ? error.message : "Unable to load your donations."}
+            </Typography>
+          ) : (
+            <DonationDataTable
+              columns={clientDonationColumns}
+              data={filteredDonations}
+              isPending={isPending}
+            />
+          )}
+        </section>
+      )}
     </Card>
   );
 }

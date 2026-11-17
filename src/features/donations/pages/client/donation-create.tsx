@@ -1,62 +1,14 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
 import useAuth from "@/context/auth/useAuth";
-import { getDonorsQueryOptions } from "@/features/donors/queries";
 import DonationForm from "@/features/donations/components/donation-form";
 import DonorRequiredCard from "@/features/donations/components/donor-required-card";
 
-type DonorProfileRecord = Record<string, unknown>;
-
-const getNestedRecord = (value: unknown, key: string) => {
-  if (!value || typeof value !== "object" || !(key in value)) {
-    return undefined;
-  }
-
-  const nested = (value as DonorProfileRecord)[key];
-  return nested && typeof nested === "object"
-    ? (nested as DonorProfileRecord)
-    : undefined;
-};
-
-const getPositiveNumber = (value: unknown) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : undefined;
-};
-
-const getDonorIdFromProfile = (profile: unknown) => {
-  if (!profile || typeof profile !== "object") {
-    return undefined;
-  }
-
-  const record = profile as DonorProfileRecord;
-  const nestedDonor = getNestedRecord(record, "donor");
-
-  return (
-    getPositiveNumber(record.donorId) ??
-    getPositiveNumber(record.donorID) ??
-    getPositiveNumber(record.donorProfileId) ??
-    getPositiveNumber(record.id) ??
-    getPositiveNumber(nestedDonor?.donorId) ??
-    getPositiveNumber(nestedDonor?.donorID) ??
-    getPositiveNumber(nestedDonor?.id)
-  );
-};
-
 export default function ClientDonationCreatePage() {
   const { user } = useAuth();
-  const { data: donors = [], isPending } = useQuery(getDonorsQueryOptions);
-
-  const donorId = useMemo(() => {
-    const directDonorId = getDonorIdFromProfile(user?.donor);
-    if (directDonorId != null) {
-      return directDonorId;
-    }
-
-    return donors.find((donor) => donor.userId === user?.userId)?.id;
-  }, [donors, user?.donor, user?.userId]);
+  const donorId = user?.donor?.id;
+  // Pending or missing donor profiles get the guard without any request
+  const canCreate = donorId != null && user?.donor?.status !== "pending";
 
   return (
     <Card className="px-8 py-6">
@@ -69,15 +21,10 @@ export default function ClientDonationCreatePage() {
         </Typography>
       </header>
       <section>
-        {isPending ? (
-          <Typography>Loading donor profile...</Typography>
-        ) : donorId == null ? (
-          <DonorRequiredCard />
+        {canCreate ? (
+          <DonationForm donorIdOverride={donorId} returnPath="/client/donations" />
         ) : (
-          <DonationForm
-            donorIdOverride={donorId}
-            returnPath="/client/donations"
-          />
+          <DonorRequiredCard />
         )}
       </section>
     </Card>
