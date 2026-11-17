@@ -14,7 +14,7 @@ import AnnouncementPage from "@/features/announcements/pages/website/announcemen
 import {
   bloodRequestAdminRoutes,
   bloodRequestUserRoutes,
-} from "@/features/requests/request.routes";
+} from "@/features/blood-requests/request.routes";
 import { userRoutes } from "@/features/users/user.routes";
 import { donorRoutes } from "./features/donors/donor.routes";
 import ClientDashboardLayout from "./features/client-dashboard/pages/client-dashboardLayout";
