@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
@@ -22,12 +22,8 @@ interface DashboardTopNavbarProps {
 export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
   const { user, logout } = useAuth();
   const isUserRole = user?.roleName === "user";
+  const isAdmin = user?.roleName === "admin" || user?.roleName === "staff";
   const [becomeOpen, setBecomeOpen] = useState(false);
-
-  const handleLogout = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    await logout();
-  };
 
   const profileRoute =
     user?.roleName === "admin" || user?.roleName === "staff"
@@ -61,31 +57,35 @@ export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
         </div>
 
         <div className="ml-auto flex items-center gap-3 sm:gap-4 lg:gap-5">
-          <Link
-            to="/"
-            className="hidden text-primary transition hover:opacity-80 md:block"
-          >
-            <Typography
-              as="span"
-              variant="body"
-              className="text-sm! font-medium"
-            >
-              Home
-            </Typography>
-          </Link>
+          {!isAdmin && (
+            <>
+              <Link
+                to="/"
+                className="hidden text-primary transition hover:opacity-80 md:block"
+              >
+                <Typography
+                  as="span"
+                  variant="body"
+                  className="text-sm! font-medium"
+                >
+                  Home
+                </Typography>
+              </Link>
 
-          <Link
-            to="/announcements"
-            className="hidden text-primary transition hover:opacity-80 md:block"
-          >
-            <Typography
-              as="span"
-              variant="body"
-              className="text-sm! font-medium"
-            >
-              Announcements
-            </Typography>
-          </Link>
+              <Link
+                to="/announcements"
+                className="hidden text-primary transition hover:opacity-80 md:block"
+              >
+                <Typography
+                  as="span"
+                  variant="body"
+                  className="text-sm! font-medium"
+                >
+                  Announcements
+                </Typography>
+              </Link>
+            </>
+          )}
 
           {user ? (
             <>
@@ -195,16 +195,17 @@ export function DashboardTopNavbar({ onMenuClick }: DashboardTopNavbarProps) {
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
-                    <form id="logout-form" onSubmit={handleLogout}>
+                    <DropdownMenuItem asChild>
                       <Button
-                        type="submit"
+                        type="button"
+                        onClick={() => logout()}
                         variant={"default"}
-                        className="w-full"
+                        className="w-full cursor-pointer"
                       >
                         <LogOut className="size-4" />
                         Log out
                       </Button>
-                    </form>
+                    </DropdownMenuItem>
                   </DropdownMenuGroup>
                 </DropdownMenuContent>
               </DropdownMenu>

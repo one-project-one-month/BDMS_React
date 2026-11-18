@@ -5,11 +5,16 @@ import type { ApiResponse } from "@/features/auth/auth.types";
 
 /** Get all hospitals */
 export const getHospitals = async (): Promise<Hospital[]> => {
-    const { data } = await api.get<ApiResponse<Hospital[]>>(HOSPITAL_ENDPOINTS.LIST);
+    try {
+        const { data } = await api.get<ApiResponse<Hospital[]>>(HOSPITAL_ENDPOINTS.LIST);
 
-    if (!data.isSuccess) throw new Error(data.message || `Failed to fetch ${HOSPITAL_ENDPOINTS.LIST}`);
+        if (!data.isSuccess) return [];
 
-    return data.data;
+        return data.data;
+    } catch (error) {
+        console.warn("Failed to fetch hospitals:", error);
+        return [];
+    }
 }
 
 /** Get a specific hospital by id */

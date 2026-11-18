@@ -16,20 +16,19 @@ import { isAxiosError } from "axios";
 const getLoginEndpoint = (mode: LoginPayload["mode"]) =>
   mode === "admin" ? AUTH_ENDPOINTS.ADMIN_LOGIN : AUTH_ENDPOINTS.USER_LOGIN;
 
-const getLogoutEndpoint = (mode: LoginPayload["mode"]) =>
-  mode === "admin" ? AUTH_ENDPOINTS.ADMIN_LOGOUT : AUTH_ENDPOINTS.USER_LOGOUT;
-
 const getProfileEndpoint = (mode: AuthMode) =>
   mode === "admin" ? AUTH_ENDPOINTS.ADMIN_PROFILE : AUTH_ENDPOINTS.USER_PROFILE;
 
 const MOCK_AUTH_STORAGE_KEY = "bdms.mock-auth-session";
 const MOCK_ADMIN_EMAIL = "admin@bdms.com";
 const MOCK_ADMIN_PASSWORD = "Admin@123";
+const MOCK_USER_EMAIL = "user@bdms.com";
+const MOCK_USER_PASSWORD = "User@123";
 
 const createMockAdminSession = (): AuthSession => ({
   userInfo: {
     userId: 1,
-    userName: "Admin BDMS",
+    userName: "System Admin",
     email: MOCK_ADMIN_EMAIL,
     roleName: "admin",
     permissions: [
@@ -41,6 +40,19 @@ const createMockAdminSession = (): AuthSession => ({
     donor: null,
   },
   token: "mock-admin-token",
+  expireToken: "",
+});
+
+const createMockUserSession = (): AuthSession => ({
+  userInfo: {
+    userId: 2,
+    userName: "Normal User",
+    email: MOCK_USER_EMAIL,
+    roleName: "user",
+    permissions: [],
+    donor: null,
+  },
+  token: "mock-user-token",
   expireToken: "",
 });
 
@@ -78,18 +90,26 @@ const clearMockSession = () => {
   window.localStorage.removeItem(MOCK_AUTH_STORAGE_KEY);
 };
 
-const tryMockAdminLogin = (payload: LoginPayload): AuthSession | null => {
+const tryMockLogin = (payload: LoginPayload): AuthSession | null => {
   if (
-    payload.mode !== "admin" ||
-    payload.email !== MOCK_ADMIN_EMAIL ||
-    payload.password !== MOCK_ADMIN_PASSWORD
+    payload.email === MOCK_ADMIN_EMAIL &&
+    payload.password === MOCK_ADMIN_PASSWORD
   ) {
-    return null;
+    const session = createMockAdminSession();
+    writeMockSession(session);
+    return session;
   }
 
-  const session = createMockAdminSession();
-  writeMockSession(session);
-  return session;
+  if (
+    payload.email === MOCK_USER_EMAIL &&
+    payload.password === MOCK_USER_PASSWORD
+  ) {
+    const session = createMockUserSession();
+    writeMockSession(session);
+    return session;
+  }
+
+  return null;
 };
 
 /** 
@@ -130,7 +150,7 @@ export const login = async (
   payload: LoginPayload,
 ): Promise<AuthSession> => {
   if (!HAS_API_BASE_URL) {
-    const mockSession = tryMockAdminLogin(payload);
+    const mockSession = tryMockLogin(payload);
     if (mockSession) {
       return mockSession;
     }
@@ -152,7 +172,7 @@ export const login = async (
     return data.data;
   } catch (error) {
     if (isAxiosError(error) && !error.response) {
-      const mockSession = tryMockAdminLogin(payload);
+      const mockSession = tryMockLogin(payload);
       if (mockSession) {
         return mockSession;
       }
@@ -162,20 +182,23 @@ export const login = async (
   }
 };
 
-/** Logout and invalidate the server session cookie. */
-export const logout = async (
-  mode: LoginPayload["mode"] = "user",
-): Promise<void> => {
-  if (readMockSession()) {
-    clearMockSession();
-    return;
-  }
+/** Logout and invalidate all server session cookies. */
+export const logout = async (): Promise<void> => {
+  clearMockSession();
 
   if (!HAS_API_BASE_URL) {
     return;
   }
 
-  await api.post(getLogoutEndpoint(mode));
+  // Ensure both admin and client auth cookies are deleted on backend
+  try {
+    await Promise.allSettled([
+      api.post(AUTH_ENDPOINTS.ADMIN_LOGOUT),
+      api.post(AUTH_ENDPOINTS.USER_LOGOUT),
+    ]);
+  } catch (e) {
+    console.warn("Logout request failed:", e);
+  }
 };
 
 /** Fetch the current session using the route-based /me. */
@@ -195,11 +218,6 @@ export const getCurrentSession = async (): Promise<AuthSession | null> => {
       return null;
     }
 
-    /**
-     * /me response တွင် token, expiredToken ပါမလာပါ။ ( TwT )
-     * therefore: check if there'is userInfo in the payload
-     * if so return the payload, otherwise return api response object
-    */
     const payload = data.data;
     if ("userInfo" in payload) {
       return payload;
@@ -211,11 +229,10 @@ export const getCurrentSession = async (): Promise<AuthSession | null> => {
       expireToken: "",
     };
   } catch (error) {
-    if (isAxiosError(error)) {
-      if (error.response?.status === 401 || !error.response) {
-        return readMockSession();
-      }
+    if (isAxiosError(error) && !error.response) {
+      // Network failure fallback only
+      return readMockSession();
     }
-    throw error;
+    return null;
   }
 };

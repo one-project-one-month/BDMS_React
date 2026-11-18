@@ -1,17 +1,8 @@
 import type { User } from "../../user.types";
 import type { ColumnDef } from "@tanstack/react-table";
-
-import { Edit, Eye, MoreHorizontal, Trash2 } from "lucide-react";
-
+import { Eye, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
@@ -68,44 +59,44 @@ export const buildColumns = ({
       cell: ({ row }) => {
         const user = row.original;
         return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <Link
-                  to={`${basePath}/${user.userId}`}
-                  className="flex items-center gap-2"
-                >
-                  <Eye className="size-4 shrink-0" />
-                  <span>View Detail</span>
-                </Link>
-              </DropdownMenuItem>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="size-8 text-muted-foreground hover:text-foreground"
+              title="View Detail"
+            >
+              <Link to={`${basePath}/${user.userId}`}>
+                <Eye className="size-4" />
+                <span className="sr-only">View Detail</span>
+              </Link>
+            </Button>
 
-              <DropdownMenuItem asChild className="cursor-pointer">
-                <Link
-                  to={`${basePath}/${user.userId}/edit`}
-                  className="flex items-center gap-2"
-                >
-                  <Edit className="size-4 shrink-0" />
-                  <span>Edit User</span>
-                </Link>
-              </DropdownMenuItem>
+            <Button
+              variant="ghost"
+              size="icon"
+              asChild
+              className="size-8 text-muted-foreground hover:text-foreground"
+              title="Edit User"
+            >
+              <Link to={`${basePath}/${user.userId}/edit`}>
+                <Pencil className="size-4" />
+                <span className="sr-only">Edit User</span>
+              </Link>
+            </Button>
 
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="flex items-center text-primary hover:text-secondary! hover:bg-dark-primary! transition-colors duration-200 cursor-pointer"
-                onClick={() => onRequestDelete(user)}
-              >
-                <Trash2 className="size-4 shrink-0 text-inherit" />
-                <span>Delete User</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+              onClick={() => onRequestDelete(user)}
+              title="Delete User"
+            >
+              <Trash2 className="size-4" />
+              <span className="sr-only">Delete User</span>
+            </Button>
+          </div>
         );
       },
     },

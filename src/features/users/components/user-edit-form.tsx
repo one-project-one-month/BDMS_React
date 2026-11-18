@@ -87,7 +87,7 @@ export default function UserEditForm({ id }: { id: number }) {
       toast.success("User record updated successfully.", {
         position: "bottom-right",
       });
-      navigate("/admin/users");
+      navigate("/admin/security/users");
     },
     onError: (error) => {
       console.error(error);
@@ -275,7 +275,7 @@ export default function UserEditForm({ id }: { id: number }) {
             {updateUserMutation.isPending ? "Updating..." : "Update"}
           </Button>
           <Button variant={"outline"} asChild>
-            <Link to={"/admin/users"}>Back to Users</Link>
+            <Link to={"/admin/security/users"}>Back to Users</Link>
           </Button>
         </div>
       </FieldGroup>

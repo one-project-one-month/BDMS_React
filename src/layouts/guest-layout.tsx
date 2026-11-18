@@ -1,4 +1,4 @@
-import { Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 /** edited by KK */
 import { Navbar } from "@/components/nav/nav-bar";
 import { Footer } from "@/components/footer/footer";
@@ -9,10 +9,16 @@ import BloodAvailability from '@/features/home/components/blood-availability';
 import HowItWorks from '@/features/home/components/how-it-work';
 
 export default function GuestLayout() {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
   const location = useLocation();
   const isHomePage = location.pathname === '/';
   const isAnnouncementPage = location.pathname === '/announcements';
+
+  // Admin and staff must only view the dashboard side, not the user portal
+  const isAdmin = user?.roleName === "admin" || user?.roleName === "staff";
+  if (isAuthenticated && isAdmin) {
+    return <Navigate to="/admin" replace />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col">

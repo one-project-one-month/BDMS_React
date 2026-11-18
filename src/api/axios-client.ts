@@ -49,18 +49,12 @@ api.interceptors.response.use(
 
             queryClient.setQueryData(authKeys.me(), null);
 
-            const roleName = session?.userInfo?.roleName;
-            const loginPath =
-                roleName === "admin" || roleName === "staff"
-                    ? "/admin/login"
-                    : "/login";
-
             const currentPath = window.location.pathname;
             if (
                 !currentPath.startsWith("/login") &&
                 !currentPath.startsWith("/admin/login")
             ) {
-                window.location.assign(loginPath);
+                window.location.assign("/login");
             }
         }
         return Promise.reject(error);

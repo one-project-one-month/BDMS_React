@@ -1,7 +1,7 @@
 import LoginForm from "../components/login-form";
 
 type LoginPageProps = {
-  mode: "admin" | "user";
+  mode?: "admin" | "user";
 };
 
 export default function LoginPage({ mode }: LoginPageProps) {

@@ -1,6 +1,9 @@
 import { queryOptions, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getPermissions,
+  createPermission,
+  updatePermission,
+  deletePermission,
   getRolePermissions,
   createRolePermission,
   deleteRolePermission,
@@ -20,6 +23,48 @@ export const permissionsQueryOptions = queryOptions<Permission[]>({
   queryKey: rolePermissionKeys.permissionsList(),
   queryFn: getPermissions,
 });
+
+/**
+ * Mutation: Create a permission
+ */
+export const useCreatePermissionMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<Permission, Error, { name: string }>({
+    mutationFn: createPermission,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: rolePermissionKeys.permissionsList() });
+    },
+  });
+};
+
+/**
+ * Mutation: Update a permission
+ */
+export const useUpdatePermissionMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<Permission, Error, { id: number; name: string }>({
+    mutationFn: updatePermission,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: rolePermissionKeys.permissionsList() });
+    },
+  });
+};
+
+/**
+ * Mutation: Delete a permission
+ */
+export const useDeletePermissionMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<boolean, Error, number>({
+    mutationFn: deletePermission,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: rolePermissionKeys.permissionsList() });
+    },
+  });
+};
 
 /**
  * Query options to fetch role-permission matrix mappings

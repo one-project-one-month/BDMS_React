@@ -24,13 +24,13 @@ export default function UserDetailPage() {
         <section className="space-y-4">
           <div>
             <Button asChild variant="outline">
-              <Link to="/admin/users">Back to User List</Link>
+              <Link to="/admin/security/users">Back to User List</Link>
             </Button>
           </div>
           <Typography>Invalid user id.</Typography>
           <div>
             <Button asChild variant="outline">
-              <Link to="/admin/users">Back to User List</Link>
+              <Link to="/admin/security/users">Back to User List</Link>
             </Button>
           </div>
         </section>

@@ -192,7 +192,8 @@ export const getHospitals = async (): Promise<Hospital[]> => {
     );
     return extractApiData(data);
   } catch (error) {
-    throw new Error(getApiErrorMessage(error, "Failed to fetch hospitals"));
+    console.warn("Failed to fetch hospitals, returning empty list:", error);
+    return [];
   }
 };
 
@@ -200,7 +201,7 @@ export const getBloodRequests = async (): Promise<BloodRequest[]> => {
   ensureApiBaseUrl();
 
   try {
-    const hospitals = await getHospitals();
+    const hospitals = await getHospitals().catch(() => []);
     const { data } = await api.get<ApiResponse<BloodRequest[]> | BloodRequest[]>(
       BLOOD_REQUEST_ENDPOINTS.LIST,
     );
@@ -220,7 +221,7 @@ export const getBloodRequest = async (id: number): Promise<BloodRequest> => {
   ensureApiBaseUrl();
 
   try {
-    const hospitals = await getHospitals();
+    const hospitals = await getHospitals().catch(() => []);
     const { data } = await api.get<ApiResponse<BloodRequest> | BloodRequest>(
       BLOOD_REQUEST_ENDPOINTS.GET_BY_ID(id),
     );
@@ -238,7 +239,7 @@ export const createBloodRequest = async (
   ensureApiBaseUrl();
 
   try {
-    const hospitals = await getHospitals();
+    const hospitals = await getHospitals().catch(() => []);
     const { data } = await api.post<ApiResponse<BloodRequest> | BloodRequest | null>(
       BLOOD_REQUEST_ENDPOINTS.CREATE,
       buildApiPayload(input),

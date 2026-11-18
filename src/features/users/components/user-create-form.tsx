@@ -87,7 +87,7 @@ export default function UserCreateForm() {
       toast.success("User record created successfully.", {
         position: "bottom-right",
       });
-      navigate("/admin/users");
+      navigate("/admin/security/users");
     },
     onError: (error) => {
       console.error(error);
@@ -287,7 +287,7 @@ export default function UserCreateForm() {
             {createUserMutation.isPending ? "Submitting..." : "Submit"}
           </Button>
           <Button variant={"outline"} asChild>
-            <Link to={"/admin/users"}>Back to Users</Link>
+            <Link to={"/admin/security/users"}>Back to Users</Link>
           </Button>
         </div>
       </FieldGroup>

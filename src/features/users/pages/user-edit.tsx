@@ -26,7 +26,7 @@ export default function UserEditPage() {
           <Typography>Invalid user id.</Typography>
           <div>
             <Button asChild variant="outline">
-              <Link to="/admin/users">Back to User List</Link>
+              <Link to="/admin/security/users">Back to User List</Link>
             </Button>
           </div>
         </section>

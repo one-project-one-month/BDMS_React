@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 
 import GuestLayout from "@/layouts/guest-layout";
 import DashboardLayout from "@/layouts/dashboard-layout";
@@ -34,8 +34,8 @@ import {
 } from "@/features/appointments/appointment.routes";
 import { bloodInventoryRoutes } from "@/features/blood-inventories/blood-inventory.routes";
 import AdminDashboardPage from "@/features/admin-dashboard/pages/admin-dashboard";
-import SettingsPage from "@/features/roles/pages/settings-page";
 import ProfilePage from "@/features/users/pages/profile-page";
+import { securityRoutes } from "@/features/security/security.routes";
 
 export const router = createBrowserRouter([
   {
@@ -126,13 +126,12 @@ export const router = createBrowserRouter([
           // },
           //certificates
           certificateRoutes,
+          // security
+          securityRoutes,
+          // settings — redirect to security/roles
           {
             path: "settings",
-            element: (
-              <ProtectedRoute allowed={["admin"]}>
-                <SettingsPage />
-              </ProtectedRoute>
-            ),
+            element: <Navigate to="/admin/security/roles" replace />,
           },
           // donations
           donationRoutes,

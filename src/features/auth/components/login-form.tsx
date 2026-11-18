@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Typography } from "@/components/ui/typography";
 import { Checkbox } from "@/components/ui/checkbox";
 import useAuth from "@/context/auth/useAuth";
+import type { AuthSession } from "../auth.types";
 
 const formSchema = z.object({
   email: z
@@ -34,10 +35,10 @@ const formSchema = z.object({
 });
 
 type LoginFormProps = {
-  mode: "admin" | "user";
+  mode?: "admin" | "user";
 };
 
-export default function LoginForm({ mode }: LoginFormProps) {
+export default function LoginForm({ mode = "user" }: LoginFormProps) {
   const { login } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,36 +57,58 @@ export default function LoginForm({ mode }: LoginFormProps) {
     try {
       setIsSubmitting(true);
 
-      const session = await login({
-        email: data.email,
-        password: data.password,
-        rememberMe: data.rememberMe ?? false,
-        mode,
-        /**
-         * * NOTE: backend ဆရာသမားများက Auth အတွက် api နှစ်ခု ထုတ်ပေးလိုက်သည့်အတွက်
-         * * admin auth နဲ့ user auth ဖြစ်စေရန် mode('user' | 'admin') သုံးထားပါသည်။
-         */
-      });
+      let session: AuthSession;
+      try {
+        session = await login({
+          email: data.email,
+          password: data.password,
+          rememberMe: data.rememberMe ?? false,
+          mode,
+        });
+      } catch (firstError) {
+        // Fallback to the other mode in case user entered admin or user credentials
+        const altMode = mode === "admin" ? "user" : "admin";
+        try {
+          session = await login({
+            email: data.email,
+            password: data.password,
+            rememberMe: data.rememberMe ?? false,
+            mode: altMode,
+          });
+        } catch {
+          throw firstError;
+        }
+      }
 
       form.reset();
 
-      const roleDestination =
+      const isAdmin =
         session.userInfo.roleName === "admin" ||
-        session.userInfo.roleName === "staff"
-          ? "/admin"
-          : "/client";
+        session.userInfo.roleName === "staff";
+
+      const roleDestination = isAdmin ? "/admin" : "/client";
 
       const fromState = location.state as { from?: Location } | null;
       const returnTo = fromState?.from?.pathname
         ? `${fromState.from.pathname}${fromState.from.search ?? ""}`
         : null;
 
-      navigate(returnTo ?? roleDestination);
+      // Admin users should only view dashboard side, never user portal
+      const destination =
+        isAdmin && (!returnTo || !returnTo.startsWith("/admin"))
+          ? "/admin"
+          : (!isAdmin && returnTo?.startsWith("/admin"))
+          ? "/client"
+          : returnTo ?? roleDestination;
+
+      navigate(destination, { replace: true });
     } catch (error) {
       console.error(error);
       const message = isAxiosError(error)
         ? ((error.response?.data as { message?: string })?.message ??
           "Invalid email or password")
+        : error instanceof Error
+        ? error.message
         : "Invalid email or password";
       form.setError("root", { message });
     } finally {
@@ -205,7 +228,7 @@ export default function LoginForm({ mode }: LoginFormProps) {
           </FieldGroup>
         </form>
       </CardContent>
-      <CardFooter className="flex flex-col gap-y-6">
+      <CardFooter className="flex flex-col gap-y-4">
         <Field orientation="horizontal">
           <Button
             type="submit"
@@ -243,6 +266,16 @@ export default function LoginForm({ mode }: LoginFormProps) {
             >
               <Link to="/register">Register</Link>
             </Button>
+          </div>
+        </Field>
+        <Field className="pt-1">
+          <div className="flex items-center justify-center">
+            <Link
+              to="/"
+              className="text-xs text-muted-foreground hover:text-primary underline text-center"
+            >
+              ← Return to User Portal Home
+            </Link>
           </div>
         </Field>
       </CardFooter>

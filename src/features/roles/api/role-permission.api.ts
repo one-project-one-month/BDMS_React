@@ -13,6 +13,35 @@ export const getPermissions = async (): Promise<Permission[]> => {
   return data.data;
 };
 
+/** Create a new permission */
+export const createPermission = async (payload: { name: string }): Promise<Permission> => {
+  const { data } = await api.post<ApiResponse<Permission>>(PERMISSION_ENDPOINTS.CREATE, payload);
+  if (!data.isSuccess) {
+    throw new Error(data.message || "Failed to create permission");
+  }
+  return data.data;
+};
+
+/** Update an existing permission */
+export const updatePermission = async (payload: { id: number; name: string }): Promise<Permission> => {
+  const { data } = await api.put<ApiResponse<Permission>>(PERMISSION_ENDPOINTS.UPDATE, payload);
+  if (!data.isSuccess) {
+    throw new Error(data.message || "Failed to update permission");
+  }
+  return data.data;
+};
+
+/** Delete a permission by id */
+export const deletePermission = async (id: number): Promise<boolean> => {
+  const { data } = await api.delete<ApiResponse<boolean>>(PERMISSION_ENDPOINTS.DELETE, {
+    data: { id },
+  });
+  if (!data.isSuccess) {
+    throw new Error(data.message || "Failed to delete permission");
+  }
+  return true;
+};
+
 /** Get role permission mappings */
 export const getRolePermissions = async (): Promise<RolePermission[]> => {
   const { data } = await api.get<ApiResponse<RolePermission[]>>(ROLE_PERMISSION_ENDPOINTS.LIST);

@@ -15,7 +15,7 @@ export default function UserDetailTable({ id }: { id: number }) {
     <>
       <div>
         <Button asChild variant={"outline"}>
-          <Link to={"/admin/users"}>Back to User List</Link>
+          <Link to={"/admin/security/users"}>Back to User List</Link>
         </Button>
       </div>
       <div className="w-full overflow-x-auto rounded-[10px] border">
@@ -56,7 +56,7 @@ export default function UserDetailTable({ id }: { id: number }) {
       </div>
       <div>
         <Button asChild variant={"outline"}>
-          <Link to={"/admin/users"}>Back to User List</Link>
+          <Link to={"/admin/security/users"}>Back to User List</Link>
         </Button>
       </div>
     </>

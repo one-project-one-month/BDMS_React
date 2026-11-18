@@ -40,7 +40,7 @@ export const loginMutationOptions = mutationOptions<
 export const logoutMutationOptions = mutationOptions<
     void,
     unknown,
-    Parameters<typeof logout>[0]
+    void
 >({
-    mutationFn: logout,
+    mutationFn: () => logout(),
 });

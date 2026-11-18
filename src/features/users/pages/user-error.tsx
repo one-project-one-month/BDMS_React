@@ -20,7 +20,7 @@ export default function UserErrorPage() {
         <section className="space-y-4">
           <Typography>This user does not exist.</Typography>
           <Button asChild variant="outline">
-            <Link to="/admin/users">Back to User List</Link>
+            <Link to="/admin/security/users">Back to User List</Link>
           </Button>
         </section>
       </Card>

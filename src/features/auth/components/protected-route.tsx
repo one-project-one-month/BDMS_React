@@ -47,10 +47,7 @@ export default function ProtectedRoute({
   }
 
   if (!isAuthenticated) {
-    const requiresAdmin =
-      allowed.includes("admin") || allowed.includes("staff");
-    const loginPath = requiresAdmin ? "/admin/login" : "/login";
-    return <Navigate to={loginPath} state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (user?.roleName && !allowed.includes(user.roleName)) {

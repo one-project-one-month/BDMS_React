@@ -1,4 +1,3 @@
-import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
@@ -38,11 +37,6 @@ const guestItems: NavItem[] = [
 
 export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
   const { user, logout } = useAuth();
-
-  const handleLogout = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    logout();
-  };
 
   const profileRoute =
     user?.roleName === "admin" || user?.roleName === "staff"
@@ -365,16 +359,17 @@ export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
                       </DropdownMenuGroup>
                       <DropdownMenuSeparator />
                       <DropdownMenuGroup>
-                        <form id="logout-form" onSubmit={handleLogout}>
+                        <DropdownMenuItem asChild>
                           <Button
-                            type="submit"
+                            type="button"
+                            onClick={() => logout()}
                             variant={"default"}
-                            className="w-full"
+                            className="w-full cursor-pointer"
                           >
                             <LogOut className="size-4" />
                             Log out
                           </Button>
-                        </form>
+                        </DropdownMenuItem>
                       </DropdownMenuGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -625,16 +620,17 @@ export function Navbar({ isLoggedIn = false, activePage }: NavbarProps) {
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                          <form id="logout-form" onSubmit={handleLogout}>
+                          <DropdownMenuItem asChild>
                             <Button
-                              type="submit"
+                              type="button"
+                              onClick={() => logout()}
                               variant={"default"}
-                              className="w-full"
+                              className="w-full cursor-pointer"
                             >
                               <LogOut className="size-4" />
                               Log out
                             </Button>
-                          </form>
+                          </DropdownMenuItem>
                         </DropdownMenuGroup>
                       </DropdownMenuContent>
                     </DropdownMenu>

@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet } from "react-router-dom";
 import useAuth from "@/context/auth/useAuth";
 import Container from "@/components/container";
 import Section from "@/components/section";
@@ -22,15 +22,17 @@ export default function AuthLayout() {
     <Container>
       <Section className="flex flex-col min-h-screen items-center justify-center">
         <div className="mb-4">
-          <img
-            src="/images/logo.png"
-            alt="blood-life-logo"
-            fetchPriority="high"
-            loading="eager"
-            width={225}
-            height={55}
-            title="blood life logo"
-          />
+          <Link to="/" title="Return to Home">
+            <img
+              src="/images/logo.png"
+              alt="blood-life-logo"
+              fetchPriority="high"
+              loading="eager"
+              width={225}
+              height={55}
+              title="blood life logo"
+            />
+          </Link>
         </div>
         <Outlet />
       </Section>

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Droplet, RefreshCw, Plus, MinusCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 import { Card } from "@/components/ui/card";
 import { Typography } from "@/components/ui/typography";
@@ -177,16 +178,30 @@ export default function BloodInventoryListPage() {
       </header>
 
       {/* Aggregate Stock Summary Grid */}
-      <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+      <section className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4">
         {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map((group) => {
           const matchingItem = availableStock.find((s) => s.bloodGroup === group);
           const count = matchingItem ? matchingItem.availableCount : 0;
           return (
-            <Card key={group} className="relative overflow-hidden p-4 border-l-4 border-l-red-500 flex flex-col justify-between h-24 shadow-sm hover:shadow-md transition-shadow">
-              <span className="text-sm font-bold text-muted-foreground uppercase">{group}</span>
-              <div className="flex items-baseline justify-between mt-2">
-                <span className="text-3xl font-extrabold tracking-tight text-foreground">{count}</span>
-                <Droplet className={`size-5 ${count > 0 ? "text-red-500 fill-red-500 animate-pulse" : "text-muted-foreground/30"}`} />
+            <Card
+              key={group}
+              className="relative p-3.5 sm:p-4 gap-0 border-l-4 border-l-red-500 flex flex-col justify-between min-h-24 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <span className="text-xs sm:text-sm font-bold text-muted-foreground uppercase tracking-wider">
+                {group}
+              </span>
+              <div className="flex items-end justify-between mt-3">
+                <span className="text-2xl sm:text-3xl font-extrabold tracking-tight leading-none text-foreground">
+                  {count}
+                </span>
+                <Droplet
+                  className={cn(
+                    "size-5 shrink-0",
+                    count > 0
+                      ? "text-red-500 fill-red-500 animate-pulse"
+                      : "text-muted-foreground/30",
+                  )}
+                />
               </div>
             </Card>
           );

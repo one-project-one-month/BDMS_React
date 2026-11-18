@@ -46,13 +46,18 @@ export default function AuthProvider({ children }: PropsWithChildren) {
   );
 
   const logout = useCallback(async () => {
-    const mode =
-      session?.userInfo.roleName === "admin" ||
-      session?.userInfo.roleName === "staff"
-        ? "admin"
-        : "user";
-    await logoutMutation.mutateAsync(mode);
-  }, [logoutMutation, session?.userInfo.roleName]);
+    try {
+      await logoutMutation.mutateAsync();
+    } catch (error) {
+      console.warn("Logout error:", error);
+    } finally {
+      queryClient.clear();
+      queryClient.setQueryData(authKeys.me(), null);
+      delete api.defaults.headers.common.Authorization;
+      // Redirect to login page on logout
+      window.location.replace("/login");
+    }
+  }, [logoutMutation, queryClient]);
 
   const user = session?.userInfo ?? null;
 
